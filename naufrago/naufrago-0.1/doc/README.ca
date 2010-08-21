@@ -1,0 +1,140 @@
+
+==========
+Contingut
+==========
+
+1. Introducció.
+2. Característiques i llista de desitjos.
+3. Requisits (mínims).
+4. Per què reinventar la roda?
+5. Instalació i ús.
+6. Problemes / Soport.
+7. Llicència.
+8. Autors.
+9. Agraïments.
+
+================
+1. Introducció
+================
+
+Náufrago! és un lector simple de RSS que permet veure noticias amb
+les seves imatges tot i no mantenir-se a flot, o dit d'altre manera,
+sense estar online. Això és perquè hi ha gent, com l'autor, que no 
+sempre té una conexió a mà i, tot i això, vol poder llegir articles/
+entrades/posts amb les imatges que puguin acompanyar-los. Aquest és
+el leit motiv de l'aplicació.
+
+====================
+2. Característiques
+====================
+
+Les destacades serien:
+
+ - Categotirzació de feeds d'un únic nivell en arbre.
+ - Organització de feeds per categories mitjançant drag & drop.
+ - Lectura online/offline de feeds (incloent imatges).
+ - Mode pantalla complerta per a la lectura de feeds.
+ - Marcatge de feeds com importants/permanents /gravació).
+ - Inclusió de favicons.
+ - Iconització de l'aplicació en la Tray.
+ - Importació/exportació de feeds en format OPML.
+ - Multilidioma (de moment, en Anglès, Català i Castellà).
+
+Lista de desitjos:
+
+ - Carpeta d'importants.
+ - Traduccions a més idiomes.
+ - Més threads.
+ - Buscador de termes.
+
+======================
+3. Requisits (mínims)
+======================
+
+A nivell de software:
+
+ - GNU/Linux (Squeeze/Testing o superior per al paquet Debian).
+ - Python 2.5 o superior.
+ - python-gtk2 (bindings de gtk2 per a Python).
+ - python-pysqlite2 (bindings de sqlite3 per a Python).
+ - python-feedparser (bindings de feedparser per a Python).
+ - python-webkit (bindings de Webkit per a Python).
+
+A nivell de hardware, qualsevol cosa que pugui moure-ho. L'autor 
+ha realitzat el desenvolupament i l'utilitza a diari des d'un
+Netbook amb un Intel Atom a 1,6Ghz amd 1GB de RAM.
+
+================================
+4. Per què reinventar la roda?
+================================
+
+Si és un client clavat (amb excepcions) a Liferea (en el que al disseny
+es refereix), per què reinventar la roda? Per molts motius. Principalment
+perquè l'autor no va saber trobar un client de RSS que funcionés offline
+amb imatges incloses, els desenvolupadors de Liferea no admeten feature
+requests (algo totalment respectable) i mirar codi font aliè requereix 
+doble esforç que crear-ne un propi (atenció, opinió personal!). Reinventant
+la roda també s'apren, i a més podem sorgir millores o noves formes de fer
+les coses que d'altre manera no haguèssin sorgit.
+
+====================
+5. Instalació i ús
+====================
+
+Si utilitzes el paquet de Debian, probablement ja el tinguis instalat
+i amb les dependències resoltes. Per a iniciar l'aplicació, existeix una
+icona al menú Internet de GNOME. En tot cas, per a utilitzar l'aplicació
+necessites Debian Squeeze/Testing o superior (al menys fins que Squeeze passi
+a ser la següent Stable ;)
+
+Si utilitzes el tarball, havent-ho desempaquetat e instal-lat les dependències
+esmentades en l'anterior punt, nomès queda executar -preferiblement- el
+script "naufrago_launcher.sh". Tots els arxius i directoris que necessiti
+l'aplicació seran creats al directori on s'executi. Opcionalment, si vols
+utilitzar una icona/llançador per a iniciar l'aplicació, pots utilitzar el
+proporcionat (naufrago.desktop) canviant la ruta cap al script d'inici
+"naufrago_launcher.sh" i ubicant-lo al directori corresponent (per a Debian
+amb GNOME, aquesta ubicació és /usr/share/applications/).
+
+=======================
+6. Problemes / Suport
+=======================
+
+L'aplicació intenta de bon grat portar a terme el seu comès, però molt
+probablement no està exenta d'errors. En cas de que succeeixin, pots
+contactarme detallant el problema del mode més precís possile i intentaré
+veure què succeeix per a corregir-ho.
+
+=============
+7. Llicència
+=============
+
+Aquesta aplicació s'ampara en la GPLv3. Deuríes haver rebut una copia amb
+la mateixa. De no ser així o de detectar cap infracció al termes de la
+mateixa, si us plau, posat en contacte amb l'autor o la FSF. Està en joc
+la teva llibertat!
+
+===========
+8. Autors
+===========
+
+De moment, nomès n'hi ha un: Jordi Oliveras ( worbynet at gmail dot com ).
+
+===============
+9. Agraïments
+===============
+
+Dec agraïr als que m'han aguantat durant el desenvolupament,
+especialment a la meva parella, i a més:
+
+- Canals Python de irc.freenode.net & irc.hispano.org.
+- El meravellòs svg utilitzat com a logo de GMcGlinn
+  (http://www.openclipart.org/user-detail/GMcGlinn).
+- El necessari svg de RSS de SRD
+  (http://www.openclipart.org/user-detail/SRD).
+- Doug Quale ( quale1 at charter dot net ) & 
+  Walter Anger ( WalterAnger at aon dot at ).
+  per l'excel-lent material DnD.
+- L'estupendu tutorial de pygtk
+  (http://www.pygtk.org/pygtk2tutorial/index.html).
+

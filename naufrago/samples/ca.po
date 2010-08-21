@@ -1,0 +1,21 @@
+# Catalan translations for PACKAGE package
+# Traduccions al català del paquet «PACKAGE».
+# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# jors <worbynet@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-07-04 20:49+0200\n"
+"PO-Revision-Date: 2010-07-04 20:52+0200\n"
+"Last-Translator: jors <worbynet@gmail.com>\n"
+"Language-Team: Catalan <ca@dodds.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: translate2.py:21
+msgid "You must choose a category folder or feed to edit!"
+msgstr "Tens que escollir una carpeta de categoría o un feed a editar!"

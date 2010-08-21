@@ -1,0 +1,19 @@
+TREE:
+
+# Campos: nombre, icono, id_categoria_o_feed, font-style
+self.treestore = gtk.TreeStore(str, str, int, str)
+
+P.ej.:
+dad = self.treestore.append(None, [row[1], gtk.STOCK_OPEN, row[0], 'normal'])
+son = self.treestore.append(dad, [row2[1], gtk.STOCK_NEW, row2[0], 'bold'])
+
+-----
+
+LIST:
+
+# Campos: fecha, flag_importante, titulo, font-style, id_entry/articulo
+self.liststore = gtk.ListStore(str, bool, str, str, int)
+
+P.ej.:
+self.liststore.append([fecha, importante, row[1], font_style, row[0]])
+

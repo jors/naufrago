@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+try:
+    import pygtk; pygtk.require("2.0")
+except:
+    pass
+import gtk
+
+
+def treeview_expand_to_path(treeview, path):
+    """Expand row at path, expanding any ancestors as needed.
+
+    This function is provided by gtk+ >=2.2, but it is not yet wrapped
+    by pygtk 2.0.0."""
+    for i in range(len(path)):
+        treeview.expand_row(path[:i+1], open_all=False)
+
+def treeview_copy_row(treeview, model, source, target, drop_position):
+    """Copy tree model rows from treeiter source into, before or after treeiter target.
+
+    All children of the source row are also copied and the
+    expanded/collapsed status of each row is maintained."""
+
+    source_row = model[source]
+    if drop_position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+        new = model.prepend(parent=target, row=source_row)
+    elif drop_position == gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
+        new = model.append(parent=target, row=source_row)
+    elif drop_position == gtk.TREE_VIEW_DROP_BEFORE:
+        new = model.insert_before(
+            parent=None, sibling=target, row=source_row)
+    elif drop_position == gtk.TREE_VIEW_DROP_AFTER:
+        new = model.insert_after(
+            parent=None, sibling=target, row=source_row)
+
+    # Copy any children of the source row.
+    for n in range(model.iter_n_children(source)):
+        child = model.iter_nth_child(source, n)
+        treeview_copy_row(treeview, model, child, new,
+                          gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+
+    # If the source row is expanded, expand the newly copied row
+    # also.  We must add at least one child before we can expand,
+    # so we expand here after the children have been copied.
+    source_is_expanded = treeview.row_expanded(model.get_path(source))
+    if source_is_expanded:
+        treeview_expand_to_path(treeview, model.get_path(new))
+
+def treeview_on_drag_data_received(treeview, drag_context, x, y,
+                                   selection_data, info, eventtime):
+    """Handler for 'drag-data-received' that moves dropped TreeView rows.  """
+    target_path, drop_position = treeview.get_dest_row_at_pos(x, y)
+    model, source = treeview.get_selection().get_selected()
+    target = model.get_iter(target_path)
+    if not model.is_ancestor(source, target):
+        treeview_copy_row(treeview, model, source, target, drop_position)
+        # If the drop has created a new child (drop into), expand
+        # the parent so the user can see the newly copied row.
+        if (drop_position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE
+            or drop_position == gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+            treeview.expand_row(target_path, open_all=False)
+        # Finish the drag and have gtk+ delete the drag source rows.
+        drag_context.finish(success=True, del_=True, time=eventtime)
+    else:
+        drag_context.finish(success=False, del_=False, time=eventtime)
+
+def treeview_setup_dnd(treeview):
+    """Setup a treeview to move rows using drag and drop.  """
+    target_entries = [('example', gtk.TARGET_SAME_WIDGET, 0)]
+    treeview.enable_model_drag_source(
+        gtk.gdk.BUTTON1_MASK, target_entries, gtk.gdk.ACTION_MOVE)
+    treeview.enable_model_drag_dest(target_entries, gtk.gdk.ACTION_MOVE)
+    treeview.connect('drag-data-received', treeview_on_drag_data_received)
+
+
+if __name__ == '__main__':
+    window = gtk.Window()
+    window.connect("delete_event", gtk.mainquit)
+    window.set_default_size(250, 350)
+
+    scrolledwin = gtk.ScrolledWindow()
+    scrolledwin.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    window.add(scrolledwin)
+
+    data = [[0, "zero"], [1, "one"], [2, "two"], [3, "three"],
+            [4, "four"], [5, "five"], [6, "six"], [7, "seven"],]
+
+    model = gtk.TreeStore(int, str)
+    for item in data:
+        model.append(parent=None, row=item)
+
+    treeview = gtk.TreeView(model)
+    scrolledwin.add(treeview)
+
+    cell = gtk.CellRendererText()
+    tv_insert = treeview.insert_column_with_attributes
+    tv_insert(-1, 'Integer', cell, text=0)
+    tv_insert(-1, 'String', cell, text=1)
+
+    treeview_setup_dnd(treeview)
+
+    window.show_all()
+    gtk.main()
+

@@ -1,0 +1,23 @@
+Naufrago! 0.2 roadmap
+---------------------
+
+- Graphical fix: empty space between the main window and the menubar (thanks to Icaria, through GnomeFiles).
+- Render fix: strip html and newline tags in entry titles (thanks to Vicente Ruiz, through SourceForge).
+- Date parsing entries fix (thanks to Vicente Ruiz, through SourceForge).
+- Possible fix in font rendering. Strings converted to utf8 to avoid some PangoWarnings.
+- Other fixes to issues it might appear.
+- Better conformity with Freedesktop.org (adopted XDG Base Directory Specification, now app folder is located at $HOME/.config/naufrago).
+- Option to change Toolbar style and even hide it (accepted feature request from Icaria, through GnomeFiles).
+- Option to enable/disable StatusIcon (accepted feature request from Icaria, through GnomeFiles).
+- 'Importants' and 'Non read' folders.
+- Option to show a notification message when new entries.
+- Option to show/hide read entries (accepted feature request from Tom Cowel, through OMG Ubuntu).
+- Feed update status indicator through favicon change (accepted feature request from Vicente Ruiz, though SourceForge).
+- Term search.
+- Translations to Polish (thanks Michał Ćwikliński) and Italian (thanks kir).
+
+There has been a feature request about doing some kind of categorization of the entries marked as Important, but I'm still brainstorming about it's implementation or not, so still in doubt.
+
+I'm seeking guidance and/or help in bug hunting due to issues that I could not spot as long as they don't seem to be associated with a Python exception. A hand with threads in Gtk is also welcome!
+
+PS. I'll be on holidays for some weeks, so if I don't answer, don't get me wrong :)

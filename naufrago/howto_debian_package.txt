@@ -1,0 +1,6 @@
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb/debian# find . ! -type d -print0 | xargs -0 md5sum
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb/debian# vi DEBIAN/md5sum
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb/debian# cd ..
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb# chown -R root.root *
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb# dpkg-deb -b debian naufrago-0.1-1_all.deb
+mini:/home/jors/sources/proyectos/naufrago/naufrago-rss-reader-deb# lintian -i naufrago-0.1-1_all.deb

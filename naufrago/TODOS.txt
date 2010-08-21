@@ -1,0 +1,136 @@
+-------------------------
+Por orden de importancia:
+-------------------------
+
+En el menubar:
+- Editar -> Editar y Preferencias (en lugar de Herramientas -> Opciones). DONE
+- Diálogos de Editar: para Categorias y Feeds. DONE
+- Diálogo de Preferencias:
+  - nº de entradas a guardar por feed. DONE
+  - frecuencia de actualización. DONE
+  - iniciar con árbol desplegado. DONE
+  - iniciar en la tray. DONE
+  - guardar tamaño de la ventana del usuario (default). DONE
+  - último feed seleccionado (default). DISCARDED
+- Importar/exportar formato OPML. DONE
+
+En el tree:
+- EVITAR que se puedan copiar feeds en el rootnode!!! DONE
+- Actualizar la BD con los cambios de categorias de los nodos (con DnD). DONE
+- Borrar un nodo padre con hijos, UPDATE de la bd. ¡Advertir en el diálogo! DONE
+- Crear feeds en la categoría seleccionada, y si no la hay, en General. DONE
+- Menú del botón derecho en el tree. DONE
+- Tecla <Supr> para borrado. DONE
+- Verificación de la URL del feed (al menos que parezca un feed).
+- Feedparser: parsear y obtener el feed, guardar los campos/imagenes en BD. DONE
+- ScrolledWindow. DONE
+- Double clicking expands/collapse rows. DONE
+- Opción del menú de actualizar sólo _ese_ RSS o todos. DONE
+- Expand parent when adding a feed. DONE
+- Borrar los artículos asociados a un feed/categoria eliminado/a!!! DONE
+- Cantidad de entries no leídas por feed (en el tree). Puntos a tener en cuenta:
+  * Renombre de feeds. DONE
+  * Actualización single/all. Single feed/category DONE, all DONE (gui medio pajarita, valorar usar más hilos)
+  * Marcado/desmarcado leídos/no-leídos de selección individual (clic normal). DONE
+  * Marcado/desmarcado leídos/no-leídos individual/en masa (menú botón derecho). DONE
+  De este punto, faltaría marcar en negrita cuando los no-leídos > 0. DONE
+- Cambios de icono de los feeds:
+  * El por defecto, el icono naranja de rss. DONE
+  * El favicon del feed, caso que lo haya. DONE
+- Crear una nueva columna para el recuento de no-leídos.
+  Descartado dado que esta no es la solución al problema. Evitar ciertos caracteres. DONE
+
+En la tabla:
+- Mostrar las entradas (nuevas en negrita, visitadas sin) y plasmarlo en BD. DONE (sin pango)
+- Formateo de la fecha (epoch a datetime) y el 'Hoy'. DONE
+- Ordenación por fecha o por entry. DONE
+- Marcación de "importantes" (toggle con salvado en BD). DONE
+- ScrolledWindow. DONE
+- Menú botón derecho (toggle leído/no leído, marcar todos como leídos). DONE
+- Nuevas entries no se actualizan en el nodo-feed seleccionado. DONE
+- Búsqueda por palabra en entries. WISHLIST
+- El desplazamiento por las entries con el ratón no mueve el scroll. DONE
+
+En el navegador:
+- Renderizar/mostrar la entrada seleccionada. DONE
+- Open links en el navegador del usuario o el integrado? INTEGRADO
+- 'Blanquear' browser cuando no haya entry seleccionada. DONE
+- Refrescar o volver a la página "principal" mostrando algo que no sea error. DONE
+- Título para el entry seleccionado (clicable y que abra el sensible-browser). DONE
+- Browser windowed/full screen. Poner icono (gtk.STOCK_ZOOM_IN) para ello. DONE
+- Abrir nuevos enlaces en el sensible-browser. DONE
+
+En general:
+- Guardar tamaño y posición de la ventana (http://faq.pygtk.org/index.py?req=show&file=faq10.003.htp).
+  Para esto, podríamos guardar en la BD datos de configuración de la propia app, como: Tamaño y posición
+  de la ventana, nº de entries a guardar, frecuencia de actualización. DONE
+- ¿Guardar el tamaño de los widgets? No, seteados tamaños mínimos por defecto. DONE
+- Minimizar en la Tray (tray icon). DONE
+- Icono de ventana de la aplicación. DONE
+- Parpadeo del TrayIcon cuando se hayan obtenido nuevos feeds. DONE
+- Opción 'Actualizar' (todos) y 'Salir' en la tray. DONE
+- Opción temporizada de obtener feeds cada X horas. DONE
+- Reducir tamaño logo. DONE
+- Un thread/proceso que haga el get_feed() por su lado. DONE
+- Trim de los entries de cada feed 'sobrantes' durante actualizaciones. DONE
+- Trim de los entries de cada feed 'sobrantes' si por configuración se decrementa. DONE
+- Una StatusBar en el inferior (para ir informando de las actividades de la app). DONE
+
+- Coger el nombre del RSS automáticamente. DONE
+- Una IconBar en la parte superior? (Nueva categoria, nuevo feed y actualizar todo). DONE
+- Guardar los tamaños de scrolledwindow1 y 2. DONE
+- BUG. A veces, el título de una entry queda fijo y no cambia al cambiar de entry!
+  Solventado, era un problema con las htmlentities. DONE
+- Conexión persistente a DB de principio a fin de la aplicación.
+  En principio no se observan problemas de concurrencia en escritura a BD. DONE
+- Actualizar todo al inicio (opción en las 'Preferencias'). DONE
+- Cambiar el icono de 'Nuevo feed' por el de RSS. DONE
+- Tema del procesado, descargado y almacenamiento de las imágenes.
+  * purge_entries() debe borrar también las imagenes sobrantes. DONE
+  * list_row_selection() debe comprobar si self.offline_mode == True, en cuyo caso debe sustituir el contenido
+    de los tags img por la ruta local hacia las imágenes de la entry seleccionada. DONE
+  * preferences() debe incluir la opción y hacer el toggle. DONE
+  * save_config() y get_config() deben tenerlo en cuenta. DONE
+  * get_feed() debe:
+    - borrar. DONE
+    - obtener imagen si es preciso (offline_mode == True). DONE
+  * delete_category() debe borrar las imagenes (tabla imagen y filesystem).
+  * delete_feed() debe borrar las imagenes (tabla imagen y filesystem).
+- Cuando se borra un feed (o varios, p.ej. categoria), debe eliminarse su favicon. DONE
+- El StatusBar jode la marrana (warnings) e incluso provoca violaciones de segmento.
+  Sustituirlo por una Label o similar. DONE
+- Desactivación opciones de los menús cuando se está haciendo una actualización. DONE
+- Paquete .deb totalmente "legal" (dependencias, desinstalación...). DONE
+- BUG: Actualizar desde una Carpeta, pone el nombre de la carpeta a cada feed. DONE
+- BUG: En algunos feeds con todo marcado como leido, al actualizar, la última entry
+  vuelve a marcarse como no leída (p.ej. Badopi). DONE
+- BUG: Al añadir un feed, no se muestra el favicon correctamente. DONE
+- Mostrar URL en la barra inferior al hacer hover en el headerlink (titulo de la entry). DONE
+- BUG: Los títulos con caracteres como & no son mostrados (se muestra el anterior, si
+  lo hubiere, o ninguno). DONE
+- BUG: algunos feeds sólo tienen una entrada (packetstorm o mozillazine). DONE
+- BUG: al hacer un shrink con purge_entries(), actualizar los no-leidos. DONE
+- Añadir como valid_links todos los # de puf.html. DONE
+- Traducir a algunos idiomas (Catala, Castellano y Ingles). DONE
+
+KNOWN ISSUES:
+- Cuando se estan recuperando feeds, al mover la ventana, tras de/iconificarla, no
+  guarda su posición.
+- Algunas veces webkit se queda pájaro y no abre enlaces.
+
+BUGS:
+- Actualizar el diccionario de iteradores al añadir y/o borrar feed y/o categoria!!! DONE
+  (Funciones afectadas: add_feed, add_category, delete_feed, delete_category)
+- Cuando se añade/borra un nuevo feed/categoría, recalcular los no-leídos.
+
+WISHLIST:
+- Poder cambiar el estilo de la toolbar o esconderla. DONE
+- Poder habilitar/deshabilitar el statusicon. DONE
+- Carpeta de importantes. DONE
+- Carpeta de no leídos. DONE
+- Tooltip/notificación de entries nuevas (meterlo en Preferencias). DONE
+- Esconder entries leidas (meterlo en Preferencias). DONE
+- Buscador de términos.
+- Traducciones a más idiomas (Polish, por Michal; italiano, por kir).
+- Más threads.
+

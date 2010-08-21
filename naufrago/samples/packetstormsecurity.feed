@@ -1,0 +1,138 @@
+Feed title: Packet Storm Security Headlines
+Link: http://packetstormsecurity.org/
+
+Searching... 12 entries found:
+
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?041eaa4d3678a124bb5dade69b1622c1', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Hackers Target Microsoft Windows XP Support System', 'updated': u'2010-07-01', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Hackers Target Microsoft Windows XP Support System', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?041eaa4d3678a124bb5dade69b1622c1'}
+
+Entry title: Hackers Target Microsoft Windows XP Support System
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?041eaa4d3678a124bb5dade69b1622c1
+Entry description: 
+Entry date: 2010-07-01
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?74d058fe8fd31a861c952d8d990f299f', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Regional Banking Trojans Sneak Past Security Defences', 'updated': u'2010-07-01', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Regional Banking Trojans Sneak Past Security Defences', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?74d058fe8fd31a861c952d8d990f299f'}
+
+Entry title: Regional Banking Trojans Sneak Past Security Defences
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?74d058fe8fd31a861c952d8d990f299f
+Entry description: 
+Entry date: 2010-07-01
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?89580c267e3f14de55e0f4bec07ad64d', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Experts - Android, iPhone Security Different But Matched', 'updated': u'2010-07-01', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Experts - Android, iPhone Security Different But Matched', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?89580c267e3f14de55e0f4bec07ad64d'}
+
+Entry title: Experts - Android, iPhone Security Different But Matched
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?89580c267e3f14de55e0f4bec07ad64d
+Entry description: 
+Entry date: 2010-07-01
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?e8fb230c36d9cab30abb4553e7897e53', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Hackers Attack 200 Web Sites, Cripple 150', 'updated': u'2010-07-01', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Hackers Attack 200 Web Sites, Cripple 150', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?e8fb230c36d9cab30abb4553e7897e53'}
+
+Entry title: Hackers Attack 200 Web Sites, Cripple 150
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?e8fb230c36d9cab30abb4553e7897e53
+Entry description: 
+Entry date: 2010-07-01
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=7, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=182, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?9c60142e83f3b330f24e29410b2af28c', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Court Questions Net Pirate Hunt', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Court Questions Net Pirate Hunt', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?9c60142e83f3b330f24e29410b2af28c'}
+
+Entry title: Court Questions Net Pirate Hunt
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?9c60142e83f3b330f24e29410b2af28c
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?561e79440b216b9a803d581e9ac9bb78', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Microsoft Sees Spike In Attacks Targeting 0day Windows Bug', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Microsoft Sees Spike In Attacks Targeting 0day Windows Bug', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?561e79440b216b9a803d581e9ac9bb78'}
+
+Entry title: Microsoft Sees Spike In Attacks Targeting 0day Windows Bug
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?561e79440b216b9a803d581e9ac9bb78
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?a70c2fc4f0c9d87b4dcc3682645f8807', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Facebook Apps Must Now Seek Permission For User Data', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Facebook Apps Must Now Seek Permission For User Data', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?a70c2fc4f0c9d87b4dcc3682645f8807'}
+
+Entry title: Facebook Apps Must Now Seek Permission For User Data
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?a70c2fc4f0c9d87b4dcc3682645f8807
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?c55c0e8db12501990bffed3bc95d9427', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Medical Diagnoses For 130,000 People Vanish Into Thin Air', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Medical Diagnoses For 130,000 People Vanish Into Thin Air', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?c55c0e8db12501990bffed3bc95d9427'}
+
+Entry title: Medical Diagnoses For 130,000 People Vanish Into Thin Air
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?c55c0e8db12501990bffed3bc95d9427
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?4dca8bdbd7ed1e35b2353b1bcc4177bd', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Foursquare Puts Money Before Privacy', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Foursquare Puts Money Before Privacy', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?4dca8bdbd7ed1e35b2353b1bcc4177bd'}
+
+Entry title: Foursquare Puts Money Before Privacy
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?4dca8bdbd7ed1e35b2353b1bcc4177bd
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?ed7adad1c862281763216518f9bc9f24', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Adobe Patches PDF Bugs Hackers Already Exploiting', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Adobe Patches PDF Bugs Hackers Already Exploiting', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?ed7adad1c862281763216518f9bc9f24'}
+
+Entry title: Adobe Patches PDF Bugs Hackers Already Exploiting
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?ed7adad1c862281763216518f9bc9f24
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?8850213e86ac8df797c4a4b680b0f688', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'Google Chrome Will Block Out-Of-Date Plug-Ins', 'updated': u'2010-06-30', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'Google Chrome Will Block Out-Of-Date Plug-Ins', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?8850213e86ac8df797c4a4b680b0f688'}
+
+Entry title: Google Chrome Will Block Out-Of-Date Plug-Ins
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?8850213e86ac8df797c4a4b680b0f688
+Entry description: 
+Entry date: 2010-06-30
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=30, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=2, tm_yday=181, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+
+{'summary_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/html', 'value': u'', 'language': None}, 'updated_parsed': time.struct_time(tm_year=2010, tm_mon=6, tm_mday=29, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=1, tm_yday=180, tm_isdst=0), 'links': [{'href': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?30bedfe7c071aef39cbf6fa8c5776747', 'type': 'text/html', 'rel': 'alternate'}], 'title': u'White Hat Uses Foursquare Privacy Hole To Capture 875,000 Check-Ins', 'updated': u'2010-06-29', 'summary': u'', 'title_detail': {'base': 'http://packetstormsecurity.org/headlines.xml', 'type': 'text/plain', 'value': u'White Hat Uses Foursquare Privacy Hole To Capture 875,000 Check-Ins', 'language': None}, 'link': u'http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?30bedfe7c071aef39cbf6fa8c5776747'}
+
+Entry title: White Hat Uses Foursquare Privacy Hole To Capture 875,000 Check-Ins
+Entry link: http://www2.packetstormsecurity.org/cgi-bin/headlines.cgi?30bedfe7c071aef39cbf6fa8c5776747
+Entry description: 
+Entry date: 2010-06-29
+Entry date_parsed: time.struct_time(tm_year=2010, tm_mon=6, tm_mday=29, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=1, tm_yday=180, tm_isdst=0)
+Sin ID
+
+- - - - - - - - - -
+

@@ -1,0 +1,34 @@
+# 1. Change app strings for gettext usage
+print _('Hello World!')
+
+# 2. Include gettext support in the app
+ import locale
+ import gettext
+ APP = 'translate2'
+ DIR = 'locale'
+ locale.setlocale(locale.LC_ALL, '')
+ gettext.bindtextdomain(APP, DIR)
+ gettext.textdomain(APP)
+ _ = gettext.gettext
+
+# 3. Extract the strings to translate from the source files
+xgettext --language=Python --keyword=_ --output=translate2.pot translate2.py
+
+# 4. Generate the locales of the language we are going to add support
+dpkg-reconfigure locale (and add wanted locales)
+
+# 5. To start a new translation, you have to create a file for it
+LANG=ca_ES.UTF-8 msginit
+
+# 6. Create app dir & compile the human readable entry
+mkdir -p locale/ca/LC_MESSAGES/
+msgfmt ca.po -o locale/ca/LC_MESSAGES/translate2.mo
+
+# 7. Start with the specified locale translation
+LANG=ca_ES.UTF-8 python translate2.py
+
+# * UPDATE PROCESS...
+xgettext --language=Python --keyword=_ --output=translate2.pot translate2.py
+msgmerge -U es.po translate2.pot
+# Añadir la traducción (revisando y eliminado los tags 'fuzzy') de lo nuevo y...
+msgfmt ca.po -o locale/ca/LC_MESSAGES/translate2.mo

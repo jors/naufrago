@@ -1,0 +1,13 @@
+Al momento de crear el tree/liststore (def populate_feeds):
+-----------------------------------------------------------
+
+index = {} # NEW
+tree = gtk.TreeStore(str, str)
+for id, value in datasource:
+ iter = tree.append([id, value])
+ index[id] = iter # NEW
+
+---
+
+SELECT id_feed FROM articulo WHERE id = ?, [id_articulo]
+

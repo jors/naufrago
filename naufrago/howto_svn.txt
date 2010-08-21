@@ -1,0 +1,20 @@
+1. (Server side)
+mkdir -p /srv/svn/naufrago
+svnadmin create /srv/svn/naufrago
+vi /srv/svn/naufrago/conf/svnserve.conf
+vi /srv/svn/naufrago/conf/passwd
+vi /srv/svn/naufrago/conf/authz
+svnserve -d -r /srv/svn/naufrago
+
+2. (Client side)
+svn import /home/jors/sources/proyectos/naufrago/ svn://enchufado.com/naufrago -m "Import inicial"
+
+svn update --> Actualizar copia de trabajo
+Hacer los cambios pertinentes
+svn add, svn delete --> Hacer los cambios pertinentes
+svn status, svn diff, svn revert --> Examinar mis cambios
+svn merge, svn resolved --> "Mergear" otros cambios
+svn commit (ci) --> Enviar mis cambios al repostorio
+svn checkout (co) --> Obtener los cambios del repositorio
+svnadmin dump /srv/svn/naufrago | gzip -9 > dump_svn_naufrago.gz --> Hacer backup
+gunzip -c dump_svn_naufrago.gz | svnadmin load /srv/svn/naufrago --> Restaurar backup
