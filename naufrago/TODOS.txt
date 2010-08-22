@@ -81,7 +81,7 @@ En general:
 - Guardar los tamaños de scrolledwindow1 y 2. DONE
 - BUG. A veces, el título de una entry queda fijo y no cambia al cambiar de entry!
   Solventado, era un problema con las htmlentities. DONE
-- Conexión persistente a DB de principio a fin de la aplicación.
+- Conexión persistente a DB de principio a fin de la aplicación. DONE
   En principio no se observan problemas de concurrencia en escritura a BD. DONE
 - Actualizar todo al inicio (opción en las 'Preferencias'). DONE
 - Cambiar el icono de 'Nuevo feed' por el de RSS. DONE
@@ -119,9 +119,13 @@ KNOWN ISSUES:
 - Algunas veces webkit se queda pájaro y no abre enlaces.
 
 BUGS:
-- Actualizar el diccionario de iteradores al añadir y/o borrar feed y/o categoria!!! DONE
+- Actualizar el diccionario de iteradores al añadir y/o borrar feed y/o categoria. DONE
   (Funciones afectadas: add_feed, add_category, delete_feed, delete_category)
-- Cuando se añade/borra un nuevo feed/categoría, recalcular los no-leídos.
+- Cuando se añade/borra un nuevo feed/categoría, recalcular los no-leídos/importantes:
+  * Añadir feed: recalcular no-leídos.
+  * Borrar feed: recalcular no-leídos e importantes.
+  * Añadir categoría: -
+  * Borrar categoría: recalcular no-leídos e importantes.
 
 WISHLIST:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
