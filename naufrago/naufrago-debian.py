@@ -2682,37 +2682,6 @@ class Naufrago:
 
     dont_parse = self.change_feed_icon(d, model, id_feed)
     if dont_parse: continue
-    # START NEW - cambio de icono cuando hay/no hay conexión contra el feed!
-    #dont_parse = False
-    #bozo_invalid = ['urlopen', 'not an XML media type', 'Document is empty'] # Custom non-wanted bozos
-    #dest_iter = self.treeindex[id_feed]
-    #if hasattr(d,'bozo_exception'):
-    # for item in bozo_invalid:
-    #  if item in str(d.bozo_exception):
-    #   print 'a'
-    #   print d.bozo_exception
-    #   model.set(dest_iter, 1, 'crossout-image')
-    #   dont_parse = True
-    #   break
-    #  else:
-    #   print 'b'
-    #   print d.bozo_exception
-       # TODO: si el feed no tiene icono propio, procurarle el generico!
-    #   if not os.path.exists(favicon_path + '/' + str(id_feed)):
-    #    model.set(dest_iter, 1, 'rss-image')
-    #   else:
-    #    model.set(dest_iter, 1, str(id_feed))
-    #else:
-    # print 'c'
-     # TODO: si el feed no tiene icono propio, procurarle el generico!
-    # if not os.path.exists(favicon_path + '/' + str(id_feed)):
-    #  model.set(dest_iter, 1, 'rss-image')
-    # else: 
-    #  model.set(dest_iter, 1, str(id_feed))
-
-    #if dont_parse == True:
-    # continue
-    # END NEW
 
     feed_link = ''
     if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
@@ -2800,6 +2769,7 @@ class Naufrago:
          self.retrieve_entry_images(unique[0], imagenes[0])
       # END Offline mode image retrieving
 
+    # Actualización de la lista si es la seleccionada
     if(count != 0):
      (model, iter2) = self.treeselection.get_selected()
      if(iter2 is not None): # Si hay algún nodo seleccionado...
@@ -2821,10 +2791,24 @@ class Naufrago:
      model.set(child, 0, feed_label, 3, font_style)
 
    cursor.close()
-   
+
+  # Actualización de no-leidos con las nuevas entradas recuperadas
+  if num_new_posts > 0:
+   (model3, useless_iter) = self.treeselection.get_selected()
+   dest_iter = self.treeindex[9999]
+   nombre_feed_destino = model3.get_value(dest_iter, 0)
+   (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+   feed_label = nombre_feed_destino
+   if no_leidos is not None:
+    no_leidos = int(no_leidos) + num_new_posts
+    feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+   else:
+    feed_label = nombre_feed_destino + ' [' + str(num_new_posts) + ']'
+   model3.set(dest_iter, 0, feed_label, 3, 'bold')
+  
+  # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
    if (new_posts == True) and (num_new_posts > 0):
-    # Notificación de mensajes nuevos
     n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts) + " entrada/s", self.imageURI)
     n.attach_to_status_icon(self.statusicon)
     n.show()

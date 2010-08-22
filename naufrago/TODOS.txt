@@ -122,7 +122,7 @@ BUGS:
 - Actualizar el diccionario de iteradores al añadir y/o borrar feed y/o categoria. DONE
   (Funciones afectadas: add_feed, add_category, delete_feed, delete_category)
 - Cuando se añade/borra un nuevo feed/categoría, recalcular los no-leídos/importantes:
-  * Añadir feed: recalcular no-leídos.
+  * Añadir feed: recalcular no-leídos (implementarlo directamente en get_feed()?). DONE
   * Borrar feed: recalcular no-leídos e importantes.
   * Añadir categoría: -
   * Borrar categoría: recalcular no-leídos e importantes.
