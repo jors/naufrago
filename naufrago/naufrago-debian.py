@@ -2491,7 +2491,8 @@ class Naufrago:
   """Toggles feed icons -between error & ok- while trying to obtain feed data."""
   count = 0
   dont_parse = False
-  bozo_invalid = ['urlopen', 'not an XML media type', 'Document is empty'] # Custom non-wanted bozos
+  #bozo_invalid = ['urlopen', 'not an XML media type', 'Document is empty'] # Custom non-wanted bozos
+  bozo_invalid = ['urlopen', 'Document is empty'] # Custom non-wanted bozos
   dest_iter = self.treeindex[id_feed]
   if hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
    for item in bozo_invalid:
@@ -2533,7 +2534,8 @@ class Naufrago:
   gtk.gdk.threads_enter()
   self.throbber.show()
   new_posts = False # Reset
-  num_new_posts = 0
+  num_new_posts_partial = 0 # Per feed
+  num_new_posts_total = 0 # Overall
 
   if(data is None): # Iterarlo todo
 
@@ -2606,6 +2608,8 @@ class Naufrago:
             self.retrieve_entry_images(unique[0], images)
           # END Offline mode image retrieving
           new_posts = True
+          num_new_posts_partial += 1
+          num_new_posts_total += 1
         else:
          images = self.find_entry_images(feed_link, description)
          cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
@@ -2623,7 +2627,8 @@ class Naufrago:
             self.retrieve_entry_images(unique[0], imagenes[0])
          # END Offline mode image retrieving
          new_posts = True
-        num_new_posts += 1
+         num_new_posts_partial += 1
+         num_new_posts_total += 1
        else:
         # START Offline mode image retrieving
         if (self.offline_mode == 1):
@@ -2636,6 +2641,7 @@ class Naufrago:
            self.retrieve_entry_images(unique[0], imagenes[0])
         # END Offline mode image retrieving
 
+      # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
        (model, iter2) = self.treeselection.get_selected()
        if(iter2 is not None): # Si hay algún nodo seleccionado...
@@ -2644,8 +2650,8 @@ class Naufrago:
          if id_selected_feed == id_feed:
           self.populate_entries(id_feed)
 
+      # Luego el recuento del feed
       if new_posts == True:
-       # Y luego con el arbol (modelo de datos)
        cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
        row = cursor.fetchone()
        if row[0] == 0:
@@ -2655,6 +2661,22 @@ class Naufrago:
         feed_label = nombre_feed + ' [' + str(row[0]) + ']'
         font_style = 'bold'
        model.set(child, 0, feed_label, 3, font_style)
+
+      # Y luego el recuento de los No-leidos
+      if num_new_posts_partial > 0:
+       print nombre_feed + ', ' + str(num_new_posts_partial) + ' entradas nuevas'
+       (model3, useless_iter) = self.treeselection.get_selected()
+       dest_iter = self.treeindex[9999]
+       nombre_feed_destino = model3.get_value(dest_iter, 0)
+       (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+       feed_label = nombre_feed_destino
+       if no_leidos is not None:
+        no_leidos = int(no_leidos) + num_new_posts_partial
+        feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+       else:
+        feed_label = nombre_feed_destino + ' [' + str(num_new_posts_partial) + ']'
+       model3.set(dest_iter, 0, feed_label, 3, 'bold')
+       num_new_posts_partial = 0
 
      iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
@@ -2742,6 +2764,8 @@ class Naufrago:
           self.retrieve_entry_images(unique[0], images)
         # END Offline mode image retrieving
         new_posts = True
+        num_new_posts_partial += 1
+        num_new_posts_total += 1
       else:
        images = self.find_entry_images(feed_link, description)
        cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
@@ -2756,7 +2780,8 @@ class Naufrago:
          self.retrieve_entry_images(unique[0], images)
        # END Offline mode image retrieving
        new_posts = True
-      num_new_posts += 1
+       num_new_posts_partial += 1
+       num_new_posts_total += 1
      else:
       # START Offline mode image retrieving
       if (self.offline_mode == 1):
@@ -2769,7 +2794,7 @@ class Naufrago:
          self.retrieve_entry_images(unique[0], imagenes[0])
       # END Offline mode image retrieving
 
-    # Actualización de la lista si es la seleccionada
+    # Actualizamos las entries del feed seleccionado
     if(count != 0):
      (model, iter2) = self.treeselection.get_selected()
      if(iter2 is not None): # Si hay algún nodo seleccionado...
@@ -2778,8 +2803,8 @@ class Naufrago:
        if id_selected_feed == id_feed:
         self.populate_entries(id_feed)
 
+    # Luego el recuento del feed
     if new_posts == True:
-     # Y luego con el arbol (modelo de datos)
      cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
      row = cursor.fetchone()
      if row[0] == 0:
@@ -2790,26 +2815,29 @@ class Naufrago:
       font_style = 'bold'
      model.set(child, 0, feed_label, 3, font_style)
 
+    # Y luego el recuento de los No-leidos
+    if num_new_posts_partial > 0:
+     print nombre_feed + ', ' + str(num_new_posts_partial) + ' entradas nuevas'
+     (model3, useless_iter) = self.treeselection.get_selected()
+     dest_iter = self.treeindex[9999]
+     nombre_feed_destino = model3.get_value(dest_iter, 0)
+     (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+     feed_label = nombre_feed_destino
+     if no_leidos is not None:
+      no_leidos = int(no_leidos) + num_new_posts_partial
+      feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+     else:
+      feed_label = nombre_feed_destino + ' [' + str(num_new_posts_partial) + ']'
+     model3.set(dest_iter, 0, feed_label, 3, 'bold')
+     num_new_posts_partial = 0
+
    cursor.close()
 
-  # Actualización de no-leidos con las nuevas entradas recuperadas
-  if num_new_posts > 0:
-   (model3, useless_iter) = self.treeselection.get_selected()
-   dest_iter = self.treeindex[9999]
-   nombre_feed_destino = model3.get_value(dest_iter, 0)
-   (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-   feed_label = nombre_feed_destino
-   if no_leidos is not None:
-    no_leidos = int(no_leidos) + num_new_posts
-    feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-   else:
-    feed_label = nombre_feed_destino + ' [' + str(num_new_posts) + ']'
-   model3.set(dest_iter, 0, feed_label, 3, 'bold')
-  
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
-   if (new_posts == True) and (num_new_posts > 0):
-    n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts) + " entrada/s", self.imageURI)
+   if (new_posts == True) and (num_new_posts_total > 0):
+    print "Se añadieron " + str(num_new_posts_total) + " entrada/s"
+    n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts_total) + " entrada/s", self.imageURI)
     n.attach_to_status_icon(self.statusicon)
     n.show()
 

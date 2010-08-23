@@ -126,6 +126,12 @@ BUGS:
   * Borrar feed: recalcular no-leídos e importantes.
   * Añadir categoría: -
   * Borrar categoría: recalcular no-leídos e importantes.
+- Cuando se selecciona la carpeta especial No-leidos o Importantes y no tienen feeds,
+  se muestran los datos del feed anterior (by Jcasas).
+- Cuando se estan actualizando los feeds, si se marcan todos como leídos en No-leidos,
+  cuando termina la actualización (global), el recuento es incorrecto. Mejor mantener
+  actualizado en No-leidos al mismo tiempo que cada feed (by Jcasas). DONE
+- Cuando se actualizan los feeds, el contador No-leidos no cuenta bien (by Jcasas). DONE
 
 WISHLIST:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
