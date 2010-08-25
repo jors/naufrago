@@ -46,11 +46,16 @@ import xml.sax.saxutils
 import locale
 import gettext
 import pynotify
+import socket
 
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
 window_visible = True
+
+# Global socket timeout stuff
+if hasattr(socket, 'setdefaulttimeout'):
+ socket.setdefaulttimeout(5)
 
 # Locale stuff
 APP = 'naufrago'
@@ -982,6 +987,7 @@ class Naufrago:
    id_feed = self.treestore.get_value(iter, 2)
    if (id_feed == 9998) or (id_feed == 9999):
     self.populate_entries(id_feed)
+    self.webview.load_string("<h2>" + _("Special folder") + ": "+row_name+"</h2>", "text/html", "utf-8", "valid_link")
    elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
     ###id_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_feed)
@@ -1715,6 +1721,16 @@ class Naufrago:
      dialog.destroy()
 
      if(response == gtk.RESPONSE_OK):
+      # Recuento de los no-leidos en los feeds de esta categoria
+      no_leidos = None
+      for i in range(model.iter_n_children(iter)):
+       a_child_iter = model.iter_nth_child(iter, i)
+       nombre_feed_temp = model.get_value(a_child_iter, 0)
+       (nombre_feed_temp, no_leidos_temp) = self.less_simple_name_parsing(nombre_feed_temp)
+       if no_leidos_temp is not None:
+        no_leidos = 0
+        no_leidos += int(no_leidos_temp)
+
       # De cara al model, esto es suficiente :-o
       result = self.treestore.remove(iter)
       del self.treeindex_cat[id_categoria] # Update category dict
@@ -1743,6 +1759,12 @@ class Naufrago:
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
       self.conn.commit()
+
+      # Actualizamos No-leidos e Importantes
+      if no_leidos is not None:
+       self.update_special_folder(9999, no_leidos)
+       self.update_special_folder(9998, no_leidos)
+
       # Finalmente ponemos las cosas en su sitio
       self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
       self.scrolled_window2.set_size_request(0,0)
@@ -1855,6 +1877,23 @@ class Naufrago:
      self.update_feed(data=None, new=True)
    cursor.close()
 
+ def update_special_folder(self, id_folder, no_leidos):
+  """Updates the total non-read entries of Unread or Non-important special folder"""
+  (model, useless_iter) = self.treeselection.get_selected()
+  dest_iter = self.treeindex[id_folder]
+  nombre_feed_destino = model.get_value(dest_iter, 0)
+  (nombre_feed_destino, no_leidos_destino) = self.less_simple_name_parsing(nombre_feed_destino)
+  feed_label = nombre_feed_destino
+  if (no_leidos_destino is not None):
+   no_leidos = int(no_leidos_destino) - int(no_leidos)
+   if no_leidos <= 0:
+    font_style = 'normal'
+    feed_label = nombre_feed_destino
+   else:
+    font_style = 'bold'
+    feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+   model.set(dest_iter, 0, feed_label, 3, font_style)
+
  def delete_feed(self, data=None):
   """Deletes a feed from the user feed tree structure"""
   (model, iter) = self.treeselection.get_selected()
@@ -1868,7 +1907,7 @@ class Naufrago:
     dialog.destroy()
 
     if(response == gtk.RESPONSE_OK):
-     text = self.treestore.get_value(iter, 0)
+     nombre_feed = self.treestore.get_value(iter, 0)
      id_feed = self.treestore.get_value(iter, 2)
      result = self.treestore.remove(iter)
      del self.treeindex[id_feed] # Update feeds dict
@@ -1894,6 +1933,14 @@ class Naufrago:
      cursor.close()
      if os.path.exists(favicon_path + '/'+ str(id_feed)):
       os.unlink(favicon_path + '/'+ str(id_feed))
+
+     # Actualizamos No-leidos e Importantes
+     (nombre_feed_origen, no_leidos_origen) = self.less_simple_name_parsing(nombre_feed)
+
+     if no_leidos_origen is not None:
+      self.update_special_folder(9999, no_leidos_origen)
+      self.update_special_folder(9998, no_leidos_origen)
+
      # Finalmente ponemos las cosas en su sitio
      self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
      self.scrolled_window2.set_size_request(0,0)

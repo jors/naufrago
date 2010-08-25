@@ -123,17 +123,17 @@ BUGS:
   (Funciones afectadas: add_feed, add_category, delete_feed, delete_category)
 - Cuando se añade/borra un nuevo feed/categoría, recalcular los no-leídos/importantes:
   * Añadir feed: recalcular no-leídos (implementarlo directamente en get_feed()?). DONE
-  * Borrar feed: recalcular no-leídos e importantes.
+  * Borrar feed: recalcular no-leídos e importantes. DONE
   * Añadir categoría: -
-  * Borrar categoría: recalcular no-leídos e importantes.
+  * Borrar categoría: recalcular no-leídos e importantes. DONE
 - Cuando se selecciona la carpeta especial No-leidos o Importantes y no tienen feeds,
-  se muestran los datos del feed anterior (by Jcasas).
+  se muestran los datos del feed anterior (by Jcasas). DONE
 - Cuando se estan actualizando los feeds, si se marcan todos como leídos en No-leidos,
   cuando termina la actualización (global), el recuento es incorrecto. Mejor mantener
   actualizado en No-leidos al mismo tiempo que cada feed (by Jcasas). DONE
 - Cuando se actualizan los feeds, el contador No-leidos no cuenta bien (by Jcasas). DONE
 
-WISHLIST:
+ROADMAP 0.2:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
 - Poder habilitar/deshabilitar el statusicon. DONE
 - Carpeta de importantes. DONE
