@@ -202,12 +202,10 @@ class Naufrago:
    (model, iter) = self.treeselection.get_selected()
 
    if(iter is not None): # Hay algún nodo seleccionado
-    ###row_name = self.treestore.get_value(iter, 0)
     id_feed = self.treestore.get_value(iter, 2)
 
     if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999): # Si es HOJA...
      # 1º vamos a por el label del feed...
-     ###id_feed = self.treestore.get_value(iter, 2)
 
      # START NAME PARSING (nodo origen) #
      nombre_feed = model.get_value(iter, 0)
@@ -227,11 +225,6 @@ class Naufrago:
       entry_ids += str(id_articulo)+','
       iter2 = self.liststore.iter_next(iter2)
      entry_ids = entry_ids[0:-1]
-
-     # ...y 3º a por los datos
-     #cursor.execute('UPDATE articulo SET leido=1 WHERE id_feed = ?', [id_feed])
-     #self.conn.commit()
-     #cursor.close()
 
      # START NAME PARSING (nodo destino) #
      if nombre_feed == _("Important") or nombre_feed == _("Unread"):
@@ -258,17 +251,13 @@ class Naufrago:
         ### START: ¡También cabe actualizar su compañero de batallas!
         if nombre_feed == _("Important"):
          # Actualizamos Unread
-         #print 'a) El seleccionado es Important, así que actualizaremos Unread... (-'+str(count)+')'
          dest_iter = self.treeindex[9999]
         elif nombre_feed == _("Unread"):
          # Actualizamos Important
          dest_iter = self.treeindex[9998]
-         # *** NEW ***
          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' +str(feed[0])+ ' and id IN (' + entry_ids + ') and leido = 0 and importante = 1'
          cursor.execute(q)
          count = cursor.fetchone()[0]
-         #print 'a) El seleccionado es Unread, así que actualizaremos Important... (-'+str(count)+')'
-         # *** NEW ***
         nombre_feed_destino = model.get_value(dest_iter, 0)
         (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
         if no_leidos is not None:
@@ -279,11 +268,9 @@ class Naufrago:
          else: # Y si todavía quedan...
           font_style = 'bold'
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-         #if nombre_feed == _("Important") or (nombre_feed == _("Unread"):
          model.set(dest_iter, 0, feed_label, 3, font_style)
         ### END: ¡También cabe actualizar su compañero de batallas!
      else:
-      #print 'Destino: feed especial'
       # Destino: No leídos
       dest_iter = self.treeindex[9999]
       nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -298,7 +285,6 @@ class Naufrago:
       else:
        feed_label = nombre_feed_destino
        font_style = 'normal'
-      #print 'a) Cambiando nombre de feed de ' + model.get_value(dest_iter, 0) + ' a ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
       # Destino: Importantes
       dest_iter = self.treeindex[9998]
@@ -314,12 +300,10 @@ class Naufrago:
       else:
        feed_label = nombre_feed_destino
        font_style = 'normal'
-      #print 'b) Cambiando nombre de feed de ' + model.get_value(dest_iter, 0) + ' a ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo destino) #
 
      # ...y 3º a por los datos
-     #cursor.execute('UPDATE articulo SET leido=1 WHERE id_feed = ?', [id_feed])
      q = 'UPDATE articulo SET leido=1 WHERE id IN (' + entry_ids + ')'
      cursor.execute(q)
      self.conn.commit()
@@ -350,14 +334,7 @@ class Naufrago:
       self.liststore.set_value(iter, 3, 'normal')
       iter = self.liststore.iter_next(iter)
 
-     # ...y 3º a por los datos
-     #q = 'UPDATE articulo SET leido=1 WHERE id_feed IN (' + feed_ids + ')'
-     #cursor.execute(q)
-     #self.conn.commit()
-     #cursor.close()
-
      # START NAME PARSING (nodo destino) #
-     #print 'Destino: feed especial (¡no puede ser otro!)'
      # Destino: No leídos
      count = 0
      for feed in feed_ids_list:
@@ -413,7 +390,6 @@ class Naufrago:
     if(data == 'single'):
      if(font_style == 'normal'):
       self.liststore.set_value(iter, 3, 'bold')
-      #model.set(iter, 0, fecha, 2, titulo, 3, 'bold') # That sucks (it doesn't update the model)!
       cursor.execute('UPDATE articulo SET leido = 0 WHERE id = ?', [id_articulo])
       self.conn.commit()
 
@@ -435,7 +411,6 @@ class Naufrago:
       # END NAME PARSING (nodo origen) #
       # START NAME PARSING (nodo destino) #
       if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-       #print 'Destino: feed normal'
        cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
        id_feed = cursor.fetchone()[0]
        cursor.close()
@@ -451,11 +426,9 @@ class Naufrago:
        ### START: ¡También cabe actualizar su compañero de batallas!
        if nombre_feed == _("Important"):
         # Actualizamos Unread
-        #print 'El seleccionado es Important, así que actualizaremos Unread... (+1)'
         dest_iter = self.treeindex[9999]
        elif nombre_feed == _("Unread"):
         # Actualizamos Important
-        #print 'El seleccionado es Unread, así que actualizaremos Important... (+1)'
         dest_iter = self.treeindex[9998]
        nombre_feed_destino = model.get_value(dest_iter, 0)
        (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
@@ -468,7 +441,6 @@ class Naufrago:
         model.set(dest_iter, 0, feed_label, 3, 'bold')
        ### END: ¡También cabe actualizar su compañero de batallas!
       else:
-       #print 'Destino: feed especial'
        # Destino: No leídos
        dest_iter = self.treeindex[9999]
        nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -495,7 +467,6 @@ class Naufrago:
 
      else: # if(font_style == 'bold')
       self.liststore.set_value(iter, 3, 'normal')
-      #model.set(iter, 0, fecha, 2, titulo, 3, 'normal') # That sucks too (same crap)!
       cursor.execute('UPDATE articulo SET leido = 1 WHERE id = ?', [id_articulo])
       self.conn.commit()
 
@@ -520,7 +491,6 @@ class Naufrago:
        # END NAME PARSING (nodo origen) #
        # START NAME PARSING (nodo destino) #
        if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-        #print 'Destino: feed normal'
         cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
         id_feed = cursor.fetchone()[0]
         cursor.close()
@@ -539,11 +509,9 @@ class Naufrago:
         ### START: ¡También cabe actualizar su compañero de batallas!
         if nombre_feed == _("Important"):
          # Actualizamos Unread
-         #print 'El seleccionado de Important, así que actualizaremos Unread... (-1)'
          dest_iter = self.treeindex[9999]
         elif nombre_feed == _("Unread"):
          # Actualizamos Important
-         #print 'El seleccionado de Unread, así que actualizaremos Important... (-1)'
          dest_iter = self.treeindex[9998]
         nombre_feed_destino = model.get_value(dest_iter, 0)
         (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
@@ -559,7 +527,6 @@ class Naufrago:
           model.set(dest_iter, 0, feed_label, 3, font_style)
         ### END: ¡También cabe actualizar su compañero de batallas!
        else:
-        #print 'Destino: feed especial'
         # Destino: No leídos
         dest_iter = self.treeindex[9999]
         nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -607,9 +574,6 @@ class Naufrago:
       entry_ids += str(id_articulo)+','
       iter = self.liststore.iter_next(iter)
      entry_ids = entry_ids[0:-1]
-     ###q = 'UPDATE articulo SET leido=' + str(leido) +' WHERE id IN (' + entry_ids + ')'
-     ###cursor.execute(q)
-     ###self.conn.commit()
 
      # Y actualizar el modelo de datos.
      (model, iter) = self.treeselection.get_selected()
@@ -637,7 +601,6 @@ class Naufrago:
      # END NAME PARSING (nodo origen) #
      # START NAME PARSING (nodo destino) #
      if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-      #print 'Destino: feed normal'
       if liststore_font_style == 'bold':
        q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
        cursor.execute(q)
@@ -661,17 +624,13 @@ class Naufrago:
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
           # Actualizamos Unread
-          #print 'a) El seleccionado es Important, así que actualizaremos Unread... (-'+str(count)+')'
           dest_iter = self.treeindex[9999]
          elif nombre_feed == _("Unread"):
           # Actualizamos Important
           dest_iter = self.treeindex[9998]
-          # *** NEW ***
           q = 'SELECT count(id) FROM articulo WHERE id_feed = ' +str(feed[0])+ ' and id IN (' + entry_ids + ') and leido = 0 and importante = 1'
           cursor.execute(q)
           count = cursor.fetchone()[0]
-          #print 'a) El seleccionado es Unread, así que actualizaremos Important... (-'+str(count)+')'
-          # *** NEW ***
          nombre_feed_destino = model.get_value(dest_iter, 0)
          (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
          if no_leidos is not None:
@@ -682,7 +641,6 @@ class Naufrago:
           else: # Y si todavía quedan...
            font_style = 'bold'
            feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-          #if nombre_feed == _("Important") or (nombre_feed == _("Unread"):
           model.set(dest_iter, 0, feed_label, 3, font_style)
          ### END: ¡También cabe actualizar su compañero de batallas!
       elif liststore_font_style == 'normal':
@@ -706,17 +664,13 @@ class Naufrago:
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
           # Actualizamos Unread
-          #print 'b) El seleccionado es Important, así que actualizaremos Unread... (+'+str(count)+')'
           dest_iter = self.treeindex[9999]
          elif nombre_feed == _("Unread"):
           # Actualizamos Important
           dest_iter = self.treeindex[9998]
-          # *** NEW ***
           q = 'SELECT count(id) FROM articulo WHERE id_feed = ' +str(feed[0])+ ' and id IN (' + entry_ids + ') and leido = 1 and importante = 1'
           cursor.execute(q)
           count = cursor.fetchone()[0]
-          #print 'b) El seleccionado es Unread, así que actualizaremos Important... (+'+str(count)+')'
-          # *** NEW ***
          nombre_feed_destino = model.get_value(dest_iter, 0)
          (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
          if (no_leidos is not None) and (no_leidos > 0):
@@ -733,7 +687,6 @@ class Naufrago:
          model.set(dest_iter, 0, feed_label, 3, font_style)
          ### END: ¡También cabe actualizar su compañero de batallas!
      else:
-      #print 'Destino: feed especial'
       # Destino: No leídos
       dest_iter = self.treeindex[9999]
       nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -743,7 +696,6 @@ class Naufrago:
       if liststore_font_style == 'bold':
        cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? and leido = 0', [id_feed])
        count = cursor.fetchone()[0]
-       #print 'El feed ' + nombre_feed_destino + ' tiene ' + str(count) + ' entries no leidas.'
        if (no_leidos is not None) and (no_leidos > 0) and (int(no_leidos) - int(count) > 0):
         no_leidos = int(no_leidos) - int(count)
         feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
@@ -760,7 +712,6 @@ class Naufrago:
        else:
         feed_label = nombre_feed_destino + ' [' + str(count) + ']'
        font_style = 'bold'
-      #print 'Cambiando nombre de feed de ' + model.get_value(dest_iter, 0) + ' a ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
       # Destino: Importantes
       dest_iter = self.treeindex[9998]
@@ -770,7 +721,6 @@ class Naufrago:
       if liststore_font_style == 'bold':
        cursor.execute('SELECT count(id) FROM articulo WHERE id_feed=? and leido=0 and importante=1', [id_feed])
        count = cursor.fetchone()[0]
-       #print 'El feed ' + nombre_feed_destino + ' tiene ' + str(count) + ' entries no leidas.'
        if (no_leidos is not None) and (no_leidos > 0) and (int(no_leidos) - int(count) > 0):
         no_leidos = int(no_leidos) - int(count)
         feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
@@ -787,7 +737,6 @@ class Naufrago:
        else:
         feed_label = nombre_feed_destino + ' [' + str(count) + ']'
        font_style = 'bold'
-      #print 'Cambiando nombre de feed de ' + model.get_value(dest_iter, 0) + ' a ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo destino) #
 
@@ -1097,7 +1046,8 @@ class Naufrago:
                  <menuitem action='New category'/>
                  <menuitem action='Delete feed'/>
                  <menuitem action='Delete category'/>
-                 <separator/><menuitem action='Import feeds'/>
+                 <separator/>
+                 <menuitem action='Import feeds'/>
                  <menuitem action='Export feeds'/>
                  <separator/>
                  <menuitem action='Quit'/>
@@ -1145,8 +1095,8 @@ class Naufrago:
             ('ArchiveMenu', None, _('_Archive')),
             ('New feed', 'rss-image', _('New _feed'), '<control>F', _('Adds a feed'), self.add_feed),
             ('New category', gtk.STOCK_DIRECTORY, _('New _category'), '<control>C', _('Adds a category'), self.add_category),
-            ('Delete feed', gtk.STOCK_CLEAR, _('Delete _feed'), '<alt>F', _('Deletes a feed'), self.delete_feed),
-            ('Delete category', gtk.STOCK_CLOSE, _('Delete _category'), '<alt>C', _('Deletes a category'), self.delete_category),
+            ('Delete feed', gtk.STOCK_CLEAR, _('Delete feed'), None, _('Deletes a feed'), self.delete_feed),
+            ('Delete category', gtk.STOCK_CANCEL, _('Delete category'), None, _('Deletes a category'), self.delete_category),
             ('Import feeds', gtk.STOCK_REDO, _('Import feeds'), None, _('Imports a feedlist'), self.import_feeds),
             ('Export feeds', gtk.STOCK_UNDO, _('Export feeds'), None, _('Exports a feedlist'), self.export_feeds),
             ('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', _('Quits'), self.delete_event),
@@ -1155,7 +1105,7 @@ class Naufrago:
             ('Preferences', gtk.STOCK_EXECUTE, _('_Preferences'), '<control>P', _('Shows preferences'), self.preferences),
             ('NetworkMenu', None, _('_Network')),
             ('Update', None, _('_Update'), '<control>U', _('Updates the selected feed'), self.update_feed),
-            ('Update all', gtk.STOCK_REFRESH, _('U_pdate all'), '<control>P', _('Update all feeds'), self.update_all_feeds),
+            ('Update all', gtk.STOCK_REFRESH, _('Update all'), '<control>R', _('Update all feeds'), self.update_all_feeds),
             ('HelpMenu', None, _('_Help')),
             ('FAQ', gtk.STOCK_HELP, _('FAQ'), None, _('FAQ'), self.load_puf),
             ('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.help_about),
@@ -1660,7 +1610,7 @@ class Naufrago:
  def add_category(self, data=None):
   """Adds/edits a category to/from the user feed tree structure"""
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
-  entry = gtk.Entry(max=32)
+  entry = gtk.Entry(max=128)
 
   if((data is not None) and (type(data) is not gtk.Action)): # Modo edición I
    cursor = self.conn.cursor()
@@ -1780,7 +1730,7 @@ class Naufrago:
  def add_feed(self, data=None):
   """Adds a feed to the user feed tree structure"""
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
-  entryName = gtk.Entry(max=32)
+  entryName = gtk.Entry(max=256)
   entryURL = gtk.Entry(max=1024)
   labelName = gtk.Label(_('Name '))
 
@@ -2544,15 +2494,15 @@ class Naufrago:
   if hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
    for item in bozo_invalid:
     if item in str(d.bozo_exception):
-     print 'a'
-     print d.bozo_exception
+     #print 'a'
+     #print d.bozo_exception
      model.set(dest_iter, 1, 'crossout-image')
      dont_parse = True
      break
     #else:
     elif count == len(bozo_invalid):
-     print 'b'
-     print d.bozo_exception
+     #print 'b'
+     #print d.bozo_exception
      # TODO: si el feed no tiene icono propio, procurarle el generico!
      if not os.path.exists(favicon_path + '/' + str(id_feed)):
       model.set(dest_iter, 1, 'rss-image')
@@ -2560,7 +2510,7 @@ class Naufrago:
       model.set(dest_iter, 1, str(id_feed))
     count += 1
   else: # Feed HAS NOT any bozo exception...
-   print 'c'
+   #print 'c'
    # TODO: si el feed no tiene icono propio, procurarle el generico!
    if not os.path.exists(favicon_path + '/' + str(id_feed)):
     model.set(dest_iter, 1, 'rss-image')
