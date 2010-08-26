@@ -35,6 +35,7 @@ import time
 import datetime
 import webkit
 import threading
+#gtk.gdk.threads_init()
 import webbrowser
 import pango
 import urllib2
@@ -893,7 +894,7 @@ class Naufrago:
        font_style = 'bold'
        feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
       # ESTO ES ABSOLUTAMENTE NECESARIO para que 'Important' no actúe si no tenemos el flag_importante.
-      # TODO: Aplicarlo en los demás sitios que falte.
+      # Aplicarlo en los demás sitios que falte.
       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
        model.set(dest_iter, 0, feed_label, 3, font_style)
      ### END: ¡También cabe actualizar su compañero de batallas!
@@ -1924,6 +1925,26 @@ class Naufrago:
   else:
    self.warning_message(_('You must choose a category or a feed to edit!'))
 
+ # ¡¡¡ TODO START !!!
+ def search(self):
+  """Searches for a keyword on a given feed (or all, if no one is selected)."""
+  print 'Searching...'
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  dialog.set_title(_('Search'))
+  dialog.set_markup(_('Insert the <b>term/s to search for</b>:'))
+  entry = gtk.Entry(max=128)
+  dialog.set_default_response(gtk.RESPONSE_OK) # Sets default response
+  entry.set_activates_default(True) # Activates default response
+  dialog.vbox.pack_end(entry, True, True, 0)
+  dialog.show_all()
+  response = dialog.run()
+  text = entry.get_text()
+  dialog.destroy()
+ # ¡¡¡ TODO END !!!
+
+  if((text != '') and (response == gtk.RESPONSE_OK)):
+   print 'Searching the term/s "' + text + '"...'
+
  def change_toolbar_mode(self, toolbar_mode):
   """Changes the toolbar style."""
   if toolbar_mode == 0:
@@ -2503,7 +2524,7 @@ class Naufrago:
     elif count == len(bozo_invalid):
      #print 'b'
      #print d.bozo_exception
-     # TODO: si el feed no tiene icono propio, procurarle el generico!
+     # Si el feed no tiene icono propio, procurarle el generico!
      if not os.path.exists(favicon_path + '/' + str(id_feed)):
       model.set(dest_iter, 1, 'rss-image')
      else:
@@ -2511,7 +2532,7 @@ class Naufrago:
     count += 1
   else: # Feed HAS NOT any bozo exception...
    #print 'c'
-   # TODO: si el feed no tiene icono propio, procurarle el generico!
+   # Si el feed no tiene icono propio, procurarle el generico!
    if not os.path.exists(favicon_path + '/' + str(id_feed)):
     model.set(dest_iter, 1, 'rss-image')
    else: 
@@ -2528,8 +2549,8 @@ class Naufrago:
      the heart of the app. Maybe it should be splitted in subfunctions in order to
      don't turn mad."""
   self.toggle_menuitems_sensitiveness(enable=False)
-  gtk.gdk.threads_enter()
   self.throbber.show()
+  ###gtk.gdk.threads_enter()
   new_posts = False # Reset
   num_new_posts_partial = 0 # Per feed
   num_new_posts_total = 0 # Overall
@@ -2554,6 +2575,8 @@ class Naufrago:
       cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
       url = cursor.fetchone()[0]
       self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
+
+      gtk.gdk.threads_enter() ### TEST ###
       d = feedparser.parse(url)
       dont_parse = self.change_feed_icon(d, model, id_feed)
       if dont_parse: continue
@@ -2638,6 +2661,8 @@ class Naufrago:
            self.retrieve_entry_images(unique[0], imagenes[0])
         # END Offline mode image retrieving
 
+      gtk.gdk.threads_leave() ### TEST
+
       # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
        (model, iter2) = self.treeselection.get_selected()
@@ -2697,6 +2722,7 @@ class Naufrago:
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
     url = cursor.fetchone()[0]
     self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
+    gtk.gdk.threads_enter() ### TEST ###
     d = feedparser.parse(url)
 
     dont_parse = self.change_feed_icon(d, model, id_feed)
@@ -2791,6 +2817,8 @@ class Naufrago:
          self.retrieve_entry_images(unique[0], imagenes[0])
       # END Offline mode image retrieving
 
+    gtk.gdk.threads_leave() ### TEST
+
     # Actualizamos las entries del feed seleccionado
     if(count != 0):
      (model, iter2) = self.treeselection.get_selected()
@@ -2838,12 +2866,12 @@ class Naufrago:
     n.attach_to_status_icon(self.statusicon)
     n.show()
 
+  ###gtk.gdk.threads_leave()
   self.statusbar.set_text('')
   # Fires tray icon blinking
   if((new_posts == True) and (window_visible == False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
   self.throbber.hide()
-  gtk.gdk.threads_leave()
   self.toggle_menuitems_sensitiveness(enable=True)
 
  def import_feeds(self, data=None):
@@ -3019,7 +3047,7 @@ class Naufrago:
 def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
- timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
+ ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
  # In case we would want to stop the timer...
  #gobject.source_remove(timer_id)
  gtk.main()

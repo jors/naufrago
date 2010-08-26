@@ -132,6 +132,9 @@ BUGS:
   cuando termina la actualización (global), el recuento es incorrecto. Mejor mantener
   actualizado en No-leidos al mismo tiempo que cada feed (by Jcasas). DONE
 - Cuando se actualizan los feeds, el contador No-leidos no cuenta bien (by Jcasas). DONE
+- Uso del thread de obtención de feeds mejorado. DONE
+- Uso del thread de importación de feeds mejorado?
+- Aceleradores más intuitivos. DONE
 
 ROADMAP 0.2:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
