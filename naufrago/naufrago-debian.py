@@ -937,7 +937,8 @@ class Naufrago:
    id_feed = self.treestore.get_value(iter, 2)
    if (id_feed == 9998) or (id_feed == 9999):
     self.populate_entries(id_feed)
-    self.webview.load_string("<h2>" + _("Special folder") + ": "+row_name+"</h2>", "text/html", "utf-8", "valid_link")
+    nombre_feed = self.simple_name_parsing(row_name)
+    self.webview.load_string("<h2>" + _("Special folder") + ": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
    elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
     ###id_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_feed)
