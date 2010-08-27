@@ -133,7 +133,7 @@ BUGS:
   actualizado en No-leidos al mismo tiempo que cada feed (by Jcasas). DONE
 - Cuando se actualizan los feeds, el contador No-leidos no cuenta bien (by Jcasas). DONE
 - Uso del thread de obtención de feeds mejorado. DONE
-- Uso del thread de importación de feeds mejorado?
+- Uso del thread de importación de feeds mejorado. DONE
 - Aceleradores más intuitivos. DONE
 
 ROADMAP 0.2:

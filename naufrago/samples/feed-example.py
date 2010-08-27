@@ -5,9 +5,10 @@ import time
 import datetime
 import sys
 
-d = feedparser.parse("http://www.hacktimes.com/feeds")
-print d
-sys.exit()
+d = feedparser.parse("http://feeds2.feedburner.com/AscoDeVida")
+#d = feedparser.parse("http://www.hacktimes.com/feeds")
+#print d
+#sys.exit()
 
 #d = feedparser.parse("http://www.hacktimes.com/feeds")
 #d = feedparser.parse("http://packetstormsecurity.org/headlines.xml")

@@ -1096,7 +1096,7 @@ class Naufrago:
   actions = [
             ('ArchiveMenu', None, _('_Archive')),
             ('New feed', 'rss-image', _('New _feed'), '<control>F', _('Adds a feed'), self.add_feed),
-            ('New category', gtk.STOCK_DIRECTORY, _('New _category'), '<control>C', _('Adds a category'), self.add_category),
+            ('New category', gtk.STOCK_DIRECTORY, _('New _category'), '<alt>C', _('Adds a category'), self.add_category),
             ('Delete feed', gtk.STOCK_CLEAR, _('Delete feed'), None, _('Deletes a feed'), self.delete_feed),
             ('Delete category', gtk.STOCK_CANCEL, _('Delete category'), None, _('Deletes a category'), self.delete_category),
             ('Import feeds', gtk.STOCK_REDO, _('Import feeds'), None, _('Imports a feedlist'), self.import_feeds),
@@ -1266,7 +1266,7 @@ class Naufrago:
   self.hpaned = gtk.HPaned()
   self.hpaned.set_border_width(2)
   # Creación del Tree izquierdo para los feeds
-  # Campos: nombre, icono, id_categoria
+  # Campos: nombre, icono, id_categoria_o_feed, font-style
   self.treestore = gtk.TreeStore(str, str, int, str)
   self.populate_feeds() # Propaga los feeds del usuario
   # Create the TreeView using treestore
@@ -2506,25 +2506,29 @@ class Naufrago:
   self.statusicon_menu.set_sensitive(enable)
   self.lock = not enable
 
- def change_feed_icon(self, d, model, id_feed):
+ def change_feed_icon(self, d, model, id_feed, cursor):
   """Toggles feed icons -between error & ok- while trying to obtain feed data."""
-  count = 0
   dont_parse = False
-  #bozo_invalid = ['urlopen', 'not an XML media type', 'Document is empty'] # Custom non-wanted bozos
+  count = 0
   bozo_invalid = ['urlopen', 'Document is empty'] # Custom non-wanted bozos
   dest_iter = self.treeindex[id_feed]
-  if hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
+
+  if not len(d.entries) > 0: # Feed has no entries...
+   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ?', [id_feed])
+   num_entries = cursor.fetchone()[0]
+   if num_entries == 0: # ... and never had! Fingerprinted as invalid!
+    model.set(dest_iter, 1, 'crossout-image')
+    dont_parse = True
+  elif hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
+   #print d.bozo_exception
    for item in bozo_invalid:
     if item in str(d.bozo_exception):
      #print 'a'
-     #print d.bozo_exception
      model.set(dest_iter, 1, 'crossout-image')
      dont_parse = True
      break
-    #else:
     elif count == len(bozo_invalid):
      #print 'b'
-     #print d.bozo_exception
      # Si el feed no tiene icono propio, procurarle el generico!
      if not os.path.exists(favicon_path + '/' + str(id_feed)):
       model.set(dest_iter, 1, 'rss-image')
@@ -2540,7 +2544,6 @@ class Naufrago:
     model.set(dest_iter, 1, str(id_feed))
 
   if dont_parse == True:
-   #continue
    return True
   else:
    return False
@@ -2579,7 +2582,7 @@ class Naufrago:
 
       gtk.gdk.threads_enter() ### TEST ###
       d = feedparser.parse(url)
-      dont_parse = self.change_feed_icon(d, model, id_feed)
+      dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
       if dont_parse: continue
 
       feed_link = ''
@@ -2726,7 +2729,7 @@ class Naufrago:
     gtk.gdk.threads_enter() ### TEST ###
     d = feedparser.parse(url)
 
-    dont_parse = self.change_feed_icon(d, model, id_feed)
+    dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
     if dont_parse: continue
 
     feed_link = ''
@@ -2920,7 +2923,9 @@ class Naufrago:
       # Obtain feed favicon
       row = cursor.execute('SELECT MAX(id) FROM feed')
       id_feed = cursor.fetchone()[0]
-      self.get_favicon(id_feed, url)
+      #self.get_favicon(id_feed, url)
+      t = threading.Thread(target=self.get_favicon, args=(id_feed, url, ))
+      t.start()
     elif tipo == 'folder' and len(node) is not 0:
      if node[0].attrib.get('type') != 'folder':
       cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [name])
@@ -3013,6 +3018,7 @@ class Naufrago:
   if not os.path.exists(favicon_path):
    os.makedirs(favicon_path)
 
+  gtk.gdk.threads_enter()
   try:
    split = url.split("/")
    favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
@@ -3027,6 +3033,7 @@ class Naufrago:
   except:
    self.add_icon_to_factory(None, id_feed)
    pass
+  gtk.gdk.threads_leave()
 
  def populate_favicons(self):
   """Iterates 'favicons' directory to load existent favicons in a bunch."""
@@ -3048,7 +3055,7 @@ class Naufrago:
 def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
- ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
+ timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
  # In case we would want to stop the timer...
  #gobject.source_remove(timer_id)
  gtk.main()
