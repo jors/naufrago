@@ -2554,7 +2554,6 @@ class Naufrago:
      don't turn mad."""
   self.toggle_menuitems_sensitiveness(enable=False)
   self.throbber.show()
-  ###gtk.gdk.threads_enter()
   new_posts = False # Reset
   num_new_posts_partial = 0 # Per feed
   num_new_posts_total = 0 # Overall
@@ -2580,7 +2579,7 @@ class Naufrago:
       url = cursor.fetchone()[0]
       self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
-      gtk.gdk.threads_enter() ### TEST ###
+      gtk.gdk.threads_enter()
       d = feedparser.parse(url)
       dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
       if dont_parse: continue
@@ -2665,7 +2664,7 @@ class Naufrago:
            self.retrieve_entry_images(unique[0], imagenes[0])
         # END Offline mode image retrieving
 
-      gtk.gdk.threads_leave() ### TEST
+      gtk.gdk.threads_leave()
 
       # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
@@ -2726,7 +2725,7 @@ class Naufrago:
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
     url = cursor.fetchone()[0]
     self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
-    gtk.gdk.threads_enter() ### TEST ###
+    gtk.gdk.threads_enter()
     d = feedparser.parse(url)
 
     dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
@@ -2821,7 +2820,7 @@ class Naufrago:
          self.retrieve_entry_images(unique[0], imagenes[0])
       # END Offline mode image retrieving
 
-    gtk.gdk.threads_leave() ### TEST
+    gtk.gdk.threads_leave()
 
     # Actualizamos las entries del feed seleccionado
     if(count != 0):
@@ -2870,7 +2869,6 @@ class Naufrago:
     n.attach_to_status_icon(self.statusicon)
     n.show()
 
-  ###gtk.gdk.threads_leave()
   self.statusbar.set_text('')
   # Fires tray icon blinking
   if((new_posts == True) and (window_visible == False) and (self.show_trayicon == 1)):
@@ -2974,7 +2972,10 @@ class Naufrago:
     cursor.execute('SELECT nombre,url FROM feed WHERE id_categoria = ?', [row[0]])
     feeds = cursor.fetchall()
     for row2 in feeds:
-     out += '<outline title="'+row2[0]+'" text="'+row2[0]+'" description="'+row2[0]+'" type="rss" xmlUrl="'+row2[1]+'" htmlUrl="http://badopi.net"/>\n'
+     nombre = row2[0].replace('&', '%26')
+     url = row2[1].replace('&', '%26')
+     out += '<outline title="'+nombre+'" text="'+nombre+'" type="rss" xmlUrl="'+url+'"/>\n'
+    out += '</outline>'
    out += '</body>\n</opml>'
    f.write(out)
    f.close()
@@ -3044,7 +3045,6 @@ class Naufrago:
  ########
 
  def __init__(self):
-  # Inicializamos el threading...
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
   # Obtiene la config de la app
