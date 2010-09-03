@@ -248,6 +248,7 @@ class Naufrago:
         else:
          feed_label = nombre_feed_destino
          font_style = 'normal'
+        print 'a) ' + feed_label
         model.set(dest_iter, 0, feed_label, 3, font_style)
         ### START: ¡También cabe actualizar su compañero de batallas!
         if nombre_feed == _("Important"):
@@ -269,6 +270,7 @@ class Naufrago:
          else: # Y si todavía quedan...
           font_style = 'bold'
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+         print 'b) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, font_style)
         ### END: ¡También cabe actualizar su compañero de batallas!
      else:
@@ -286,6 +288,7 @@ class Naufrago:
       else:
        feed_label = nombre_feed_destino
        font_style = 'normal'
+      print 'c) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
       # Destino: Importantes
       dest_iter = self.treeindex[9998]
@@ -301,6 +304,7 @@ class Naufrago:
       else:
        feed_label = nombre_feed_destino
        font_style = 'normal'
+      print 'd) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo destino) #
 
@@ -352,6 +356,7 @@ class Naufrago:
      else:
       feed_label = nombre_feed_destino
       font_style = 'normal'
+     print 'e) ' + feed_label
      model.set(dest_iter, 0, feed_label, 3, font_style)
      # Destino: Importantes
      count = 0
@@ -369,6 +374,7 @@ class Naufrago:
      else:
       feed_label = nombre_feed_destino
       font_style = 'normal'
+     print 'f) ' + feed_label
      model.set(dest_iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo destino) #
 
@@ -398,7 +404,18 @@ class Naufrago:
       (model, iter) = self.treeselection.get_selected()
       # START NAME PARSING (nodo origen) #
       rgxp = r''' \[.*\]$'''
-      nombre_feed = model.get_value(iter, 0)
+      ### BETA TEST ###
+      # Little hack for being able to mark read/unread the entries found on a search.
+      try:
+       nombre_feed = model.get_value(iter, 0)
+      except:
+       q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+       cursor.execute(q)
+       id_feed = cursor.fetchone()[0]
+       iter = self.treeindex[id_feed]
+       nombre_feed = model.get_value(iter, 0)
+      ### BETA TEST ###
+
       m = re.search(rgxp, nombre_feed)
       if m is not None:
        nombre_feed = nombre_feed.split(' ')
@@ -408,6 +425,7 @@ class Naufrago:
        feed_label = nombre_feed + ' [' + str(no_leidos) + ']'
       else:
        feed_label = nombre_feed + ' [1]'
+      print 'g) ' + feed_label
       model.set(iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo origen) #
       # START NAME PARSING (nodo destino) #
@@ -423,6 +441,7 @@ class Naufrago:
         feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
        else:
         feed_label = nombre_feed_destino + ' [1]'
+       print 'h) ' + feed_label
        model.set(dest_iter, 0, feed_label, 3, 'bold')
        ### START: ¡También cabe actualizar su compañero de batallas!
        if nombre_feed == _("Important"):
@@ -439,6 +458,7 @@ class Naufrago:
        else:
         feed_label = nombre_feed_destino + ' [1]'
        if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
+        print 'i) ' + feed_label
         model.set(dest_iter, 0, feed_label, 3, 'bold')
        ### END: ¡También cabe actualizar su compañero de batallas!
       else:
@@ -451,6 +471,7 @@ class Naufrago:
         feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
        else:
         feed_label = nombre_feed_destino + ' [1]'
+       print 'j) ' + feed_label
        model.set(dest_iter, 0, feed_label, 3, 'bold')
        # Destino: Importantes
        if flag_importante == True:
@@ -462,6 +483,7 @@ class Naufrago:
          feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
         else:
          feed_label = nombre_feed_destino + ' [1]'
+        print 'k)' + feed_label
         model.set(dest_iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo destino) #
        
@@ -475,7 +497,19 @@ class Naufrago:
       (model, iter) = self.treeselection.get_selected()
       # START NAME PARSING (nodo origen) #
       rgxp = r''' \[.*\]$'''
-      nombre_feed = model.get_value(iter, 0)
+      ### BETA TEST ###
+      # Little hack for being able to mark read/unread the entries found on a search.
+      try:
+       nombre_feed = model.get_value(iter, 0)
+      except:
+       q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+       cursor.execute(q)
+       id_feed = cursor.fetchone()[0]
+       iter = self.treeindex[id_feed]
+       nombre_feed = model.get_value(iter, 0)
+      ### BETA TEST ###
+      ###nombre_feed = model.get_value(iter, 0)
+
       m = re.search(rgxp, nombre_feed)
       if m is not None:
        nombre_feed = nombre_feed.split(' ')
@@ -488,6 +522,7 @@ class Naufrago:
        else:
         font_style = 'bold'
         feed_label = nombre_feed + ' [' + str(no_leidos) + ']'
+       print 'l) ' + feed_label
        model.set(iter, 0, feed_label, 3, font_style)
        # END NAME PARSING (nodo origen) #
        # START NAME PARSING (nodo destino) #
@@ -506,6 +541,7 @@ class Naufrago:
          else: # Y si todavía quedan...
           font_style = 'bold'
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+         print 'm) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, font_style)
         ### START: ¡También cabe actualizar su compañero de batallas!
         if nombre_feed == _("Important"):
@@ -525,6 +561,7 @@ class Naufrago:
           font_style = 'bold'
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']' 
          if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
+          print 'n) ' + feed_label
           model.set(dest_iter, 0, feed_label, 3, font_style)
         ### END: ¡También cabe actualizar su compañero de batallas!
        else:
@@ -540,6 +577,7 @@ class Naufrago:
          else: # Y si todavía quedan...
           font_style = 'bold'
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+         print 'o) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, font_style)
         # Destino: Importantes
         if flag_importante == True:
@@ -554,6 +592,7 @@ class Naufrago:
           else: # Y si todavía quedan...
            font_style = 'bold'
            feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+          print 'p) ' + feed_label
           model.set(dest_iter, 0, feed_label, 3, font_style)
        # END NAME PARSING (nodo destino) #
 
@@ -580,7 +619,20 @@ class Naufrago:
      (model, iter) = self.treeselection.get_selected()
      # START NAME PARSING (nodo origen) #
      rgxp = r''' \[.*\]$'''
-     nombre_feed = model.get_value(iter, 0)
+     ### BETA TEST ###
+     # Little hack for being able to mark read/unread the entries found on a search.
+     # ¡¡¡ Esto aquí cambia porque hay varios feeds involucrados !!!
+     try:
+      nombre_feed = model.get_value(iter, 0)
+     except:
+      q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+      cursor.execute(q)
+      id_feed = cursor.fetchone()[0]
+      iter = self.treeindex[id_feed]
+      nombre_feed = model.get_value(iter, 0)
+     ### BETA TEST ###
+     ###nombre_feed = model.get_value(iter, 0)
+
      font_style = ''
      if liststore_font_style == 'bold': # Si antes era bold...
       m = re.search(rgxp, nombre_feed)
@@ -598,6 +650,7 @@ class Naufrago:
        nombre_feed = ' '.join(nombre_feed[0:len(nombre_feed)-1])
       feed_label = nombre_feed + ' [' + str(count) + ']'
       font_style = 'bold'
+     print 'q) ' + feed_label
      model.set(iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo origen) #
      # START NAME PARSING (nodo destino) #
@@ -621,6 +674,7 @@ class Naufrago:
          else:
           feed_label = nombre_feed_destino
           font_style = 'normal'
+         print 'r) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, font_style)
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
@@ -642,6 +696,7 @@ class Naufrago:
           else: # Y si todavía quedan...
            font_style = 'bold'
            feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+          print 's) ' + feed_label
           model.set(dest_iter, 0, feed_label, 3, font_style)
          ### END: ¡También cabe actualizar su compañero de batallas!
       elif liststore_font_style == 'normal':
@@ -661,6 +716,7 @@ class Naufrago:
           feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
          else:
           feed_label = nombre_feed_destino + ' [' + str(count) + ']'
+         print 't) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, 'bold')
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
@@ -685,6 +741,7 @@ class Naufrago:
          else:
           font_style = 'normal'
           feed_label = nombre_feed_destino
+         print 'u) ' + feed_label
          model.set(dest_iter, 0, feed_label, 3, font_style)
          ### END: ¡También cabe actualizar su compañero de batallas!
      else:
@@ -713,6 +770,7 @@ class Naufrago:
        else:
         feed_label = nombre_feed_destino + ' [' + str(count) + ']'
        font_style = 'bold'
+      print 'v) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
       # Destino: Importantes
       dest_iter = self.treeindex[9998]
@@ -738,6 +796,7 @@ class Naufrago:
        else:
         feed_label = nombre_feed_destino + ' [' + str(count) + ']'
        font_style = 'bold'
+      print 'w) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo destino) #
 
@@ -842,7 +901,19 @@ class Naufrago:
    if liststore_font_style == 'bold': # Si la entry era bold, cabe actualizar el nodo del feed
     rgxp = r''' \[.*\]$'''
     feed_label = ''
-    nombre_feed = model.get_value(iter, 0)
+    ### BETA TEST ###
+    # Little hack for being able to mark read/unread the entries found on a search.
+    try:
+     nombre_feed = model.get_value(iter, 0)
+    except:
+     q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+     cursor.execute(q)
+     id_feed = cursor.fetchone()[0]
+     iter = self.treeindex[id_feed]
+     nombre_feed = model.get_value(iter, 0)
+    ### BETA TEST ###
+    ###nombre_feed = model.get_value(iter, 0)
+
     m = re.search(rgxp, nombre_feed)
     if m is not None:
      nombre_feed = nombre_feed.split(' ')
@@ -855,6 +926,7 @@ class Naufrago:
      else: # Y si todavía quedan...
       font_style = 'bold'
       feed_label = nombre_feed + ' [' + str(no_leidos) + ']'
+     print 'x) ' + feed_label
      model.set(iter, 0, feed_label, 3, font_style)
    # END NAME PARSING (nodo origen) #
     # START NAME PARSING (nodo destino) #
@@ -873,6 +945,7 @@ class Naufrago:
       else: # Y si todavía quedan...
        font_style = 'bold'
        feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+      print 'y) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      ### START: ¡También cabe actualizar su compañero de batallas!
      if nombre_feed == _("Important"):
@@ -896,6 +969,7 @@ class Naufrago:
       # ESTO ES ABSOLUTAMENTE NECESARIO para que 'Important' no actúe si no tenemos el flag_importante.
       # Aplicarlo en los demás sitios que falte.
       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
+       print 'z) ' + feed_label
        model.set(dest_iter, 0, feed_label, 3, font_style)
      ### END: ¡También cabe actualizar su compañero de batallas!
     else:
@@ -912,6 +986,7 @@ class Naufrago:
       else: # Y si todavía quedan...
        font_style = 'bold'
        feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+      print 'a1) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      # Destino: Importantes
      if flag_importante == True:
@@ -926,6 +1001,7 @@ class Naufrago:
        else: # Y si todavía quedan...
         font_style = 'bold'
         feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
+       print 'b1) ' + feed_label
        model.set(dest_iter, 0, feed_label, 3, font_style)
     # END NAME PARSING (nodo destino) #
 
@@ -937,11 +1013,13 @@ class Naufrago:
    id_feed = self.treestore.get_value(iter, 2)
    if (id_feed == 9998) or (id_feed == 9999):
     self.populate_entries(id_feed)
+    self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     nombre_feed = self.simple_name_parsing(row_name)
     self.webview.load_string("<h2>" + _("Special folder") + ": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
    elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
     ###id_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_feed)
+    self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     cursor = self.conn.cursor()
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
     url = cursor.fetchone()[0]
@@ -1056,6 +1134,7 @@ class Naufrago:
                 </menu>
                 <menu action='EditMenu'>
                  <menuitem action='Edit'/>
+                 <menuitem action='Search'/>
                  <menuitem action='Preferences'/>
                 </menu>
                 <menu action='NetworkMenu'>
@@ -1073,6 +1152,7 @@ class Naufrago:
                 <separator name='sep1'/>
                 <toolitem name='Update all' action='Update all'/>
                 <separator name='sep2'/>
+                <toolitem name='Search' action='Search'/>
                 <toolitem name='Preferences' action='Preferences'/>
                </toolbar>
               </ui>"""
@@ -1095,7 +1175,7 @@ class Naufrago:
   ag = gtk.ActionGroup('WindowActions')
   actions = [
             ('ArchiveMenu', None, _('_Archive')),
-            ('New feed', 'rss-image', _('New _feed'), '<control>F', _('Adds a feed'), self.add_feed),
+            ('New feed', 'rss-image', _('_New feed'), '<control>N', _('Adds a feed'), self.add_feed),
             ('New category', gtk.STOCK_DIRECTORY, _('New _category'), '<alt>C', _('Adds a category'), self.add_category),
             ('Delete feed', gtk.STOCK_CLEAR, _('Delete feed'), None, _('Deletes a feed'), self.delete_feed),
             ('Delete category', gtk.STOCK_CANCEL, _('Delete category'), None, _('Deletes a category'), self.delete_category),
@@ -1104,6 +1184,7 @@ class Naufrago:
             ('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', _('Quits'), self.delete_event),
             ('EditMenu', None, _('E_dit')),
             ('Edit', gtk.STOCK_EDIT, _('_Edit'), '<control>E', _('Edits the selected element'), self.edit),
+            ('Search', gtk.STOCK_FIND, _('Search'), '<control>F', _('Searchs for a term in the feeds'), self.search),
             ('Preferences', gtk.STOCK_EXECUTE, _('_Preferences'), '<control>P', _('Shows preferences'), self.preferences),
             ('NetworkMenu', None, _('_Network')),
             ('Update', None, _('_Update'), '<control>U', _('Updates the selected feed'), self.update_feed),
@@ -1569,7 +1650,7 @@ class Naufrago:
   self.treeindex[9998] = special # NEW
   self.treeindex[9999] = special2 # NEW
 
- def populate_entries(self, id_feed):
+ def populate_entries(self, id_feed, search_request_entry_ids=None):
   """Obtains the entries of the selected feed"""
   font_style=''
   importante=False
@@ -1580,6 +1661,8 @@ class Naufrago:
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
   elif id_feed == 9999:
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+  elif search_request_entry_ids is not None:
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
   else:
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
   cursor.execute(q)
@@ -1611,7 +1694,11 @@ class Naufrago:
 
  def add_category(self, data=None):
   """Adds/edits a category to/from the user feed tree structure"""
-  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  #dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
+  dialog.add_button(_("Create"), gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+
   entry = gtk.Entry(max=128)
 
   if((data is not None) and (type(data) is not gtk.Action)): # Modo edición I
@@ -1627,7 +1714,7 @@ class Naufrago:
    dialog.set_markup(_('Please, insert the <b>category</b>:'))
 
   # These are for 'capturing Enter' as OK
-  dialog.set_default_response(gtk.RESPONSE_OK) # Sets default response
+  dialog.set_default_response(gtk.RESPONSE_ACCEPT) # Sets default response
   entry.set_activates_default(True) # Activates default response
 
   dialog.vbox.pack_end(entry, True, True, 0)
@@ -1636,7 +1723,7 @@ class Naufrago:
   text = entry.get_text()
   dialog.destroy()
 
-  if((text != '') and (response == gtk.RESPONSE_OK)):
+  if((text != '') and (response == gtk.RESPONSE_ACCEPT)):
    cursor = self.conn.cursor()
    # Create category in the database (if it does not exist!)
    cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [text.decode("utf-8")])
@@ -1731,7 +1818,11 @@ class Naufrago:
 
  def add_feed(self, data=None):
   """Adds a feed to the user feed tree structure"""
-  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  #dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
+  dialog.add_button(_("Add"), gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+
   entryName = gtk.Entry(max=256)
   entryURL = gtk.Entry(max=1024)
   labelName = gtk.Label(_('Name '))
@@ -1750,7 +1841,7 @@ class Naufrago:
   else:
    labelURL = gtk.Label('URL ')
    dialog.set_title(_('Add feed'))
-   dialog.set_markup(_('Please, insert <b>feed</b> data:'))
+   dialog.set_markup(_('Please, insert <b>feed</b> address:'))
    new = True
 
   hbox1 = gtk.HBox()
@@ -1762,7 +1853,7 @@ class Naufrago:
   hbox2.pack_start(entryURL, True, True, 0)
   dialog.vbox.pack_start(hbox2, True, True, 0)
   # These are for 'capturing Enter' as OK
-  dialog.set_default_response(gtk.RESPONSE_OK) # Sets default response
+  dialog.set_default_response(gtk.RESPONSE_ACCEPT) # Sets default response
   entryName.set_activates_default(True) # Activates default response for this entry
   entryURL.set_activates_default(True) # Activates default response for this entry
   dialog.show_all()
@@ -1785,7 +1876,7 @@ class Naufrago:
    else: textName = _('Default name')
   dialog.destroy()
 
-  if((textName != '') and (textURL != '') and (response == gtk.RESPONSE_OK)):
+  if((textName != '') and (textURL != '') and (response == gtk.RESPONSE_ACCEPT)):
    cursor = self.conn.cursor()
    (model, iter) = self.treeselection.get_selected()
    if((data is not None) and (type(data) is not gtk.Action)): # Modo edición III
@@ -1927,24 +2018,44 @@ class Naufrago:
    self.warning_message(_('You must choose a category or a feed to edit!'))
 
  # ¡¡¡ TODO START !!!
- def search(self):
+ def search(self, data=None):
   """Searches for a keyword on a given feed (or all, if no one is selected)."""
-  print 'Searching...'
-  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
+  dialog.add_button(_("Search"), gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+
   dialog.set_title(_('Search'))
-  dialog.set_markup(_('Insert the <b>term/s to search for</b>:'))
+  dialog.set_markup(_('Insert the <b>searchterm/s</b>:'))
   entry = gtk.Entry(max=128)
-  dialog.set_default_response(gtk.RESPONSE_OK) # Sets default response
+  dialog.set_default_response(gtk.RESPONSE_ACCEPT) # Sets default response
   entry.set_activates_default(True) # Activates default response
   dialog.vbox.pack_end(entry, True, True, 0)
   dialog.show_all()
   response = dialog.run()
   text = entry.get_text()
   dialog.destroy()
- # ¡¡¡ TODO END !!!
 
-  if((text != '') and (response == gtk.RESPONSE_OK)):
-   print 'Searching the term/s "' + text + '"...'
+  if((text != '') and (response == gtk.RESPONSE_ACCEPT)):
+   self.throbber.show()
+   self.treeselection.unselect_all()
+
+   cursor = self.conn.cursor()
+   cursor.execute("SELECT id FROM articulo WHERE titulo LIKE '%"+text+"%' OR contenido LIKE '%"+text+"%'")
+   row = cursor.fetchall()
+   cursor.close()
+   entry_ids = ''
+   if (row is not None) and (len(row)>0):
+    for id_articulo in row:
+     entry_ids += str(id_articulo[0])+','
+    entry_ids = entry_ids[0:-1]
+
+    self.scrolled_window2.set_size_request(300,150)
+    self.scrolled_window2.show()
+    self.populate_entries(123456, entry_ids) # Invented feed_id since we don't need any here...
+    self.webview.load_string("<h2>" + _("Search results for") + ": "+ text + "</h2>", "text/html", "utf-8", "valid_link")
+
+   self.throbber.hide()
+ # ¡¡¡ TODO END !!!
 
  def change_toolbar_mode(self, toolbar_mode):
   """Changes the toolbar style."""
@@ -1989,8 +2100,12 @@ class Naufrago:
 
  def preferences(self, data=None):
   """Preferences dialog."""
-  dialog = gtk.Dialog(_("Preferences"), self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+  dialog = gtk.Dialog(_("Preferences"), self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, None)
+  #                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+  
+  dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+
   dialog.set_size_request(250,225)
   dialog.set_border_width(2)
   dialog.set_resizable(False)
@@ -2154,7 +2269,7 @@ class Naufrago:
   parent_value = str(model.get_value(target, 0))
   row_value = str(model.get_value(source_row.iter, 0))
   row_value = self.simple_name_parsing(row_value)
-  cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value,row_value])
+  cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value.decode("utf-8")])
   self.conn.commit()
   cursor.close()
 
@@ -2413,13 +2528,18 @@ class Naufrago:
    dp = dentry.date_parsed
    try:
     secs = time.mktime(datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
+    #t = datetime.datetime(int(dp[0]), int(dp[1]), int(dp[2]), int(dp[3]), int(dp[4]), int(dp[5]))
+    #secs = time.mktime(t.timetuple())
+    #print 'Correct date taken: ' + str(dp)
    except:
+    #print 'Dentry.date_parsed exist, BUT correct date could not be taken; creating my own...'
     split = str(datetime.datetime.now()).split(' ')
     ds = split[0].split('-')
     ts = split[1].split(':')
     t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
     secs = time.mktime(t.timetuple())
   else:
+   #print 'Date entry does not exist! Creating my own...'
    split = str(datetime.datetime.now()).split(' ')
    ds = split[0].split('-')
    ts = split[1].split(':')
@@ -2495,10 +2615,11 @@ class Naufrago:
   """Enables/disables some menuitems while getting feeds to avoid
      multiple instances running or race conditions."""
   item_list = ["/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
-               "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Quit",
-               "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Preferences",
-               "/Menubar/NetworkMenu/Update", "/Menubar/NetworkMenu/Update all",
-               "/Toolbar/Update all", "/Toolbar/Preferences"]
+               "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
+               "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
+               "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
+               "/Menubar/NetworkMenu/Update all", "/Toolbar/Update all", "/Toolbar/Search",
+               "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
@@ -2883,8 +3004,8 @@ class Naufrago:
   dialog = gtk.FileChooserDialog(_("Open.."),
                                 self.window,
                                 gtk.FILE_CHOOSER_ACTION_OPEN,
-                                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+                                (gtk.STOCK_OPEN, gtk.RESPONSE_OK,
+                                gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
 
   dialog.set_default_response(gtk.RESPONSE_OK)
 
@@ -2947,10 +3068,12 @@ class Naufrago:
   """Exports feeds to an OPML file."""
   dialog = gtk.FileChooserDialog(_("Open.."),
                                 self.window,
-                                gtk.FILE_CHOOSER_ACTION_SAVE,
-                                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+                                gtk.FILE_CHOOSER_ACTION_SAVE, None)
+                                #(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                #gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
+  dialog.add_button(_("_Save"), gtk.RESPONSE_OK)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
   dialog.set_default_response(gtk.RESPONSE_OK)
 
   filter = gtk.FileFilter()

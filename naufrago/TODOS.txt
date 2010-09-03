@@ -135,6 +135,9 @@ BUGS:
 - Uso del thread de obtención de feeds mejorado. DONE
 - Uso del thread de importación de feeds mejorado. DONE
 - Aceleradores más intuitivos. DONE
+- Intento de usar fechas correctas, pero el problema es de feedparser. DISCARDED
+- Todavía problemas de recuento en Unread. PENDING
+- Marcar/desmarcar todos como leidos en las entries de una busqueda. PENDING
 
 ROADMAP 0.2:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
