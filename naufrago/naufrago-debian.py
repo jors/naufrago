@@ -515,14 +515,15 @@ class Naufrago:
      ### BETA TEST ###
      # Little hack for being able to mark read/unread the entries found on a search.
      # ¡¡¡ Esto aquí cambia porque hay varios feeds involucrados !!!
-     try:
+     """try:
       nombre_feed = model.get_value(iter, 0)
      except:
       q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
       cursor.execute(q)
       id_feed = cursor.fetchone()[0]
       iter = self.treeindex[id_feed]
-      nombre_feed = model.get_value(iter, 0)
+      nombre_feed = model.get_value(iter, 0)"""
+     nombre_feed = model.get_value(iter, 0)
      ### BETA TEST ###
 
      font_style = ''
@@ -573,15 +574,6 @@ class Naufrago:
          else:
           feed_label = nombre_feed_destino
           font_style = 'normal'
-         """(nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-         if (no_leidos is not None) and (no_leidos > 0) and (int(no_leidos) - int(count) > 0):
-          no_leidos = int(no_leidos) - int(count)
-          feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-          font_style = 'bold'
-         else:
-          feed_label = nombre_feed_destino
-          font_style = 'normal'
-         print 'r) ' + feed_label"""
          model.set(dest_iter, 0, feed_label, 3, font_style)
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
@@ -614,13 +606,6 @@ class Naufrago:
          else:
           feed_label = nombre_feed_destino
           font_style = 'normal'
-         """(nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-         if no_leidos is not None:
-          no_leidos = int(no_leidos) + int(count)
-          feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-         else:
-          feed_label = nombre_feed_destino + ' [' + str(count) + ']'
-         print 't) ' + feed_label"""
          model.set(dest_iter, 0, feed_label, 3, 'bold')
          ### START: ¡También cabe actualizar su compañero de batallas!
          if nombre_feed == _("Important"):
