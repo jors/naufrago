@@ -136,7 +136,7 @@ BUGS:
 - Uso del thread de importación de feeds mejorado. DONE
 - Aceleradores más intuitivos. DONE
 - Intento de usar fechas correctas, pero el problema es de feedparser. DISCARDED
-- Todavía problemas de recuento en Unread. PENDING
+- Todavía problemas de recuento en Unread. DONE
 - Marcar/desmarcar todos como leidos en las entries de una busqueda. PENDING
 
 ROADMAP 0.2:
@@ -146,7 +146,11 @@ ROADMAP 0.2:
 - Carpeta de no leídos. DONE
 - Tooltip/notificación de entries nuevas (meterlo en Preferencias). DONE
 - Esconder entries leidas (meterlo en Preferencias). DONE
-- Buscador de términos.
+- Buscador de términos. DONE
 - Traducciones a más idiomas (Polish, por Michal; italiano, por kir).
-- Más threads.
+- Más threads. DONE
+Además...
+- Moverse al principio de la entry list al seleccionar un feed. DONE
+- Guardado del ancho de la lista de feeds. DONE
+- Pequeños bugs de importar/exportar feeds. DONE
 
