@@ -35,7 +35,6 @@ import time
 import datetime
 import webkit
 import threading
-#gtk.gdk.threads_init()
 import webbrowser
 import pango
 import urllib2
@@ -347,7 +346,6 @@ class Naufrago:
 
       # 3º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
-      ### BETA TEST ###
       # Little hack for being able to mark read/unread the entries found on a search.
       try: # Feed seleccionado en el tree
        nombre_feed = model.get_value(iter, 0)
@@ -357,7 +355,6 @@ class Naufrago:
        id_feed = cursor.fetchone()[0]
        iter = self.treeindex[id_feed]
        nombre_feed = model.get_value(iter, 0)
-      ### BETA TEST ###
 
       (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
       if no_leidos is not None:
@@ -411,7 +408,6 @@ class Naufrago:
 
       # 3º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
-      ### BETA TEST ###
       # Little hack for being able to mark read/unread the entries found on a search.
       try: # Feed seleccionado en el tree
        nombre_feed = model.get_value(iter, 0)
@@ -421,8 +417,6 @@ class Naufrago:
        id_feed = cursor.fetchone()[0]
        iter = self.treeindex[id_feed]
        nombre_feed = model.get_value(iter, 0)
-      ###nombre_feed = model.get_value(iter, 0)
-      ### BETA TEST ###
 
       (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
       if (no_leidos is not None) and (no_leidos > 0):
@@ -492,7 +486,6 @@ class Naufrago:
       entry_ids += str(id_articulo)+','
       iter = self.liststore.iter_next(iter)
      entry_ids = entry_ids[0:-1]
-     print 'entry_ids: ' + entry_ids
 
      # La actualización en BD del nodo origen se deja para el final...
      q = 'UPDATE articulo SET leido = ' + str(leido) + ' WHERE id IN (' + entry_ids + ')'
@@ -502,9 +495,7 @@ class Naufrago:
      # Y actualizar el modelo de datos.
      (model, iter) = self.treeselection.get_selected()
      # START NAME PARSING (nodo origen) #
-     ### BETA TEST ###
-     # Little hack for being able to mark read/unread the entries found on a search.
-     # ¡¡¡ Esto aquí cambia porque hay varios feeds involucrados !!!
+     # Little hack -slightly different- for being able to mark read/unread the entries found on a search.
      id_feeds = []
      nombre_feeds = []
      on_a_search = False
@@ -518,7 +509,6 @@ class Naufrago:
       for id_feed in id_feeds:
        iter = self.treeindex[id_feed[0]]
        nombre_feeds.append(model.get_value(iter, 0))
-     ### BETA TEST ###
 
      nombre_feed = nombre_feeds[0]
      if not on_a_search:
@@ -633,7 +623,6 @@ class Naufrago:
         for nombre_feed in nombre_feeds:
          nombre_feed = self.simple_name_parsing(nombre_feed)
          q = 'SELECT count(id) FROM articulo WHERE id_feed = '+str(id_feeds[i][0])+' AND leido = 0'
-         print 'q: ' + str(q)
          cursor.execute(q)
          count = cursor.fetchone()
          if count[0] is not None:
@@ -692,7 +681,6 @@ class Naufrago:
 
   (model, iter) = self.treeselection2.get_selected()
   if(iter is not None): # Hay alguna fila de la lista seleccionada
-   #fecha = self.liststore.get_value(iter, 0)
    flag_importante = self.liststore.get_value(iter, 1)
    titulo = self.liststore.get_value(iter, 2)
    id_articulo = self.liststore.get_value(iter, 4)
@@ -747,7 +735,6 @@ class Naufrago:
    # START NAME PARSING (nodo origen) #
    if liststore_font_style == 'bold': # Si la entry era bold, cabe actualizar el nodo del feed
     feed_label = ''
-    ### BETA TEST ###
     # Little hack for being able to mark read/unread the entries found on a search.
     try:
      nombre_feed = model.get_value(iter, 0)
@@ -757,7 +744,6 @@ class Naufrago:
      id_feed = cursor.fetchone()[0]
      iter = self.treeindex[id_feed]
      nombre_feed = model.get_value(iter, 0)
-    ### BETA TEST ###
 
     (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
     if (no_leidos is not None) and (no_leidos > 0):
@@ -789,7 +775,6 @@ class Naufrago:
       else: # Y si todavía quedan...
        font_style = 'bold'
        feed_label = nombre_feed_destino + ' [' + str(no_leidos) + ']'
-      print 'y) ' + feed_label
       model.set(dest_iter, 0, feed_label, 3, font_style)
      ### START: ¡También cabe actualizar su compañero de batallas!
      if nombre_feed == _("Important"):
@@ -801,7 +786,6 @@ class Naufrago:
       # ESTO ES ABSOLUTAMENTE NECESARIO para que 'Important' no actúe si no tenemos el flag_importante.
       # Aplicarlo en los demás sitios que falte.
       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
-       print 'z) ' + feed_label
        model.set(dest_iter, 0, feed_label, 3, font_style)
      ### END: ¡También cabe actualizar su compañero de batallas!
     else:
@@ -824,7 +808,6 @@ class Naufrago:
     nombre_feed = self.simple_name_parsing(row_name)
     self.webview.load_string("<h2>" + _("Special folder") + ": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
    elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
-    ###id_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_feed)
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     cursor = self.conn.cursor()
@@ -884,7 +867,9 @@ class Naufrago:
 
  def warning_message(self, str):
   """Shows a custom warning message dialog"""
-  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, str)
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, None)
+  dialog.set_title(_('Warning!'))
+  dialog.set_markup(str)
   dialog.run()
   dialog.destroy()
 
@@ -1197,7 +1182,6 @@ class Naufrago:
   self.scrolled_window1 = gtk.ScrolledWindow()
   self.scrolled_window1.add(self.treeview)
   self.scrolled_window1.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-  #self.scrolled_window1.set_size_request(175,50) # Sets an acceptable tree sizing
   self.scrolled_window1.set_size_request(self.a, self.b) # Sets an acceptable tree sizing
   self.hpaned.add1(self.scrolled_window1)
 
@@ -1306,7 +1290,6 @@ class Naufrago:
   self.statusbar = gtk.Label("")
   self.statusbar.set_justify(gtk.JUSTIFY_LEFT)
   self.statusbar.set_ellipsize(pango.ELLIPSIZE_END)
-  ###self.statusbar.set_alignment(xalign=0, yalign=0)
   self.statusbar.set_alignment(xalign=0.01, yalign=0)
   self.hbox2.pack_start(self.statusbar, expand=True, fill=True, padding=0)
   self.vbox.pack_start(self.hbox2, False, False, 0)
@@ -1495,8 +1478,7 @@ class Naufrago:
     else: font_style='bold'
     if row[4] == 1: importante=True
     else: importante=False
-    #self.liststore.append([fecha, importante, self.htmlentitydecode(row[1]), font_style, row[0]])
-    # We: remove newlines, remove HTML tags, decode htmlentities.
+    # We remove newlines, remove HTML tags and decode htmlentities.
     self.liststore.append([fecha, importante, self.htmlentitydecode(p.sub('',row[1].replace('\n',''))), font_style, row[0]])
     any_row_to_show=True
 
@@ -1511,11 +1493,7 @@ class Naufrago:
 
  def add_category(self, data=None):
   """Adds/edits a category to/from the user feed tree structure"""
-  #dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
-  dialog.add_button(_("Create"), gtk.RESPONSE_ACCEPT)
-  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-
   entry = gtk.Entry(max=128)
 
   if((data is not None) and (type(data) is not gtk.Action)): # Modo edición I
@@ -1526,9 +1504,12 @@ class Naufrago:
    entry.set_text(nombre_categoria)
    dialog.set_title(_('Edit category'))
    dialog.set_markup(_('Change <b>category</b> name to:'))
+   dialog.add_button(_("Edit"), gtk.RESPONSE_ACCEPT)
   else:
    dialog.set_title(_('Add category'))
    dialog.set_markup(_('Please, insert the <b>category</b>:'))
+   dialog.add_button(_("Create"), gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
   # These are for 'capturing Enter' as OK
   dialog.set_default_response(gtk.RESPONSE_ACCEPT) # Sets default response
@@ -1629,19 +1610,15 @@ class Naufrago:
       self.scrolled_window2.hide()
       cursor.close()
     else:
-     self.warning_message(_('This category cannot be deleted!'))
+     self.warning_message(_('This category <b>cannot be deleted</b>!'))
    else:
-    self.warning_message(_('You must choose a category folder!'))
+    self.warning_message(_('You <b>must choose a category</b> folder!'))
   else:
-   self.warning_message(_('You must choose a category folder!'))
+   self.warning_message(_('You <b>must choose a category</b> folder!'))
 
  def add_feed(self, data=None):
   """Adds a feed to the user feed tree structure"""
-  #dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
-  dialog.add_button(_("Add"), gtk.RESPONSE_ACCEPT)
-  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-
   entryName = gtk.Entry(max=256)
   entryURL = gtk.Entry(max=1024)
   labelName = gtk.Label(_('Name '))
@@ -1657,11 +1634,14 @@ class Naufrago:
    entryURL.set_text(row[0])
    dialog.set_title(_('Edit feed'))
    dialog.set_markup(_('Change <b>feed</b> data:'))
+   dialog.add_button(_("Edit"), gtk.RESPONSE_ACCEPT)
   else:
    labelURL = gtk.Label('URL ')
    dialog.set_title(_('Add feed'))
    dialog.set_markup(_('Please, insert <b>feed</b> address:'))
+   dialog.add_button(_("Add"), gtk.RESPONSE_ACCEPT)
    new = True
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
   hbox1 = gtk.HBox()
   hbox1.pack_start(labelName, True, True, 0)
@@ -1805,10 +1785,6 @@ class Naufrago:
       os.unlink(favicon_path + '/'+ str(id_feed))
 
      # Actualizamos No-leidos e Importantes
-     #(nombre_feed_origen, no_leidos_origen) = self.less_simple_name_parsing(nombre_feed)
-     #if no_leidos_origen is not None:
-     # self.update_special_folder(9999, no_leidos_origen)
-     # self.update_special_folder(9998, no_leidos_origen)
      self.update_special_folder(9999)
      self.update_special_folder(9998)
 
@@ -1817,9 +1793,9 @@ class Naufrago:
      self.scrolled_window2.set_size_request(0,0)
      self.scrolled_window2.hide()
    else:
-    self.warning_message(_('You must choose a feed!'))
+    self.warning_message(_('You <b>must choose a feed</b>!'))
   else:
-   self.warning_message(_('You must choose a feed!'))
+   self.warning_message(_('You <b>must choose a feed</b>!'))
 
  def delete(self, data=None):
   """Summons deleting feed or category, depending on selection."""
@@ -1839,13 +1815,12 @@ class Naufrago:
     if(id_categoria_o_feed != 1) and (id_categoria_o_feed != 9998) and (id_categoria_o_feed != 9999):
      self.add_category(id_categoria_o_feed)
     else:
-     self.warning_message(_('This category cannot be edited!'))
+     self.warning_message(_('This category <b>cannot be edited</b>!'))
    elif(model.iter_depth(iter) == 1): # ... y es un nodo hijo
     self.add_feed(id_categoria_o_feed)
   else:
-   self.warning_message(_('You must choose a category or a feed to edit!'))
+   self.warning_message(_('You <b>must choose a category or a feed</b> to edit!'))
 
- # ¡¡¡ TODO START !!!
  def search(self, data=None):
   """Searches for a keyword on a given feed (or all, if no one is selected)."""
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, None)
@@ -1853,7 +1828,7 @@ class Naufrago:
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
   dialog.set_title(_('Search'))
-  dialog.set_markup(_('Insert the <b>searchterm/s</b>:'))
+  dialog.set_markup(_('Insert the <b>searchterm</b>:'))
   entry = gtk.Entry(max=128)
   dialog.set_default_response(gtk.RESPONSE_ACCEPT) # Sets default response
   entry.set_activates_default(True) # Activates default response
@@ -1882,9 +1857,10 @@ class Naufrago:
     self.scrolled_window2.show()
     self.populate_entries(123456, entry_ids) # Invented feed_id since we don't need any here...
     self.webview.load_string("<h2>" + _("Search results for") + ": "+ text + "</h2>", "text/html", "utf-8", "valid_link")
+   else:
+    self.warning_message(_('No entry found for <b>'+text+'</b>.'))
 
    self.throbber.hide()
- # ¡¡¡ TODO END !!!
 
  def change_toolbar_mode(self, toolbar_mode):
   """Changes the toolbar style."""
@@ -1916,7 +1892,7 @@ class Naufrago:
    self.toolbar.hide()
 
  def trayicon_toggle_cb(self, checkboxparent, checkboxchild):
-  """Controlls the linked trayicon checkboxes of the preferences dialog.."""
+  """Controlls the linked trayicon checkboxes of the preferences dialog."""
   if checkboxparent.get_active():
    checkboxchild.set_sensitive(True)
    self.show_trayicon = 1
@@ -1927,11 +1903,19 @@ class Naufrago:
    self.show_trayicon = 0
    self.statusicon.set_visible(False)
 
+ def hide_read_entries_cb(self, checkbox):
+  """Controlls the read entry hidding of the preferences dialog."""
+  (model, iter) = self.treeselection.get_selected()
+  if(iter is not None): # Si hay algún nodo seleccionado...
+   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+    if checkbox.get_active(): self.hide_readentries = 1
+    else: self.hide_readentries = 0
+    id_selected_feed = self.treestore.get_value(iter, 2)
+    self.populate_entries(id_selected_feed)
+
  def preferences(self, data=None):
   """Preferences dialog."""
   dialog = gtk.Dialog(_("Preferences"), self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, None)
-  #                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-  
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
@@ -1997,12 +1981,12 @@ class Naufrago:
   else: checkbox0.set_active(False)
   vbox3.pack_start(checkbox0, True, True, 5)
 
-  # NEW
   checkbox6 = gtk.CheckButton(_("Hide read entries"))
+  aux_hide_readentries = self.hide_readentries # Aux var to remember original state
   if(self.hide_readentries == 1): checkbox6.set_active(True)
   else: checkbox6.set_active(False)
+  checkbox6.connect('toggled', self.hide_read_entries_cb)
   vbox3.pack_start(checkbox6, True, True, 5)
-  # NEW
 
   align2.add(vbox3)
   notebook.append_page(align2, gtk.Label(_("Feeds & articles")))
@@ -2078,6 +2062,7 @@ class Naufrago:
    self.change_toolbar_mode(self.toolbar_mode)
    self.statusicon.set_visible(aux_show_trayicon)
    self.show_trayicon = aux_show_trayicon
+   self.hide_readentries = aux_hide_readentries
 
  def treeview_copy_row(self, treeview, model, source, target, drop_position):
   """Copy tree model rows from treeiter source into, before or after treeiter target.
@@ -2287,7 +2272,6 @@ class Naufrago:
   """Toggles fullscreen mode for the browser."""
   if event.button == 1:
    if self.fullscreen:
-    #self.scrolled_window1.set_size_request(175,50)
     self.scrolled_window1.set_size_request(self.a, self.b)
     self.scrolled_window1.show()
     self.scrolled_window2.set_size_request(300,150)
@@ -2473,12 +2457,10 @@ class Naufrago:
    #print d.bozo_exception
    for item in bozo_invalid:
     if item in str(d.bozo_exception):
-     #print 'a'
      model.set(dest_iter, 1, 'crossout-image')
      dont_parse = True
      break
     elif count == len(bozo_invalid):
-     #print 'b'
      # Si el feed no tiene icono propio, procurarle el generico!
      if not os.path.exists(favicon_path + '/' + str(id_feed)):
       model.set(dest_iter, 1, 'rss-image')
@@ -2486,7 +2468,6 @@ class Naufrago:
       model.set(dest_iter, 1, str(id_feed))
     count += 1
   else: # Feed HAS NOT any bozo exception...
-   #print 'c'
    # Si el feed no tiene icono propio, procurarle el generico!
    if not os.path.exists(favicon_path + '/' + str(id_feed)):
     model.set(dest_iter, 1, 'rss-image')
@@ -2652,7 +2633,6 @@ class Naufrago:
    cursor = self.conn.cursor()
    for k, v in data.iteritems():
     #key: id_feed, value: feed_iter
-    #print k, v
     id_feed = k
     child = v
 
@@ -2795,7 +2775,6 @@ class Naufrago:
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
    if (new_posts == True) and (num_new_posts_total > 0):
-    print "Se añadieron " + str(num_new_posts_total) + " entrada/s"
     n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts_total) + " entrada/s", self.imageURI)
     n.attach_to_status_icon(self.statusicon)
     n.show()
@@ -2879,8 +2858,6 @@ class Naufrago:
   dialog = gtk.FileChooserDialog(_("Open.."),
                                 self.window,
                                 gtk.FILE_CHOOSER_ACTION_SAVE, None)
-                                #(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                #gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
   dialog.add_button(_("_Save"), gtk.RESPONSE_OK)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
