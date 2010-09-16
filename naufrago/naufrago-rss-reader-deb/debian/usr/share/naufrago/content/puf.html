@@ -52,8 +52,11 @@
    <li>Inclusion of <b>favicons</b> for feeds.</li>
    <li>Application <b>iconization on</b> the system <b>Tray</b>.</li>
    <li><b>Import/export</b> feeds <b>in OPML</b> format.</li>
-   <li><b>Multi language</b> (currently English, Catalan and Spanish).</li>
-   </ul></p>
+   <li><b>Important</b> and <b>Unread folders</b>.</li>
+   <li>Term <b>searching capabilities</b>.</li>
+   <li><b>Multi language</b> (currently English, Polish, Italian, Catalan and Spanish).</li>
+  </ul>
+  </p>
   <h3 id="3"><u>Which are the minimum requirements?</u></h3>
   <p>If you're reading this, you probably meet them. In terms of software:
   <ul>
@@ -85,13 +88,13 @@
 
   <h1>Problems</h1>
   <h3 id="10"><u>The entries of one or more feeds are ordered wrong chronologically</u></h3>
-  <p>There are feeds that do not publish any date for their entries. While the application concerns about generating one, if there isn't, the retrieved articles / entries / posts recovered initially do not preserve order. But from this point, the following articles / entries / posts that are recovered will start to get sorted.</p>
+  <p>There are feeds that do not publish any date for their entries. While the application concerns about generating one, if there isn't, the retrieved articles / entries / posts recovered initially do not preserve order. But from this point, the following articles / entries / posts that are recovered will start to get sorted. <b>Update:</b> Still there's another problem with feedparser while parsing some feeds that produces weird date parsing (in instance, incorrect dates, future dates included).</p>
   <h3 id="11"><u>The entries of one or more feeds have not content, just titles</u></h3>
   <p>The same way there are feeds that do not publish any date for their entries, some do not provide content either, but only the title. If you want to read the articles / entries / posts from that site, you will have to visit their website.</p>
   <h3 id="12"><u>Feed import is so slow and seems to hang the app</u></h3>
-  <p>Indeed, the feeds import is slow, but it does not hang the application. A hand on this would be appreciated concerning threading to fix this. Are you ready? :)</p>
+  <p>That happened in 0.1 version, but should now be solved as long as it has been reworked as a threaded background task.</p>
   <h3 id="13"><u>The application was closed unexpectedly!</u></h3>
-  <p>Unfortunately, this happened sometimes and is an unidentified error, so we welcome all those who wish to make contributions in this regard.</p>
+  <p>Unfortunately, this happened sometimes and is an unidentified error (sometimes as a segfault, somestimes as an X error), so WE WELCOME all those who wish to make contributions in this regard. Help is needed!</p>
   <hr>
 
   <h1>Other</h1>
@@ -102,7 +105,7 @@
   <h3 id="16"><u>I would like the application made / had ...</u></h3>
   <p>The same way Liferea do, in principle I do not accept <i>feature requests</i>, but as more was lost in Cuba (that's a spanish expression), you do not lose anything by trying. If I find it interesting, who knows :) But, you can always give me a hand with it, do it yourself, ask someone, etc...</p>
   <h3 id="17"><u>Author's Acknowledgments</u></h3>
-  <p>The author thanks all those who have endured during development (especially to my girlfriend:) and to all of those who did give a hand. Likewise, he appreciates any contribution you want to do to the project.</p>
+  <p>The author thanks all those who have endured during development (especially to my girlfriend:) and to all of those who did give a hand. Likewise, he appreciates any contribution you want to do to the project, especially bug hunting and resolving them.</p>
   <h3 id="18"><u>Do you like Naufrago!?</u></h3>
   <p>The best gift for a writer of software is not the application usage, but the user's usage and appreciation report. A "thanks mate" will suffice in most of the cases :)</p><p>But you can also help improving the project, doing <i>bug fixes</i>, implementating new features, translating to new languages, packaging for different distros... The list is endless! Similarly, although not so nice, you can also criticize it. In any case, you can write to <b>worbynet</b>_at_<b>gmail</b>_dot_<b>com</b> and I'll be happy to hear from you.</p>
  </body>
