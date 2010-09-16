@@ -1,0 +1,484 @@
+# Polish translations for PACKAGE package
+# Tłumaczenie w języku polskim pakietu PACKAGE.
+# Copyright (C) 2010 emce
+# This file is distributed under the same license as the PACKAGE package.
+# emce <mcwiklinski@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-09-15 13:39+0200\n"
+"PO-Revision-Date: 2010-09-15 18:10+0100\n"
+"Last-Translator: Michał Ćwikliński <michal@cwiklinski.org>\n"
+"Language-Team: Polish <mcwiklinski@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Polish\n"
+"X-Poedit-Country: POLAND\n"
+
+#: naufrago.py:234
+#: naufrago.py:369
+#: naufrago.py:386
+#: naufrago.py:437
+#: naufrago.py:460
+#: naufrago.py:522
+#: naufrago.py:542
+#: naufrago.py:571
+#: naufrago.py:602
+#: naufrago.py:763
+#: naufrago.py:783
+#: naufrago.py:788
+#: naufrago.py:1445
+#: naufrago.py:1447
+msgid "Unread"
+msgstr "Nieprzeczytane"
+
+#: naufrago.py:252
+#: naufrago.py:369
+#: naufrago.py:383
+#: naufrago.py:437
+#: naufrago.py:457
+#: naufrago.py:522
+#: naufrago.py:542
+#: naufrago.py:568
+#: naufrago.py:599
+#: naufrago.py:763
+#: naufrago.py:780
+#: naufrago.py:788
+#: naufrago.py:1439
+#: naufrago.py:1441
+msgid "Important"
+msgstr "Ważne"
+
+#: naufrago.py:809
+msgid "Special folder"
+msgstr "Katalog specjalny"
+
+#: naufrago.py:820
+msgid "Source"
+msgstr "Źródło"
+
+#: naufrago.py:826
+msgid "Category"
+msgstr "Kategoria"
+
+#: naufrago.py:871
+msgid "Warning!"
+msgstr "Uwaga!"
+
+#: naufrago.py:906
+msgid "Naufrago! is a simple RSS reader"
+msgstr "Naufrago! jest prostym czytnikiem RSS"
+
+#: naufrago.py:969
+msgid "_Archive"
+msgstr "_Archiwum"
+
+#: naufrago.py:970
+msgid "_New feed"
+msgstr "Nowy kanał"
+
+#: naufrago.py:970
+msgid "Adds a feed"
+msgstr "Dodanie kanału"
+
+#: naufrago.py:971
+msgid "New _category"
+msgstr "Nowa kategoria"
+
+#: naufrago.py:971
+msgid "Adds a category"
+msgstr "Dodanie kategorii"
+
+#: naufrago.py:972
+#: naufrago.py:1753
+msgid "Delete feed"
+msgstr "Usuń kanał"
+
+#: naufrago.py:972
+msgid "Deletes a feed"
+msgstr "Usunięcie kanału"
+
+#: naufrago.py:973
+#: naufrago.py:1553
+msgid "Delete category"
+msgstr "Usuń kategorię"
+
+#: naufrago.py:973
+msgid "Deletes a category"
+msgstr "Usunięcie kategorii"
+
+#: naufrago.py:974
+msgid "Import feeds"
+msgstr "Import kanałów"
+
+#: naufrago.py:974
+msgid "Imports a feedlist"
+msgstr "Import listy kanałów"
+
+#: naufrago.py:975
+msgid "Export feeds"
+msgstr "Eksport kanałów"
+
+#: naufrago.py:975
+msgid "Exports a feedlist"
+msgstr "Eksport listy kanałów"
+
+#: naufrago.py:976
+msgid "_Quit"
+msgstr "Wyjście"
+
+#: naufrago.py:976
+msgid "Quits"
+msgstr "Wyjście"
+
+#: naufrago.py:977
+msgid "E_dit"
+msgstr "E_dycja"
+
+#: naufrago.py:978
+msgid "_Edit"
+msgstr "_Edycja"
+
+#: naufrago.py:978
+msgid "Edits the selected element"
+msgstr "Edycja zaznaczonego elementu"
+
+#: naufrago.py:979
+#: naufrago.py:1827
+#: naufrago.py:1830
+msgid "Search"
+msgstr "Szukaj"
+
+#: naufrago.py:979
+msgid "Searchs for a term in the feeds"
+msgstr "Szukaj wyrażenia w kanałach"
+
+#: naufrago.py:980
+msgid "_Preferences"
+msgstr "_Preferencje"
+
+#: naufrago.py:980
+msgid "Shows preferences"
+msgstr "Preferencje"
+
+#: naufrago.py:981
+msgid "_Network"
+msgstr "Sieć"
+
+#: naufrago.py:982
+msgid "_Update"
+msgstr "Aktualizacja"
+
+#: naufrago.py:982
+msgid "Updates the selected feed"
+msgstr "Aktualizacja wybranych kanałów"
+
+#: naufrago.py:983
+#: naufrago.py:1378
+msgid "Update all"
+msgstr "Aktualizuj wszystko"
+
+#: naufrago.py:983
+msgid "Update all feeds"
+msgstr "Aktualizacja wszystkich kanałów"
+
+#: naufrago.py:984
+msgid "_Help"
+msgstr "Pomoc"
+
+#: naufrago.py:985
+msgid "FAQ"
+msgstr "FAQ"
+
+#: naufrago.py:986
+msgid "_About"
+msgstr "O progr_amie"
+
+#: naufrago.py:986
+msgid "About"
+msgstr "O programie"
+
+#: naufrago.py:1163
+msgid "Feeds"
+msgstr "Kanały"
+
+#: naufrago.py:1217
+msgid "Date"
+msgstr "Data"
+
+#: naufrago.py:1218
+msgid "Title"
+msgstr "Tytuł"
+
+#: naufrago.py:1260
+msgid "Clic to fullscreen"
+msgstr "Pełny ekran"
+
+#: naufrago.py:1267
+msgid "Clic to open in browser"
+msgstr "Otwórz w przeglądarce"
+
+#: naufrago.py:1381
+msgid "Quit"
+msgstr "Wyjdź"
+
+#: naufrago.py:1476
+msgid "Today"
+msgstr "Dzisiaj"
+
+#: naufrago.py:1505
+msgid "Edit category"
+msgstr "Edytuj kategorię"
+
+#: naufrago.py:1506
+msgid "Change <b>category</b> name to:"
+msgstr "Zmień nazwę <b>kategorii</b> na:"
+
+#: naufrago.py:1507
+#: naufrago.py:1637
+#: naufrago.py:2189
+msgid "Edit"
+msgstr "Edytuj"
+
+#: naufrago.py:1509
+msgid "Add category"
+msgstr "Dodaj kategorię"
+
+#: naufrago.py:1510
+msgid "Please, insert the <b>category</b>:"
+msgstr "Proszę podaj <b>kategorię</b>:"
+
+#: naufrago.py:1511
+msgid "Create"
+msgstr "Utwórz"
+
+#: naufrago.py:1554
+msgid "Delete the selected <b>category</b>?"
+msgstr "Usunąć wybraną <b>kategorię</b>?"
+
+#: naufrago.py:1555
+msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
+msgstr "<b>Uwaga:</b> wszystkie kanały w kategorii zostaną usunięte. Kontynuować?"
+
+#: naufrago.py:1613
+msgid "This category <b>cannot be deleted</b>!"
+msgstr "Nie można usunąć <b>tej kategorii</b>!"
+
+#: naufrago.py:1615
+#: naufrago.py:1617
+msgid "You <b>must choose a category</b> folder!"
+msgstr "<b>Musisz wybrać</b> katalog kategorii!"
+
+#: naufrago.py:1624
+msgid "Name "
+msgstr "Nazwa "
+
+#: naufrago.py:1635
+msgid "Edit feed"
+msgstr "Edytuj kanał"
+
+#: naufrago.py:1636
+msgid "Change <b>feed</b> data:"
+msgstr "Zmień dane <b>kanału</b>:"
+
+#: naufrago.py:1640
+msgid "Add feed"
+msgstr "Dodaj kanał"
+
+#: naufrago.py:1641
+msgid "Please, insert <b>feed</b> address:"
+msgstr "Proszę, podaj adres <b>kanału</b>:"
+
+#: naufrago.py:1642
+msgid "Add"
+msgstr "Dodaj"
+
+#: naufrago.py:1675
+msgid "Default name"
+msgstr "Domyślna nazwa"
+
+#: naufrago.py:1754
+msgid "Delete selected <b>feed</b>?"
+msgstr "Usunąć zaznaczony <b>kanał</b>?"
+
+#: naufrago.py:1796
+#: naufrago.py:1798
+msgid "You <b>must choose a feed</b>!"
+msgstr "<b>Musisz wybrać</b> kanał!"
+
+#: naufrago.py:1818
+msgid "This category <b>cannot be edited</b>!"
+msgstr "<b>Nie można edytować<b> tej kategorii!"
+
+#: naufrago.py:1822
+msgid "You <b>must choose a category or a feed</b> to edit!"
+msgstr "Musisz wybrać kategorię lub kanał do edycji!"
+
+#: naufrago.py:1831
+msgid "Insert the <b>searchterm</b>:"
+msgstr "Proszę podaj <b>frazę do wyszukiwania</b>:"
+
+#: naufrago.py:1859
+msgid "Search results for"
+msgstr "Wyniki wyszukiwania dla"
+
+#: naufrago.py:1861
+msgid "No entry found for <b>"
+msgstr "Brak wpisów dla <b>"
+
+#: naufrago.py:1918
+msgid "Preferences"
+msgstr "Preferencje"
+
+#: naufrago.py:1919
+msgid "Save"
+msgstr "Zapisz"
+
+#: naufrago.py:1933
+msgid "Start with unfolded tree"
+msgstr "Uruchamiaj ze zwiniętym drzewem"
+
+#: naufrago.py:1937
+msgid "Start in Tray Icon"
+msgstr "Uruchom jako ikona w pasku"
+
+#: naufrago.py:1945
+msgid "Update on start"
+msgstr "Aktualizacja przy starcie"
+
+#: naufrago.py:1950
+msgid "Start"
+msgstr "Start"
+
+#: naufrago.py:1956
+msgid "Number of feed entries"
+msgstr "Ilość wpisów w kanale"
+
+#: naufrago.py:1968
+msgid "Update every (in hours)"
+msgstr "Okres aktualizacji (w godzinach)"
+
+#: naufrago.py:1979
+msgid "Offline mode (slower!)"
+msgstr "Tryb offline (wolny!)"
+
+#: naufrago.py:1984
+msgid "Hide read entries"
+msgstr "Ukryj przeczytane pozycje"
+
+#: naufrago.py:1992
+msgid "Feeds & articles"
+msgstr "Kanały i artykuły"
+
+#: naufrago.py:1998
+msgid "Show notification on new entries"
+msgstr "Pokaż powiadomienia o nowych pozycjach"
+
+#: naufrago.py:2002
+msgid "Show icon in tray"
+msgstr "Pokaż ikonę w zasobniku"
+
+#: naufrago.py:2009
+msgid "Toolbar mode"
+msgstr "Tryb paska narzędzi"
+
+#: naufrago.py:2012
+msgid "Full"
+msgstr "Pełny"
+
+#: naufrago.py:2013
+msgid "Icons only"
+msgstr "Tylko ikony"
+
+#: naufrago.py:2014
+msgid "Text only"
+msgstr "Tylko tekst"
+
+#: naufrago.py:2015
+msgid "Hidden"
+msgstr "Ukryty"
+
+#: naufrago.py:2021
+msgid "Interface"
+msgstr "Interfejs"
+
+#: naufrago.py:2179
+msgid "Mark all as read"
+msgstr "Zaznacz wszystko jako przeczytane"
+
+#: naufrago.py:2184
+msgid "Update"
+msgstr "Aktualizuj"
+
+#: naufrago.py:2194
+msgid "Delete"
+msgstr "Usuń"
+
+#: naufrago.py:2200
+msgid "New feed"
+msgstr "Nowy kanał"
+
+#: naufrago.py:2203
+msgid "New category"
+msgstr "Nowa kategoria"
+
+#: naufrago.py:2247
+msgid "Open in browser"
+msgstr "Otwórz w przeglądarce"
+
+#: naufrago.py:2248
+msgid "Copy URL to clipboard"
+msgstr "Skopiuj URL do schowka"
+
+#: naufrago.py:2251
+msgid "Toggle read/non-read"
+msgstr "Przełącz przeczytane/nieprzeczytane"
+
+#: naufrago.py:2254
+msgid "Toggle all read/non-read"
+msgstr "Przełącz wszystkie przeczytane/nieprzeczytane"
+
+#: naufrago.py:2362
+msgid "Without title"
+msgstr "Bez tytułu"
+
+#: naufrago.py:2366
+msgid "Without link"
+msgstr "Bez adresu"
+
+#: naufrago.py:2404
+msgid "Obtaining image "
+msgstr "Pobieranie obrazka"
+
+#: naufrago.py:2510
+#: naufrago.py:2647
+msgid "Obtaining feed "
+msgstr "Pobieranie kanału "
+
+#: naufrago.py:2793
+#: naufrago.py:2858
+msgid "Open.."
+msgstr "Otwórz.."
+
+#: naufrago.py:2807
+msgid "All files"
+msgstr "Wszystkie pliki"
+
+#: naufrago.py:2862
+msgid "_Save"
+msgstr "Zapisz"
+
+#~ msgid "New _feed"
+#~ msgstr "Nowy kanał"
+#~ msgid "Delete _feed"
+#~ msgstr "Usunięcie kanału"
+#~ msgid "Delete _category"
+#~ msgstr "Usunięcie kategorii"
+#~ msgid "U_pdate all"
+#~ msgstr "Aktualizacja wszystkich kanałów"
+
