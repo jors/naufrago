@@ -8,338 +8,433 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-09 17:09+0200\n"
+"POT-Creation-Date: 2010-09-15 13:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: naufrago-debian.py:440
+#: naufrago.py:234 naufrago.py:369 naufrago.py:386 naufrago.py:437
+#: naufrago.py:460 naufrago.py:522 naufrago.py:542 naufrago.py:571
+#: naufrago.py:602 naufrago.py:763 naufrago.py:783 naufrago.py:788
+#: naufrago.py:1445 naufrago.py:1447
+msgid "Unread"
+msgstr ""
+
+#: naufrago.py:252 naufrago.py:369 naufrago.py:383 naufrago.py:437
+#: naufrago.py:457 naufrago.py:522 naufrago.py:542 naufrago.py:568
+#: naufrago.py:599 naufrago.py:763 naufrago.py:780 naufrago.py:788
+#: naufrago.py:1439 naufrago.py:1441
+msgid "Important"
+msgstr ""
+
+#: naufrago.py:809
+msgid "Special folder"
+msgstr ""
+
+#: naufrago.py:820
 msgid "Source"
 msgstr ""
 
-#: naufrago-debian.py:446
+#: naufrago.py:826
 msgid "Category"
 msgstr ""
 
-#: naufrago-debian.py:513
+#: naufrago.py:871
+msgid "Warning!"
+msgstr ""
+
+#: naufrago.py:906
 msgid "Naufrago! is a simple RSS reader"
 msgstr ""
 
-#: naufrago-debian.py:567
+#: naufrago.py:969
 msgid "_Archive"
 msgstr ""
 
-#: naufrago-debian.py:568
-msgid "New _feed"
+#: naufrago.py:970
+msgid "_New feed"
 msgstr ""
 
-#: naufrago-debian.py:568
+#: naufrago.py:970
 msgid "Adds a feed"
 msgstr ""
 
-#: naufrago-debian.py:569
+#: naufrago.py:971
 msgid "New _category"
 msgstr ""
 
-#: naufrago-debian.py:569
+#: naufrago.py:971
 msgid "Adds a category"
 msgstr ""
 
-#: naufrago-debian.py:570
-msgid "Delete _feed"
-msgstr ""
-
-#: naufrago-debian.py:570
-msgid "Deletes a feed"
-msgstr ""
-
-#: naufrago-debian.py:571
-msgid "Delete _category"
-msgstr ""
-
-#: naufrago-debian.py:571
-msgid "Deletes a category"
-msgstr ""
-
-#: naufrago-debian.py:572
-msgid "Import feeds"
-msgstr ""
-
-#: naufrago-debian.py:572
-msgid "Imports a feedlist"
-msgstr ""
-
-#: naufrago-debian.py:573
-msgid "Export feeds"
-msgstr ""
-
-#: naufrago-debian.py:573
-msgid "Exports a feedlist"
-msgstr ""
-
-#: naufrago-debian.py:574
-msgid "_Quit"
-msgstr ""
-
-#: naufrago-debian.py:574
-msgid "Quits"
-msgstr ""
-
-#: naufrago-debian.py:575
-msgid "E_dit"
-msgstr ""
-
-#: naufrago-debian.py:576
-msgid "_Edit"
-msgstr ""
-
-#: naufrago-debian.py:576
-msgid "Edits the selected element"
-msgstr ""
-
-#: naufrago-debian.py:577
-msgid "_Preferences"
-msgstr ""
-
-#: naufrago-debian.py:577
-msgid "Shows preferences"
-msgstr ""
-
-#: naufrago-debian.py:578
-msgid "_Network"
-msgstr ""
-
-#: naufrago-debian.py:579
-msgid "_Update"
-msgstr ""
-
-#: naufrago-debian.py:579
-msgid "Updates the selected feed"
-msgstr ""
-
-#: naufrago-debian.py:580
-msgid "U_pdate all"
-msgstr ""
-
-#: naufrago-debian.py:580
-msgid "Update all feeds"
-msgstr ""
-
-#: naufrago-debian.py:581
-msgid "_Help"
-msgstr ""
-
-#: naufrago-debian.py:582
-msgid "FAQ"
-msgstr ""
-
-#: naufrago-debian.py:583
-msgid "_About"
-msgstr ""
-
-#: naufrago-debian.py:583
-msgid "About"
-msgstr ""
-
-#: naufrago-debian.py:801
-msgid "Date"
-msgstr ""
-
-#: naufrago-debian.py:802
-msgid "Title"
-msgstr ""
-
-#: naufrago-debian.py:843
-msgid "Clic to fullscreen"
-msgstr ""
-
-#: naufrago-debian.py:850
-msgid "Clic to open in browser"
-msgstr ""
-
-#: naufrago-debian.py:958
-msgid "Update all"
-msgstr ""
-
-#: naufrago-debian.py:961
-msgid "Quit"
-msgstr ""
-
-#: naufrago-debian.py:1016
-msgid "Today"
-msgstr ""
-
-#: naufrago-debian.py:1042
-msgid "Edit category"
-msgstr ""
-
-#: naufrago-debian.py:1043
-msgid "Change <b>category</b> name to:"
-msgstr ""
-
-#: naufrago-debian.py:1045
-msgid "Add category"
-msgstr ""
-
-#: naufrago-debian.py:1046
-msgid "Please, insert the <b>category</b>:"
-msgstr ""
-
-#: naufrago-debian.py:1086
-msgid "Delete category"
-msgstr ""
-
-#: naufrago-debian.py:1087
-msgid "Delete the selected <b>category</b>?"
-msgstr ""
-
-#: naufrago-debian.py:1088
-msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
-msgstr ""
-
-#: naufrago-debian.py:1126
-msgid "The General category cannot be deleted!"
-msgstr ""
-
-#: naufrago-debian.py:1128 naufrago-debian.py:1130
-msgid "You must choose a category folder!"
-msgstr ""
-
-#: naufrago-debian.py:1137
-msgid "Name "
-msgstr ""
-
-#: naufrago-debian.py:1148
-msgid "Edit feed"
-msgstr ""
-
-#: naufrago-debian.py:1149
-msgid "Change <b>feed</b> data:"
-msgstr ""
-
-#: naufrago-debian.py:1152
-msgid "Add feed"
-msgstr ""
-
-#: naufrago-debian.py:1153
-msgid "Please, insert <b>feed</b> data:"
-msgstr ""
-
-#: naufrago-debian.py:1185
-msgid "Default name"
-msgstr ""
-
-#: naufrago-debian.py:1237
+#: naufrago.py:972 naufrago.py:1753
 msgid "Delete feed"
 msgstr ""
 
-#: naufrago-debian.py:1238
-msgid "Delete selected <b>feed</b>?"
+#: naufrago.py:972
+msgid "Deletes a feed"
 msgstr ""
 
-#: naufrago-debian.py:1274 naufrago-debian.py:1276
-msgid "You must choose a feed!"
+#: naufrago.py:973 naufrago.py:1553
+msgid "Delete category"
 msgstr ""
 
-#: naufrago-debian.py:1297
-msgid "You must choose a category or a feed to edit!"
+#: naufrago.py:973
+msgid "Deletes a category"
 msgstr ""
 
-#: naufrago-debian.py:1301
-msgid "Preferences"
+#: naufrago.py:974
+msgid "Import feeds"
 msgstr ""
 
-#: naufrago-debian.py:1308
-msgid "Number of feed entries"
+#: naufrago.py:974
+msgid "Imports a feedlist"
 msgstr ""
 
-#: naufrago-debian.py:1320
-msgid "Update every (in hours)   "
+#: naufrago.py:975
+msgid "Export feeds"
 msgstr ""
 
-#: naufrago-debian.py:1331
-msgid "Offline mode (slower!)"
+#: naufrago.py:975
+msgid "Exports a feedlist"
 msgstr ""
 
-#: naufrago-debian.py:1336
-msgid "Start"
+#: naufrago.py:976
+msgid "_Quit"
 msgstr ""
 
-#: naufrago-debian.py:1341
-msgid "Start with unfolded tree"
+#: naufrago.py:976
+msgid "Quits"
 msgstr ""
 
-#: naufrago-debian.py:1345
-msgid "Start in Tray Icon"
+#: naufrago.py:977
+msgid "E_dit"
 msgstr ""
 
-#: naufrago-debian.py:1349
-msgid "Update on start"
+#: naufrago.py:978
+msgid "_Edit"
 msgstr ""
 
-#: naufrago-debian.py:1485
-msgid "Mark all as read"
+#: naufrago.py:978
+msgid "Edits the selected element"
 msgstr ""
 
-#: naufrago-debian.py:1488
-msgid "Update"
+#: naufrago.py:979 naufrago.py:1827 naufrago.py:1830
+msgid "Search"
 msgstr ""
 
-#: naufrago-debian.py:1493
+#: naufrago.py:979
+msgid "Searchs for a term in the feeds"
+msgstr ""
+
+#: naufrago.py:980
+msgid "_Preferences"
+msgstr ""
+
+#: naufrago.py:980
+msgid "Shows preferences"
+msgstr ""
+
+#: naufrago.py:981
+msgid "_Network"
+msgstr ""
+
+#: naufrago.py:982
+msgid "_Update"
+msgstr ""
+
+#: naufrago.py:982
+msgid "Updates the selected feed"
+msgstr ""
+
+#: naufrago.py:983 naufrago.py:1378
+msgid "Update all"
+msgstr ""
+
+#: naufrago.py:983
+msgid "Update all feeds"
+msgstr ""
+
+#: naufrago.py:984
+msgid "_Help"
+msgstr ""
+
+#: naufrago.py:985
+msgid "FAQ"
+msgstr ""
+
+#: naufrago.py:986
+msgid "_About"
+msgstr ""
+
+#: naufrago.py:986
+msgid "About"
+msgstr ""
+
+#: naufrago.py:1163
+msgid "Feeds"
+msgstr ""
+
+#: naufrago.py:1217
+msgid "Date"
+msgstr ""
+
+#: naufrago.py:1218
+msgid "Title"
+msgstr ""
+
+#: naufrago.py:1260
+msgid "Clic to fullscreen"
+msgstr ""
+
+#: naufrago.py:1267
+msgid "Clic to open in browser"
+msgstr ""
+
+#: naufrago.py:1381
+msgid "Quit"
+msgstr ""
+
+#: naufrago.py:1476
+msgid "Today"
+msgstr ""
+
+#: naufrago.py:1505
+msgid "Edit category"
+msgstr ""
+
+#: naufrago.py:1506
+msgid "Change <b>category</b> name to:"
+msgstr ""
+
+#: naufrago.py:1507 naufrago.py:1637 naufrago.py:2189
 msgid "Edit"
 msgstr ""
 
-#: naufrago-debian.py:1498
+#: naufrago.py:1509
+msgid "Add category"
+msgstr ""
+
+#: naufrago.py:1510
+msgid "Please, insert the <b>category</b>:"
+msgstr ""
+
+#: naufrago.py:1511
+msgid "Create"
+msgstr ""
+
+#: naufrago.py:1554
+msgid "Delete the selected <b>category</b>?"
+msgstr ""
+
+#: naufrago.py:1555
+msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
+msgstr ""
+
+#: naufrago.py:1613
+msgid "This category <b>cannot be deleted</b>!"
+msgstr ""
+
+#: naufrago.py:1615 naufrago.py:1617
+msgid "You <b>must choose a category</b> folder!"
+msgstr ""
+
+#: naufrago.py:1624
+msgid "Name "
+msgstr ""
+
+#: naufrago.py:1635
+msgid "Edit feed"
+msgstr ""
+
+#: naufrago.py:1636
+msgid "Change <b>feed</b> data:"
+msgstr ""
+
+#: naufrago.py:1640
+msgid "Add feed"
+msgstr ""
+
+#: naufrago.py:1641
+msgid "Please, insert <b>feed</b> address:"
+msgstr ""
+
+#: naufrago.py:1642
+msgid "Add"
+msgstr ""
+
+#: naufrago.py:1675
+msgid "Default name"
+msgstr ""
+
+#: naufrago.py:1754
+msgid "Delete selected <b>feed</b>?"
+msgstr ""
+
+#: naufrago.py:1796 naufrago.py:1798
+msgid "You <b>must choose a feed</b>!"
+msgstr ""
+
+#: naufrago.py:1818
+msgid "This category <b>cannot be edited</b>!"
+msgstr ""
+
+#: naufrago.py:1822
+msgid "You <b>must choose a category or a feed</b> to edit!"
+msgstr ""
+
+#: naufrago.py:1831
+msgid "Insert the <b>searchterm</b>:"
+msgstr ""
+
+#: naufrago.py:1859
+msgid "Search results for"
+msgstr ""
+
+#: naufrago.py:1861
+msgid "No entry found for <b>"
+msgstr ""
+
+#: naufrago.py:1918
+msgid "Preferences"
+msgstr ""
+
+#: naufrago.py:1919
+msgid "Save"
+msgstr ""
+
+#: naufrago.py:1933
+msgid "Start with unfolded tree"
+msgstr ""
+
+#: naufrago.py:1937
+msgid "Start in Tray Icon"
+msgstr ""
+
+#: naufrago.py:1945
+msgid "Update on start"
+msgstr ""
+
+#: naufrago.py:1950
+msgid "Start"
+msgstr ""
+
+#: naufrago.py:1956
+msgid "Number of feed entries"
+msgstr ""
+
+#: naufrago.py:1968
+msgid "Update every (in hours)"
+msgstr ""
+
+#: naufrago.py:1979
+msgid "Offline mode (slower!)"
+msgstr ""
+
+#: naufrago.py:1984
+msgid "Hide read entries"
+msgstr ""
+
+#: naufrago.py:1992
+msgid "Feeds & articles"
+msgstr ""
+
+#: naufrago.py:1998
+msgid "Show notification on new entries"
+msgstr ""
+
+#: naufrago.py:2002
+msgid "Show icon in tray"
+msgstr ""
+
+#: naufrago.py:2009
+msgid "Toolbar mode"
+msgstr ""
+
+#: naufrago.py:2012
+msgid "Full"
+msgstr ""
+
+#: naufrago.py:2013
+msgid "Icons only"
+msgstr ""
+
+#: naufrago.py:2014
+msgid "Text only"
+msgstr ""
+
+#: naufrago.py:2015
+msgid "Hidden"
+msgstr ""
+
+#: naufrago.py:2021
+msgid "Interface"
+msgstr ""
+
+#: naufrago.py:2179
+msgid "Mark all as read"
+msgstr ""
+
+#: naufrago.py:2184
+msgid "Update"
+msgstr ""
+
+#: naufrago.py:2194
 msgid "Delete"
 msgstr ""
 
-#: naufrago-debian.py:1504
+#: naufrago.py:2200
 msgid "New feed"
 msgstr ""
 
-#: naufrago-debian.py:1507
+#: naufrago.py:2203
 msgid "New category"
 msgstr ""
 
-#: naufrago-debian.py:1543
+#: naufrago.py:2247
 msgid "Open in browser"
 msgstr ""
 
-#: naufrago-debian.py:1544
+#: naufrago.py:2248
 msgid "Copy URL to clipboard"
 msgstr ""
 
-#: naufrago-debian.py:1547
+#: naufrago.py:2251
 msgid "Toggle read/non-read"
 msgstr ""
 
-#: naufrago-debian.py:1550
+#: naufrago.py:2254
 msgid "Toggle all read/non-read"
 msgstr ""
 
-#: naufrago-debian.py:1646
+#: naufrago.py:2362
 msgid "Without title"
 msgstr ""
 
-#: naufrago-debian.py:1650
+#: naufrago.py:2366
 msgid "Without link"
 msgstr ""
 
-#: naufrago-debian.py:1688
+#: naufrago.py:2404
 msgid "Obtaining image "
 msgstr ""
 
-#: naufrago-debian.py:1754 naufrago-debian.py:1873
+#: naufrago.py:2510 naufrago.py:2647
 msgid "Obtaining feed "
 msgstr ""
 
-#: naufrago-debian.py:1994 naufrago-debian.py:2057
+#: naufrago.py:2793 naufrago.py:2858
 msgid "Open.."
 msgstr ""
 
-#: naufrago-debian.py:2008
+#: naufrago.py:2807
 msgid "All files"
+msgstr ""
+
+#: naufrago.py:2862
+msgid "_Save"
 msgstr ""
