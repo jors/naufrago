@@ -330,8 +330,8 @@ msgid "Number of feed entries"
 msgstr "Número de entradas"
 
 #: naufrago.py:1968
-msgid "Update every (in hours)"
-msgstr "Actualizar cada (en horas)   "
+msgid "Update every (hours)"
+msgstr "Actualizar cada (horas)   "
 
 #: naufrago.py:1979
 msgid "Offline mode (slower!)"

@@ -328,8 +328,8 @@ msgid "Number of feed entries"
 msgstr "Nombre d'entrades per font"
 
 #: naufrago.py:1968
-msgid "Update every (in hours)"
-msgstr "Actualitzar font cada (en hores)"
+msgid "Update every (hours)"
+msgstr "Actualitzar font cada (hores)"
 
 #: naufrago.py:1979
 msgid "Offline mode (slower!)"

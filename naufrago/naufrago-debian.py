@@ -1965,7 +1965,7 @@ class Naufrago:
   vbox3.pack_start(hbox, True, True, 5)
 
   hbox2 = gtk.HBox()
-  label2 = gtk.Label(_("Update every (in hours)"))
+  label2 = gtk.Label(_("Update every (hours)"))
   hbox2.pack_start(label2, True, True, 2)
   # Spin button 2
   adjustment2 = gtk.Adjustment(value=1, lower=1, upper=24, step_incr=1, page_incr=1, page_size=0)
