@@ -1,7 +1,8 @@
 Package: naufrago
-Version: 0.2
+Version: 0.2-1
 Architecture: all
 Maintainer: Jordi Oliveras Palacios (qat/jors) <worbynet@gmail.com>
+Conflicts: naufrago
 Installed-Size: 292
 Depends: python (>= 2.5), python-gtk2, python-feedparser, python-gobject, python-pysqlite2, python-webkit
 Section: net
