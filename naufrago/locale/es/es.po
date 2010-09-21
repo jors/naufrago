@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-15 13:39+0200\n"
+"POT-Creation-Date: 2010-09-20 21:24+0200\n"
 "PO-Revision-Date: 2010-07-06 18:28+0200\n"
 "Last-Translator: jors <worbynet@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -146,7 +146,7 @@ msgstr "Red"
 
 #: naufrago.py:982
 msgid "_Update"
-msgstr "Actualizar"
+msgstr "Act_ualizar"
 
 #: naufrago.py:982
 msgid "Updates the selected feed"
@@ -297,7 +297,7 @@ msgstr "Introduce el <b>término de búsqueda</b>:"
 msgid "Search results for"
 msgstr "Resultados de la búsqueda para"
 
-#: naufrago.py:1861
+#: naufrago.py:1873
 msgid "No entry found for <b>"
 msgstr "No se encontró ninguna entrada para <b>"
 
@@ -346,8 +346,8 @@ msgid "Feeds & articles"
 msgstr "Fuentes y artículos"
 
 #: naufrago.py:1998
-msgid "Show notification on new entries"
-msgstr "Notificación ante nuevas entradas"
+msgid "Notification on new entries"
+msgstr "Notificar nuevas entradas"
 
 #: naufrago.py:2002
 msgid "Show icon in tray"

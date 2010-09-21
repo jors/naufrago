@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-15 13:39+0200\n"
+"POT-Creation-Date: 2010-09-20 21:24+0200\n"
 "PO-Revision-Date: 2010-07-05 16:57+0200\n"
 "Last-Translator: jors <worbynet@gmail.com>\n"
 "Language-Team: Catalan\n"
@@ -145,7 +145,7 @@ msgstr "Xarxa"
 
 #: naufrago.py:982
 msgid "_Update"
-msgstr "Actualitzar"
+msgstr "Act_ualitzar"
 
 #: naufrago.py:982
 msgid "Updates the selected feed"
@@ -344,8 +344,8 @@ msgid "Feeds & articles"
 msgstr "Fonts i articles"
 
 #: naufrago.py:1998
-msgid "Show notification on new entries"
-msgstr "Mostrar notificació per a noves entrades"
+msgid "Notification on new entries"
+msgstr "Notificació de noves entrades"
 
 #: naufrago.py:2002
 msgid "Show icon in tray"
@@ -437,7 +437,7 @@ msgstr "Tots els arxius"
 
 #: naufrago.py:2862
 msgid "_Save"
-msgstr "Desar"
+msgstr "De_sar"
 
 #~ msgid "New _feed"
 #~ msgstr "Nou _feed"

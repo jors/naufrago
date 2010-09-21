@@ -68,7 +68,7 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-if distro_package == True: # We're running on 'Debian-mode' (intended for distribution packages)
+if distro_package == True: # We're running on 'Distro-mode' (intended for distribution packages)
  app_path = '/usr/share/naufrago/'
  media_path = app_path + 'media/'
  db_path = os.getenv("HOME") + '/.config/naufrago/naufrago.db'
@@ -80,6 +80,12 @@ if distro_package == True: # We're running on 'Debian-mode' (intended for distri
  elif "ca" in locale:
   index_path = app_path + 'content/index_ca.html'
   puf_path = app_path + 'content/puf_ca.html'
+ elif "pl" in locale:
+  index_path = app_path + 'content/index_pl.html'
+  puf_path = app_path + 'content/puf_pl.html'
+ elif "it" in locale:
+  index_path = app_path + 'content/index_it.html'
+  puf_path = app_path + 'content/puf.html'
  else:
   index_path = app_path + 'content/index.html'
   puf_path = app_path + 'content/puf.html'
@@ -96,6 +102,12 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
  elif "ca" in locale:
   index_path = current_path + '/content/index_ca.html'
   puf_path = current_path + '/content/puf_ca.html'
+ elif "pl" in locale:
+  index_path = current_path + '/content/index_pl.html'
+  puf_path = current_path + '/content/puf_pl.html'
+ elif "it" in locale:
+  index_path = current_path + '/content/index_it.html'
+  puf_path = current_path + '/content/puf.html'
  else:
   index_path = current_path + '/content/index.html'
   puf_path = current_path + '/content/puf.html'
@@ -1919,7 +1931,7 @@ class Naufrago:
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
-  dialog.set_size_request(250,225)
+  dialog.set_size_request(250,250)
   dialog.set_border_width(2)
   dialog.set_resizable(False)
   dialog.set_has_separator(False)
@@ -1995,7 +2007,7 @@ class Naufrago:
   align3 = gtk.Alignment()
   align3.set_padding(10, 0, 15, 0)
 
-  checkbox5 = gtk.CheckButton(_("Show notification on new entries"))
+  checkbox5 = gtk.CheckButton(_("Notification on new entries"))
   if(self.show_newentries_notification == 1): checkbox5.set_active(True)
   else: checkbox5.set_active(False)
   vbox4.pack_start(checkbox5, True, True, 5)
