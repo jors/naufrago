@@ -346,7 +346,7 @@ msgid "Feeds & articles"
 msgstr "Fuentes y artículos"
 
 #: naufrago.py:1998
-msgid "Show notification on new entries"
+msgid "Notification on new entries"
 msgstr "Notificar nuevas entradas"
 
 #: naufrago.py:2002
