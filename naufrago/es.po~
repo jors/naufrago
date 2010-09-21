@@ -297,7 +297,7 @@ msgstr "Introduce el <b>término de búsqueda</b>:"
 msgid "Search results for"
 msgstr "Resultados de la búsqueda para"
 
-#: naufrago.py:1873
+#: naufrago.py:1861
 msgid "No entry found for <b>"
 msgstr "No se encontró ninguna entrada para <b>"
 
@@ -346,7 +346,7 @@ msgid "Feeds & articles"
 msgstr "Fuentes y artículos"
 
 #: naufrago.py:1998
-msgid "Notification on new entries"
+msgid "Show notification on new entries"
 msgstr "Notificar nuevas entradas"
 
 #: naufrago.py:2002

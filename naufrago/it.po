@@ -299,7 +299,7 @@ msgstr "Risultati della ricerca per"
 
 #: naufrago.py:1861
 msgid "No entry found for <b>"
-msgstr ""
+msgstr "Nessun risultato trovato per <b>"
 
 #: naufrago.py:1918
 msgid "Preferences"
