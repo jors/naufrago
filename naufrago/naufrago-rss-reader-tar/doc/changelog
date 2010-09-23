@@ -1,0 +1,37 @@
+naufrago (0.2-1) testing unstable; urgency=low
+
+  * Second Release.
+  * FIXED: 2px border issue on main window (applied to hpaned).
+  * FIXED: Avoid 'General' category edition.
+  * FIXED: Strip html and newline tags in entry titles.
+  * FIXED: Date parsing some feed entries.
+  * FIXED: Strings converted to utf8 to avoid some PangoWarnings.
+  * FIXED: Some bugs when importing/exporting feeds.
+  * FIXED: Many bugfixes during new version development.
+  * NEW: Added option to show a notification on new entries.
+  * NEW: Feed update status indicator through favicon change.
+  * NEW: Added option to show/hide Tray Icon.
+  * NEW: Added option to show/hide Toolbar & to modify its style.
+  * NEW: Added option to show/hide read entries.
+  * NEW: Added special folders 'Important' & 'Unread'.
+  * NEW: More threads added to avoid GUI freezing.
+  * NEW: Translations to Polish and Italian.
+  * IMPROVED: Preferencess dialog reworked & reorganized.
+  * IMPROVED: Paths changed to freedesktop.org "XDG Base Directory
+    Specification".
+  * IMPROVED: Launcher script adapted to comply with the LSB.
+  * IMPROVED: Context category icons (changes between
+    collapsed/expanded).
+  * IMPROVED: Added automatic database update script.
+  * IMPROVED: Thread that obtains feeds.
+  * IMPROVED: Moving entry list to the top when selecting a feed.
+  * IMPROVED: Feed list window saves its width.
+  * IMPROVED: Key accelerators.
+
+ -- Jordi Oliveras <worbynet@gmail.com>  Fri, 16 Sep 2010 11:08:21 +0200
+
+naufrago (0.1-1) testing unstable; urgency=low
+
+  * Initial Release. Closes: #100.
+
+ -- Jordi Oliveras <worbynet@gmail.com>  Sun, 27 Jun 2010 02:30:46 +0200

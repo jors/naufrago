@@ -68,7 +68,7 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-if distro_package == True: # We're running on 'Debian-mode' (intended for distribution packages)
+if distro_package == True: # We're running on 'Distro-mode' (intended for distribution packages)
  app_path = '/usr/share/naufrago/'
  media_path = app_path + 'media/'
  db_path = os.getenv("HOME") + '/.config/naufrago/naufrago.db'
@@ -80,6 +80,12 @@ if distro_package == True: # We're running on 'Debian-mode' (intended for distri
  elif "ca" in locale:
   index_path = app_path + 'content/index_ca.html'
   puf_path = app_path + 'content/puf_ca.html'
+ elif "pl" in locale:
+  index_path = app_path + 'content/index_pl.html'
+  puf_path = app_path + 'content/puf_pl.html'
+ elif "it" in locale:
+  index_path = app_path + 'content/index_it.html'
+  puf_path = app_path + 'content/puf.html'
  else:
   index_path = app_path + 'content/index.html'
   puf_path = app_path + 'content/puf.html'
@@ -96,6 +102,12 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
  elif "ca" in locale:
   index_path = current_path + '/content/index_ca.html'
   puf_path = current_path + '/content/puf_ca.html'
+ elif "pl" in locale:
+  index_path = current_path + '/content/index_pl.html'
+  puf_path = current_path + '/content/puf_pl.html'
+ elif "it" in locale:
+  index_path = current_path + '/content/index_it.html'
+  puf_path = current_path + '/content/puf.html'
  else:
   index_path = current_path + '/content/index.html'
   puf_path = current_path + '/content/puf.html'
@@ -997,8 +1009,6 @@ class Naufrago:
   if not os.path.exists(db_path):
    if distro_package == True:
     os.makedirs(os.getenv("HOME") + '/.config/naufrago/')
-   else:
-    os.makedirs(current_path + '/.naufrago/')
 
    self.conn = sqlite3.connect(db_path, check_same_thread=False)
    cursor = self.conn.cursor()
@@ -1446,8 +1456,8 @@ class Naufrago:
   else:
    special2 = self.treestore.append(None, [_("Unread")+' ['+str(row3[0])+']', 'no-leidos', 9999, 'bold'])
   cursor.close()
-  self.treeindex[9998] = special # NEW
-  self.treeindex[9999] = special2 # NEW
+  self.treeindex[9998] = special
+  self.treeindex[9999] = special2
 
  def populate_entries(self, id_feed, search_request_entry_ids=None):
   """Obtains the entries of the selected feed"""
@@ -1598,9 +1608,6 @@ class Naufrago:
       self.conn.commit()
 
       # Actualizamos No-leidos e Importantes
-      #if no_leidos is not None:
-      # self.update_special_folder(9999, no_leidos)
-      # self.update_special_folder(9998, no_leidos)
       self.update_special_folder(9999)
       self.update_special_folder(9998)
 
@@ -1919,7 +1926,7 @@ class Naufrago:
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
-  dialog.set_size_request(250,225)
+  dialog.set_size_request(250,250)
   dialog.set_border_width(2)
   dialog.set_resizable(False)
   dialog.set_has_separator(False)
@@ -1965,7 +1972,7 @@ class Naufrago:
   vbox3.pack_start(hbox, True, True, 5)
 
   hbox2 = gtk.HBox()
-  label2 = gtk.Label(_("Update every (in hours)"))
+  label2 = gtk.Label(_("Update every (hours)"))
   hbox2.pack_start(label2, True, True, 2)
   # Spin button 2
   adjustment2 = gtk.Adjustment(value=1, lower=1, upper=24, step_incr=1, page_incr=1, page_size=0)
@@ -1995,7 +2002,7 @@ class Naufrago:
   align3 = gtk.Alignment()
   align3.set_padding(10, 0, 15, 0)
 
-  checkbox5 = gtk.CheckButton(_("Show notification on new entries"))
+  checkbox5 = gtk.CheckButton(_("Notification on new entries"))
   if(self.show_newentries_notification == 1): checkbox5.set_active(True)
   else: checkbox5.set_active(False)
   vbox4.pack_start(checkbox5, True, True, 5)

@@ -39,13 +39,13 @@ Las destacadas serían:
  - Inclusión de los favicons de los feeds.
  - Iconización de la aplicación en la Tray.
  - Importación/exportación de feeds en formato OPML.
+ - Carpeta de Importantes y No leídos.
+ - Buscador de términos.
  - Multiidioma (de momento Ingles, Catalan y Castellano).
 
 Lista de deseos:
- - Carpeta de importantes.
+
  - Traducciones a más idiomas.
- - Más threads.
- - Buscador de términos.
 
 ========================
 3. Requisitos (mínimos)
@@ -133,6 +133,8 @@ especialmente a mi pareja, y además:
   (http://www.openclipart.org/user-detail/GMcGlinn).
 - El necesario svg de RSS de SRD
   (http://www.openclipart.org/user-detail/SRD).
+- El simple pero claro svg del aspa roja de raemi
+  (http://www.openclipart.org/user-detail/raemi).
 - Doug Quale ( quale1 at charter dot net ) & 
   Walter Anger ( WalterAnger at aon dot at ).
   por el excelente material DnD.

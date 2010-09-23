@@ -38,14 +38,13 @@ The majors ones would be:
  - Favicon support.
  - Tray iconization.
  - Feed import/export in OPML format.
+ - Important and Unread folders.
+ - Term search engine.
  - Multilanguage (currently English, Catalan and Spanish).
 
 Whishlist:
 
- - "Important" entries folder.
  - More translations.
- - More threads.
- - Term search.
 
 ==========================
 3. Requirements (minimum)
@@ -132,6 +131,8 @@ my girl, and also:
   (http://www.openclipart.org/user-detail/GMcGlinn).
 - The also great RSS svg by SRD
   (http://www.openclipart.org/user-detail/SRD).
+- The simple but clear red crossout by raemi
+  (http://www.openclipart.org/user-detail/raemi).
 - Doug Quale ( quale1 at charter dot net ) & 
   Walter Anger ( WalterAnger at aon dot at ).
   for the excelene DnD material.

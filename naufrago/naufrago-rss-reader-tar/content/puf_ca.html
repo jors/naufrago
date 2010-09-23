@@ -52,7 +52,9 @@
    <li>Inclusi&oacute; dels <b>favicons</b> dels feeds.</li>
    <li><b>Iconitzaci&oacute;</b> de l'aplicaci&oacute; <b>a la Tray</b>.</li>
    <li><b>Importaci&oacute;/exportaci&oacute;</b> de feeds en format <b>OPML</b>.</li>
-   <li><b>Multiidioma</b> (de moment Angl&egrave;s, Catal&agrave; y Castell&agrave;).</li>
+   <li>Carpeta <b>Important</b> i <b>No llegits</b>.</li>
+   <li><b>Cercador</b> de termes.</li>
+   <li><b>Multiidioma</b> (de moment Angl&egrave;s, Polac, Itali&agrave;, Catal&agrave; y Castell&agrave;).</li>
    </ul></p>
   <h3 id="3"><u>Quins son els requisits m&iacute;nims?</u></h3>
   <p>Si estas llegint aix&ograve;, probablement ja els cumpleixis. A nivell de software:
@@ -85,13 +87,13 @@
 
   <h1>Problemes</h1>
   <h3 id="10"><u>Les entrades d'un o varis feeds surten desendre&ccedil;ades cronol&ograve;gicament</u></h3>
-  <p>Hi ha feeds que no publiquen cap data per a les seves entrades. Si be l'aplicaci&oacute; ja es preocupa d'aix&ograve; (en crea una en la seva recepci&oacute; si no en t&eacute;), els articles/entrades/posts recuperats quan es d&oacute;na d'alta el feed no conservaran l'ordre. Per&ograve; a partir d'aquest punt, els seguents articles/entrades/posts que es recuperin s&iacute; que comen&ccedil;aran a estar endre&ccedil;ats.</p>
+  <p>Hi ha feeds que no publiquen cap data per a les seves entrades. Si be l'aplicaci&oacute; ja es preocupa d'aix&ograve; (en crea una en la seva recepci&oacute; si no en t&eacute;), els articles/entrades/posts recuperats quan es d&oacute;na d'alta el feed no conservaran l'ordre. Per&ograve; a partir d'aquest punt, els seguents articles/entrades/posts que es recuperin s&iacute; que comen&ccedil;aran a estar endre&ccedil;ats.<b>Actualitzaci&oacute;:</b> Encara existeix un problema amb feedparser al moment de parsejar dates en algunas fonts, produint resultats rars (p.ex. dates incorrectes, incloent dates futures).</p>
   <h3 id="11"><u>Les entrades d'un o varis feeds no mostren el contingut, nom&egrave;s els t&iacute;tols</u></h3>
   <p>Del mateix mode que hi ha feeds que no publiquen data per a les seves entrades, alguns tampoc proporcionen contingut, sino &uacute;nicament t&iacute;tol. No et quedar&agrave; altre que visitar la seva web.</p>
   <h3 id="12"><u>La importaci&oacute; de feeds &eacute;s molt lenta i sembla penjar l'aplicaci&oacute;</u></h3>
-  <p>Efectivament, l'importaci&oacute; &eacute;s lenta, pero no penja l'aplicaci&oacute;. Es necessitar&iacute;a una m&agrave; aqu&iacute; a nivell de threads per a arreglar aix&ograve;. T'animes? :)</p>
+  <p>Aix&ograve; succeia a la versi&oacute; 0.1, per&ograve; deur&iacute;a estar resolt donat que s'ha redissenyat com a tasca (fil) en segon pl&agrave;nol.</p>
   <h3 id="13"><u>L'aplicaci&oacute; es tanca inesperadament!</u></h3>
-  <p>Per desgracia, aix&ograve; passa algun cop i &eacute;s un error no identificat, aix&iacute; que son benvingudes totes aquelles aportacions que es vulguin fer en aquest aspecte.</p>
+  <p>Per desgracia, aix&ograve; passa algun cop i &eacute;s un error no identificat, aix&iacute; que SON BENVINGUDES totes aquelles aportacions que es vulguin fer en aquest aspecte.</p>
   <hr>
 
   <h1>Varios</h1>
@@ -102,7 +104,7 @@
   <h3 id="16"><u>M'agradaria que l'aplicaci&oacute; fes/tingu&eacute;s...</u></h3>
   <p>De la mateixa manera que els desenvolupadors de Liferea, en principi no accepto <i>feature requests</i>, tot i que com m&eacute;s es va perdre a Cuba, no perds res per a intentar-ho. Si em sembla interessant i viable, qui sap :) Sino, sempre pots donar-me un cop de m&agrave; amb el tema, fer-ho t&uacute; mateix, demanar-ho a alg&uacute; altre, etc...</p>
   <h3 id="17"><u>Agraïments de l'autor</u></h3>
-  <p>L'autor agraeix a tots aquells que l'han aguantat durant el desenvolupament (especialment a la parenta :) i a tots els que l'han donat un cop de m&agrave;. Aix&iacute; mateix, agraeix qualsevol col-laboraci&oacute; que es vulgui aportar al projecte.</p>
+  <p>L'autor agraeix a tots aquells que l'han aguantat durant el desenvolupament (especialment a la parenta :) i a tots els que l'han donat un cop de m&agrave;. Aix&iacute; mateix, agraeix qualsevol col-laboraci&oacute; que es vulgui aportar al projecte, especialment caçant bugs i resolvent-los.</p>
   <h3 id="18"><u>T'agrada N&aacute;ufrago!?</u></h3>
   <p>El millor dels regals per a un escritor de software no &eacute;s que la seva aplicaci&oacute; sigui utilitzada, sino que els seus usuaris li comuniquin el seu &uacute;s i/o agraïment. Un "gracies nanu" ser&agrave; suficient per a la major&iacute;a dels casos :)</p><p>Tot i que tamb&eacute; pots col-laborar en la millora del projecte, en la correcci&oacute; de <i>bugs</i>, en l'implementaci&oacute; de noves caracter&iacute;stiques, en la traducci&oacute; a nous idiomes, en l'empaquetat per a diferents distros... la llista no t&eacute; fi! Del mateix mode, i tot i que no resulti tant agradable, tamb&eacute; pots realitzar cr&iacute;tiques al mateix. En qualsevol cas, pots escriureli a <b>worbynet</b>_at_<b>gmail</b>_dot_<b>com</b> i estar&agrave; encantat de saber de tu.</p>
  </body>

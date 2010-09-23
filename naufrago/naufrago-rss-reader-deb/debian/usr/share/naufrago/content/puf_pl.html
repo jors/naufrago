@@ -1,0 +1,112 @@
+<html>
+ <head>
+  <title>Najczęściej zadawane pytania</title>
+ </head>
+ <body>
+  <center><h1>Najczęściej zadawane pytania</h1></center>
+  <ol>
+   <li><h2>Wprowadzenie</h2></li>
+    <ul>
+     <li><a href="#1">Czym jest Naufrago!?</a></li>
+     <li><a href="#2">Jakie ma funkcje?</a></li>
+     <li><a href="#3">Jakie są minimalne wymagania?</a></li>
+     <li><a href="#4">Po co znowu wymyślać koło?</a></li>
+     <li><a href="#5"><i>Strona domowa</i> czy kanały dystrybucji</a></li>
+    </ul>
+   <li><h2>Operacje</h2></li>
+    <ul>
+     <li><a href="#6">Jak działa <i>tryb offline</i>?</a></li>
+     <li><a href="#7">Chcę zapisać ważne artykuły/wpisy/posty!</a></li>
+     <li><a href="#8">Nie mogę stworzyć podkategorii</a></li>
+     <li><a href="#9">Nie mogę usunąć artykułów/wpisów/postów z kanałów</a></li>
+    </ul>
+   <li><h2>Problemy</h2></li>
+    <ul>
+     <li><a href="#10">Pozycje jednego lub więcej kanałów nie są ułożone chronologicznie</a><li>
+     <li><a href="#11">Pozycje jednego lub więcej kanałów nie mają zawartości, tylko tytuły</a></li>
+     <li><a href="#12">Import kanałów jest tak wolny, i wydaje się zawieszać aplikację</a></li>
+     <li><a href="#13">Aplikacja została niespodziewanie zamknięta!</a></li>
+    </ul>
+   <li><h2>Inne</h2></li>
+    <ul>
+     <li><a href="#14">Jeżeli kanały RSS są podsumowaniami, czy potrzebne są offlinowe grafiki?</a></li>
+     <li><a href="#15">Na jakiej licencji dystrybuowany jest program?</a></li>
+     <li><a href="#16">Chciałabym/chciałbym, aby aplikacja miała ...</a></li>
+     <li><a href="#17">Podziękowania autora</a></li>
+     <li><a href="#18">Podoba ci się Naufrago!?</a></li>
+    </ul>
+  </ol>
+  <hr>
+
+  <h1>Wprowadzenie</h1>
+  <h3 id="1"><u>Czym jest Naufrago!?</u></h3>
+  <p>Naufrago! jest prostym czytnikiem RSS który pozwala czytać kanały wraz z grafikami, nawet bez podłączenia do Internetu. A dzieje się tak dlatego, że są ludzie, jak autor, którzy nie mają dostępu od ręki, ale chcą czytać artykuły / wpisy / posty z grafikami. To jest <i>motyw przewodni</i> aplikacji.</p>
+  <h3 id="2"><u>Jakie ma funkcje?</u></h3>
+  <p>Najciekawsze są:
+  <ul>
+   <li><b>Kategoryzacja</b> kanałów na jednym poziomie <b>drzewa kategorii</b>.</li>
+   <li>Aranżacja kanałów metodą <b>przeciągnij &amp; upuść</b>.</li>
+   <li><b>Przeglądanie online/offline</b> (również grafik).</li>
+   <li><b>Tryb pełnoekranowy</b> dla czytania kanałów.</li>
+   <li><b>Oznaczanie kanałów</b> jako <b>ważnych</b>/<b>trwałych</b> (nagrywanie).</li>
+   <li>Włączenie <b>favicon</b> dla kanałów.</li>
+   <li><b>Minimalizowanie</b> aplikacji do <b>zasobnika systemowego</b>.</li>
+   <li><b>Import/eksport</b> kanałów w formacie <b>OPML</b>.</li>
+   <li><b>Ważne</b> i <b>nieprzeczytane</b> katalogi.</li>
+   <li>Możliwość <b>wyszukiwania fraz</b>.</li>
+   <li><b>Wielojęzyczność</b> (obecnie angielski, polski, włoski, kataloński i hiszpański).</li>
+  </ul>
+  </p>
+  <h3 id="3"><u>Jakie są minimalne wymagania?</u></h3>
+  <p>Jeżeli czytasz ten dokument, najprawdopodobniej je spełniasz. W zakresie oprogramowania:
+  <ul>
+   <li>System operacyjny GNU/Linux (kilka bibliotek jest niedostępnych dla innych systemów)</li>
+   <li>Python</li>
+   <li>python-gtk2 (gtk2 bindings)</li>
+   <li>python-gobject (GObject bindings)</li>
+   <li>python-pysqlite2 (sqlite3 bindings)</li>
+   <li>python-feedparser (feedparser bindings)</li>
+   <li>python-webkit (webkit bindings)</li>
+  </ul>
+  W zakresie sprzętowym, wszystko, na czym może działać program. Autor rozwija i używa aplikacji na netbooku z procesorem Intel Atom 1.6 Ghz z 1GB pamięci RAM.</p>
+  <h3 id="4"><u>Po co znowu wymyślać koło?</u></h3>
+  <p>Jeżeli aplikacja jest podobna (z wyjątkami) do Liferea (przynajmniej wyglądowo), to po co znowu wymyślać koło? Dla wielu powodów. Głownie dlatego, że autor nie znalazł klienta RSS, który mógłby pracować offline włączając w to grafikę, deweloperzy Liferea nie akceptują <i>propozycji funkcjonalnych</i> (czegoś całkiem prostego) i zaglądniecie do źródła stron trzecich wymaga podwójnego wysiłku w porównaniu do jego utworzenia (uwaga, opinia autora!). Odkrywanie koła na nowo to także nauka, rozwój i poszukiwania nowych sposobów działania, które w inny sposób by się nie pojawiły.</p>
+  <h3 id="5"><u><i>Strona domowa</i> czy kanały dystrybucji</u></h3>
+  <p>Projekt można znaleźć zarówno na <a href="http://enchufado.com/">blogu autora</a> jak i <a href="http://sourceforge.net/projects/naufrago">stronie projektu na sourceforge</a>.</p>
+  <hr>
+
+  <h1>Operacje</h1>
+  <h3 id="6"><u>Jak działa tryb <i>offline</i>?</u></h3>
+  <p>Tryb ten zapewnia, że dostęp do artykułów / wpisów / postów z grafiką nawet bez dostępu do Internetu, bez ingerencji w inne aspekty funkcjonowania aplikacji. Oznacza to, że zawsze możesz pozostawić włączoną, bez względu na to czy masz lub nie dostęp do Internetu. Jedyną wadą jest to, że pozostawienie tego trybu zawsze aktywnym będzie konsumować więcej pasma i dłużej będzie trwała aktualizacja, ponieważ zostaną pobrane grafiki. <b> UWAGA: </b> W trybie offline aplikacja działa poprawnie, po włączeniu okna preferencji, należy zaktualizować wszystkie kanały, których grafiki chcesz przeglądać w trybie offline.</p>
+  <h3 id="7"><u>Chcę zapisać ważne artykuły/wpisy/posty!</u></h3>
+  <p>Możesz to zrobić zaznaczając pole checkbox położone na początku tytułu każdego artykułu / wpisu / postu.</p>
+  <h3 id="8"><u>Nie mogę utworzyć podkategorii</u></h3>
+  <p>Jak wspomniałem w <a href="#2">sekcji funkcji aplikacji</a>, kategoryzacja pozwala tylko na jeden poziom kategorii.</p>
+  <h3 id="9"><u>Nie mogę usunąć artykułów/wpisów/postów z kanałów</u></h3>
+  <p>To prawda, nie można ich usunąć. Zamiast tego, założono, że aplikacja usunie je automatycznie w oparciu o ilość artykułów/wpisów/postów skonfigurowaną w ustawieniach. Więc nie ma się czym martwić.</p>
+  <hr>
+
+  <h1>Problemy</h1>
+  <h3 id="10"><u>Pozycje jednego lub więcej kanałów nie są ułożone chronologicznie</u></h3>
+  <p>Istnieją kanały, które nie publikują żadnej daty dla swoich wpisów. Podczas gdy aplikacja generuje datę, jeżeli owa nie istnieje, pobrane wstępnie artykuły / wpisy / posty nie zachowują kolejności. Ale od tego punktu, następne artykuły / wpisy / posty które zostaną pobrane, zachowają kolejność. <b>Aktualizacja:</b> Jest jeszcze jeden problem z parserem kanałów, ponieważ istnieją kanały generujące dziwną datę (niepoprawne daty, przyszłe daty, itp.).</p>
+  <h3 id="11"><u>Pozycje jednego lub więcej kanałów nie mają zawartości, tylko tytuły</u></h3>
+  <p>Tak samo jak istnieją kanały nie publikujące daty, niektóre nie publikują zawartości, a tylko tytuł. Jeśli chcesz przeczytać artykuły / wpisy / posty z tej strony, musisz ją odwiedzić.</p>
+  <h3 id="12"><u>Import kanałów jest tak wolny, i wydaje się zawieszać aplikację</u></h3>
+  <p>To zdarzało się w wersji 0.1, ale teraz nie powinno mieć miejsca, ponieważ zostało przerobione na zadanie działające w tle.</p>
+  <h3 id="13"><u>Aplikacja została niespodziewanie zamknięta!</u></h3>
+  <p>Niestety, to czasami się zdarza, i ten bład jest jeszcze niezidentyfikowany (czasami jako segfault, czasami jako błąd serwera X-ów), więc zapraszamy wszystkich tych, którzy chcą, aby wkład w tym zakresie. Potrzebna jest pomoc!</p>
+  <hr>
+
+  <h1>Other</h1>
+  <h3 id="14"><u>Jeżeli kanały RSS są podsumowaniami, czy potrzebne są offlinowe grafiki?</u></h3>
+  <p>W praktyce, wpisy nie zawsze są podsumowaniem (tylko całym wpisem), i jest niejasne, czy dany temat nie zmieni się, szczególnie w Internecie. I nawet jeśli to prawda, że kanały RSS zostały przewidziane jako podsumowania, wiele z nich zawiera również grafiki / dodatkową zawartość.</p>
+  <h3 id="15"><u>Na jakiej licencji dystrybuowany jest program?</u></h3>
+  <p>Na licencji GPLv3.</p>
+  <h3 id="16"><u>Chciałabym/chciałbym, aby aplikacja miała ...</u></h3>
+  <p>Podobnie jak w przypadku Liferea, w zasadzie nie przyjmuje <i>zgłoszeń funkcji</i>, ale nie tracisz nic próbując. Jeżeli mnie zainteresuje, kto wie :) Ale, zawsze możesz mi pomóc - zrób to samemu, powiedz lub poproś kogoś, itd...</p>
+  <h3 id="17"><u>Podziękowania autora</u></h3>
+  <p>Autor dziękuje wszystkim, którzy mieli wkład w powstawanie aplikacji (szczególnie mojej dziewczynie:) i wszystkim, którzy pomagali. Także ceni wszystkie uwagi i zgłoszenia w projekcie, w szczególności wyszukiwanie błędów i ich rozwiązywanie.</p>
+  <h3 id="18"><u>Podoba ci się Naufrago!?</u></h3>
+  <p>Największym podziękowaniem dla twórcy oprogramowania jest nie używanie aplikacji, ale przyzwyczajenie użytkowników i podziękowania. Małe "dzięki, stary" wystarczy w większości przypadków :)</p><p>Ale można podziękować pracując nad projektem, <i>rozwiązując błędy</i>, wdrażając nowe funkcje, tłumacząc na nowe języki, tworząc pakiety dla różnych dystrybucji... Lista jest nieskończona! Podobnie, choć już nie będzie to miłe, można go krytykować. W każdym przypadku, możesz napisać do <b>worbynet</b>_at_<b>gmail</b>_dot_<b>com</b> a ja z chęcią przeczytam Twoją wiadomość.</p>
+ </body>
+</html>

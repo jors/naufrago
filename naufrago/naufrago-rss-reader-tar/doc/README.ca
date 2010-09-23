@@ -38,14 +38,13 @@ Les destacades serien:
  - Inclusió de favicons.
  - Iconització de l'aplicació en la Tray.
  - Importació/exportació de feeds en format OPML.
+ - Carpeta d'Importants i de No llegits.
+ - Cercador de termes.
  - Multilidioma (de moment, en Anglès, Català i Castellà).
 
 Lista de desitjos:
 
- - Carpeta d'importants.
  - Traduccions a més idiomes.
- - Més threads.
- - Buscador de termes.
 
 ======================
 3. Requisits (mínims)
@@ -132,6 +131,8 @@ especialment a la meva parella, i a més:
   (http://www.openclipart.org/user-detail/GMcGlinn).
 - El necessari svg de RSS de SRD
   (http://www.openclipart.org/user-detail/SRD).
+- En senzill però clar svg de l'aspa vermella de raemi
+  (http://www.openclipart.org/user-detail/raemi).
 - Doug Quale ( quale1 at charter dot net ) & 
   Walter Anger ( WalterAnger at aon dot at ).
   per l'excel-lent material DnD.
