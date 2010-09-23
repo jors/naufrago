@@ -1009,8 +1009,6 @@ class Naufrago:
   if not os.path.exists(db_path):
    if distro_package == True:
     os.makedirs(os.getenv("HOME") + '/.config/naufrago/')
-   else:
-    os.makedirs(current_path + '/.naufrago/')
 
    self.conn = sqlite3.connect(db_path, check_same_thread=False)
    cursor = self.conn.cursor()
@@ -1458,8 +1456,8 @@ class Naufrago:
   else:
    special2 = self.treestore.append(None, [_("Unread")+' ['+str(row3[0])+']', 'no-leidos', 9999, 'bold'])
   cursor.close()
-  self.treeindex[9998] = special # NEW
-  self.treeindex[9999] = special2 # NEW
+  self.treeindex[9998] = special
+  self.treeindex[9999] = special2
 
  def populate_entries(self, id_feed, search_request_entry_ids=None):
   """Obtains the entries of the selected feed"""
@@ -1610,9 +1608,6 @@ class Naufrago:
       self.conn.commit()
 
       # Actualizamos No-leidos e Importantes
-      #if no_leidos is not None:
-      # self.update_special_folder(9999, no_leidos)
-      # self.update_special_folder(9998, no_leidos)
       self.update_special_folder(9999)
       self.update_special_folder(9998)
 
