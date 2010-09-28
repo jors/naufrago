@@ -176,8 +176,10 @@ class Naufrago:
     model2.set(dest_iter, 0, feed_label, 3, font_style)
 
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute('UPDATE articulo SET importante = ? WHERE id = ?', [model[path][1],model[path][4]])
   self.conn.commit()
+  self.lock.release()
   cursor.close()
   return
 
@@ -239,8 +241,10 @@ class Naufrago:
 
      # ...y 3º a por los datos
      q = 'UPDATE articulo SET leido = 1 WHERE id IN (' + entry_ids + ')'
+     self.lock.acquire()
      cursor.execute(q)
      self.conn.commit()
+     self.lock.release()
 
      # START NAME PARSING (nodo destino) #
      if nombre_feed == _("Unread"):
@@ -324,8 +328,10 @@ class Naufrago:
 
      # ...y 3º a por los datos
      q = 'UPDATE articulo SET leido=1 WHERE id_feed IN (' + feed_ids + ')'
+     self.lock.acquire()
      cursor.execute(q)
      self.conn.commit()
+     self.lock.release()
 
      # START NAME PARSING (nodo destino) #
      # Destino: No leídos
@@ -350,8 +356,10 @@ class Naufrago:
       self.liststore.set_value(iter, 3, 'bold')
 
       # 2º a por los datos...
+      self.lock.acquire()
       cursor.execute('UPDATE articulo SET leido = 0 WHERE id = ?', [id_articulo])
       self.conn.commit()
+      self.lock.release()
 
       # Y actualizar el modelo de datos.
       (model, iter) = self.treeselection.get_selected()
@@ -412,8 +420,10 @@ class Naufrago:
       self.liststore.set_value(iter, 3, 'normal')
 
       # 2º a por los datos...
+      self.lock.acquire()
       cursor.execute('UPDATE articulo SET leido = 1 WHERE id = ?', [id_articulo])
       self.conn.commit()
+      self.lock.release()
 
       # Y actualizar el modelo de datos.
       (model, iter) = self.treeselection.get_selected()
@@ -501,8 +511,10 @@ class Naufrago:
 
      # La actualización en BD del nodo origen se deja para el final...
      q = 'UPDATE articulo SET leido = ' + str(leido) + ' WHERE id IN (' + entry_ids + ')'
+     self.lock.acquire()
      cursor.execute(q)
      self.conn.commit()
+     self.lock.release()
 
      # Y actualizar el modelo de datos.
      (model, iter) = self.treeselection.get_selected()
@@ -738,8 +750,10 @@ class Naufrago:
 
    if(row[0] == 0):
     # Si no estaba leído, marcarlo como tal.
+    self.lock.acquire()
     cursor.execute('UPDATE articulo SET leido=1 WHERE id = ?', [id_articulo])
     self.conn.commit()
+    self.lock.release()
    cursor.close()
 
    # Y actualizar el modelo de datos.
@@ -1012,6 +1026,7 @@ class Naufrago:
 
    self.conn = sqlite3.connect(db_path, check_same_thread=False)
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.executescript('''
      CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
@@ -1022,6 +1037,7 @@ class Naufrago:
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
+   self.lock.release()
    cursor.close()
    os.makedirs(favicon_path)
    os.makedirs(images_path)
@@ -1063,8 +1079,8 @@ class Naufrago:
   PUF_PAGE = f.read()
   f.close()
   
-  # Valor del lock...
-  self.lock = False
+  # Valor del lock de los elementos de la ui...
+  self.ui_lock = False
 
  def save_config(self):
   """Saves user window configuration"""
@@ -1084,8 +1100,10 @@ class Naufrago:
   scroll2 = str(c)+'x'+str(d)
 
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries])
   self.conn.commit()
+  self.lock.release()
   cursor.close()
 
  def purge_entries(self):
@@ -1115,9 +1133,11 @@ class Naufrago:
         os.unlink(images_path + '/'+ str(i[0]))
     id_articulos = id_articulos[0:len(id_articulos)-1]
 
+    self.lock.acquire()
     cursor.execute('DELETE FROM imagen WHERE id_articulo IN ('+id_articulos+')')
     cursor.execute('DELETE FROM articulo WHERE id IN ('+id_articulos+')')
     self.conn.commit()
+    self.lock.release()
     cursor.close()
     updated_feed_ids.append(row[0])
 
@@ -1535,11 +1555,13 @@ class Naufrago:
    cursor = self.conn.cursor()
    # Create category in the database (if it does not exist!)
    cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [text.decode("utf-8")])
-   if(cursor.fetchone() is None):
+   row = cursor.fetchone()
+   if(row is None):
     if((data is not None) and (type(data) is not gtk.Action)): # Modo edición II
      cursor.execute('SELECT nombre FROM categoria WHERE id = ?', [data])
      nombre_categoria = cursor.fetchone()[0]
      if(text != nombre_categoria):
+      self.lock.acquire()
       cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
       (model, iter) = self.treeselection.get_selected()
       model.set(iter, 0, text)
@@ -1548,8 +1570,10 @@ class Naufrago:
      row = cursor.fetchone()
      dad = self.treestore.append(None, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      self.treeindex_cat[row[0]+1] = dad # Update category dict
+     self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
     self.conn.commit()
+    self.lock.release()
    cursor.close()
 
  def delete_category(self, data=None):
@@ -1599,6 +1623,7 @@ class Naufrago:
          if (row3 is not None) and (row3[0] <= 1):
           if os.path.exists(images_path + '/'+ str(i[1])):
            os.unlink(images_path + '/'+ str(i[1]))
+        self.lock.acquire()
         cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
         self.conn.commit()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
@@ -1606,6 +1631,7 @@ class Naufrago:
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
       self.conn.commit()
+      self.lock.release()
 
       # Actualizamos No-leidos e Importantes
       self.update_special_folder(9999)
@@ -1692,8 +1718,10 @@ class Naufrago:
      feed_label = textName
     else:
      feed_label = textName + ' [' + str(row[0]) + ']'
+    self.lock.acquire()
     cursor.execute('UPDATE feed SET nombre = ?,url = ? WHERE id = ?', [textName.decode("utf-8"),textURL.decode("utf-8"),data])
     self.conn.commit()
+    self.lock.release()
     model.set(iter, 0, feed_label)
    else:
     # Create feed in the database (if it does not exist!)
@@ -1720,8 +1748,10 @@ class Naufrago:
      son = self.treestore.append(iter, [textName, str(id_feed+1), id_feed+1, 'normal'])
      self.treeindex[id_feed+1] = son # Update feeds dict
      self.treeview.expand_row(model.get_path(iter), open_all=False) # Expand parent!
+     self.lock.acquire()
      cursor.execute('INSERT INTO feed VALUES(null, ?, ?, ?)', [textName.decode("utf-8"),textURL.decode("utf-8"),id_categoria])
      self.conn.commit()
+     self.lock.release()
      self.treeselection.select_iter(son)
      self.update_feed(data=None, new=True)
    cursor.close()
@@ -1782,11 +1812,15 @@ class Naufrago:
        if (row3 is not None) and (row3[0] <= 1):
         if os.path.exists(images_path + '/'+ str(i[1])):
          os.unlink(images_path + '/'+ str(i[1]))
+      self.lock.acquire()
       cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
       self.conn.commit()
+      self.lock.release()
+     self.lock.acquire()
      cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
      cursor.execute('DELETE FROM feed WHERE id = ?', [id_feed])
      self.conn.commit()
+     self.lock.release()
      cursor.close()
      if os.path.exists(favicon_path + '/'+ str(id_feed)):
       os.unlink(favicon_path + '/'+ str(id_feed))
@@ -1926,7 +1960,7 @@ class Naufrago:
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
-  dialog.set_size_request(250,250)
+  dialog.set_size_request(275,250)
   dialog.set_border_width(2)
   dialog.set_resizable(False)
   dialog.set_has_separator(False)
@@ -2090,8 +2124,10 @@ class Naufrago:
   parent_value = str(model.get_value(target, 0))
   row_value = str(model.get_value(source_row.iter, 0))
   row_value = self.simple_name_parsing(row_value)
+  self.lock.acquire()
   cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value.decode("utf-8")])
   self.conn.commit()
+  self.lock.release()
   cursor.close()
 
   # If the source row is expanded, expand the newly copied row
@@ -2191,17 +2227,17 @@ class Naufrago:
      update_item = gtk.ImageMenuItem(_("Update"))
      icon = update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
      update_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.lock == True: update_item.set_sensitive(False)
+     if self.ui_lock == True: update_item.set_sensitive(False)
 
      edit_item = gtk.ImageMenuItem(_("Edit"))
      icon = edit_item.render_icon(gtk.STOCK_EDIT, gtk.ICON_SIZE_BUTTON)
      edit_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.lock == True: edit_item.set_sensitive(False)
+     if self.ui_lock == True: edit_item.set_sensitive(False)
 
      delete_item = gtk.ImageMenuItem(_("Delete"))
      icon = delete_item.render_icon(gtk.STOCK_CLOSE, gtk.ICON_SIZE_BUTTON)
      delete_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.lock == True: delete_item.set_sensitive(False)
+     if self.ui_lock == True: delete_item.set_sensitive(False)
 
      separator = gtk.SeparatorMenuItem()
      new_feed_item = gtk.ImageMenuItem(_("New feed"))
@@ -2339,7 +2375,7 @@ class Naufrago:
   """Updates all feeds (no complications!)."""
   # Old way: self.get_feed()
   # New way:
-  if self.lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
+  if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
    t = threading.Thread(target=self.get_feed, args=())
    t.start()
   return True
@@ -2413,8 +2449,10 @@ class Naufrago:
     id_entry_max = cursor.fetchone()[0]
     if id_entry_max is None: id_entry_max = 1
     else: id_entry_max += 1
+    self.lock.acquire()
     cursor.execute('INSERT INTO imagen VALUES(null, ?, ?, ?)', [id_entry_max,i,id_articulo])
     self.conn.commit()
+    self.lock.release()
     try:
      web_file = urllib2.urlopen(i)
      image = images_path + '/' + str(id_entry_max)
@@ -2427,8 +2465,10 @@ class Naufrago:
     self.statusbar.set_text('')
    else:
     # b) Si existe, comprobamos que no sea una entrada repe...
+    self.lock.acquire()
     cursor.execute('INSERT INTO imagen VALUES(null, ?, ?, ?)', [row[0],i,id_articulo])
     self.conn.commit()
+    self.lock.release()
   cursor.close()
 
  def toggle_menuitems_sensitiveness(self, enable):
@@ -2445,7 +2485,7 @@ class Naufrago:
    widget = self.ui.get_widget(item)
    widget.set_sensitive(enable)
   self.statusicon_menu.set_sensitive(enable)
-  self.lock = not enable
+  self.ui_lock = not enable
 
  def change_feed_icon(self, d, model, id_feed, cursor):
   """Toggles feed icons -between error & ok- while trying to obtain feed data."""
@@ -2552,12 +2592,16 @@ class Naufrago:
            if (row3 is not None) and (row3[0] <= 1):
             if os.path.exists(images_path + '/'+ str(i[0])):
              os.unlink(images_path + '/'+ str(i[0]))
+          self.lock.acquire()
           cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
           cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
           self.conn.commit()
+          self.lock.release()
           images = self.find_entry_images(feed_link, description)
+          self.lock.acquire()
           cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
           self.conn.commit()
+          self.lock.release()
           cursor.execute('SELECT MAX(id) FROM articulo')
           unique = cursor.fetchone()
           # START Offline mode image retrieving
@@ -2571,8 +2615,10 @@ class Naufrago:
           num_new_posts_total += 1
         else:
          images = self.find_entry_images(feed_link, description)
+         self.lock.acquire()
          cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
          self.conn.commit()
+         self.lock.release()
          cursor.execute('SELECT MAX(id) FROM articulo')
          unique = cursor.fetchone()
          # START Offline mode image retrieving
@@ -2668,8 +2714,10 @@ class Naufrago:
       # Update db...
       (model, iter) = self.treeselection.get_selected()
       id_feed = model.get_value(iter, 2)
+      self.lock.acquire()
       cursor.execute('UPDATE feed SET nombre = ? WHERE id = ?', [title.decode('utf-8'),id_feed])
       self.conn.commit()
+      self.lock.release()
       # Update feed tree...
       model.set(iter, 0, title)
 
@@ -2701,12 +2749,16 @@ class Naufrago:
          if (row3 is not None) and (row3[0] <= 1):
           if os.path.exists(images_path + '/'+ str(i[0])):
            os.unlink(images_path + '/'+ str(i[0]))
+        self.lock.acquire()
         cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
         cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
         self.conn.commit()
+        self.lock.release()
         images = self.find_entry_images(feed_link, description)
+        self.lock.acquire()
         cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
         self.conn.commit()
+        self.lock.release()
         cursor.execute('SELECT MAX(id) FROM articulo')
         unique = cursor.fetchone()
         # START Offline mode image retrieving
@@ -2720,8 +2772,10 @@ class Naufrago:
         num_new_posts_total += 1
       else:
        images = self.find_entry_images(feed_link, description)
+       self.lock.acquire()
        cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
        self.conn.commit()
+       self.lock.release()
        cursor.execute('SELECT MAX(id) FROM articulo')
        unique = cursor.fetchone()
        # START Offline mode image retrieving
@@ -2831,10 +2885,13 @@ class Naufrago:
     tipo = node.attrib.get('type')
     if name and url:
      cursor.execute('SELECT id FROM feed WHERE nombre = ?', [name])
-     if(cursor.fetchone() is None):
+     row = cursor.fetchone()
+     if(row is None):
       # Create feed in the DB
+      self.lock.acquire()
       cursor.execute('INSERT INTO feed VALUES(null, ?, ?, ?)', [name,url,current_category])
       self.conn.commit()
+      self.lock.release()
       # Obtain feed favicon
       row = cursor.execute('SELECT MAX(id) FROM feed')
       id_feed = cursor.fetchone()[0]
@@ -2847,8 +2904,10 @@ class Naufrago:
       row = cursor.fetchone()
       if(row is None):
        # Create category in the DB (if it does not exist already)
+       self.lock.acquire()
        cursor.execute('INSERT INTO categoria VALUES(null, ?)', [name])
        self.conn.commit()
+       self.lock.release()
        row = cursor.execute('SELECT MAX(id) FROM categoria')
        row = cursor.fetchone()
       current_category = row[0]
@@ -2962,6 +3021,7 @@ class Naufrago:
  ########
 
  def __init__(self):
+  self.lock = threading.Lock()
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
   # Obtiene la config de la app
@@ -2978,6 +3038,8 @@ def main():
  gtk.main()
  
 if __name__ == "__main__":
- naufrago = Naufrago()
- main()
-
+ try:
+  naufrago = Naufrago()
+  main()
+ except MyError as e:
+  print 'My exception occurred, value:', e.value
