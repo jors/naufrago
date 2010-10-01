@@ -4,7 +4,8 @@
 # There is a pygi-convert script which will give you some idea of the currently required transformations.
 
 
-FILES_TO_CONVERT="$(find sugar-pygi -iname \*.py) $(find sugar-toolkit-pygi -iname \*.py) sugar-pygi/bin/sugar-session"
+#FILES_TO_CONVERT="$(find sugar-pygi -iname \*.py) $(find sugar-toolkit-pygi -iname \*.py) sugar-pygi/bin/sugar-session"
+FILES_TO_CONVERT="naufrago-debian-pygi.py"
 
 for f in $FILES_TO_CONVERT; do
     perl -i -0 \
