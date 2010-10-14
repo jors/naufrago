@@ -154,3 +154,14 @@ Además...
 - Guardado del ancho de la lista de feeds. DONE
 - Pequeños bugs de importar/exportar feeds. DONE
 
+ROADMAP 0.3:
+- IMPROVED: Estabilizar crashes provocados por SQLite (thread blocking). TESTING
+- NEW: Sort by article important state. DONE
+- Sort by article reading state (otra columna?). DISCARDED
+- Use system font style. Already handled (font & size), but not style (normal/bold/italic). DONE
+- Bold folders with unread articles.
+- Custom notification formats (title of the update).
+- Posibilidad de cancelar el update (botón al lado de actualizar todo).
+- Módulo multiprocessing vs threading?
+- Migración a pygi?
+

@@ -926,7 +926,7 @@ class Naufrago:
   about = gtk.AboutDialog()
   about.set_transient_for(self.window)
   about.set_program_name("Naufrago!")
-  about.set_version("0.2")
+  about.set_version("0.3")
   about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
@@ -969,6 +969,7 @@ class Naufrago:
                 <toolitem name='New category' action='New category'/>
                 <separator name='sep1'/>
                 <toolitem name='Update all' action='Update all'/>
+                <toolitem name='Stop update' action='Stop update'/>
                 <separator name='sep2'/>
                 <toolitem name='Search' action='Search'/>
                 <toolitem name='Preferences' action='Preferences'/>
@@ -1007,6 +1008,7 @@ class Naufrago:
             ('NetworkMenu', None, _('_Network')),
             ('Update', None, _('_Update'), '<control>U', _('Updates the selected feed'), self.update_feed),
             ('Update all', gtk.STOCK_REFRESH, _('Update all'), '<control>R', _('Update all feeds'), self.update_all_feeds),
+            ('Stop update', gtk.STOCK_STOP, _('Stop'), None, _('Stop update'), None),
             ('HelpMenu', None, _('_Help')),
             ('FAQ', gtk.STOCK_HELP, _('FAQ'), None, _('FAQ'), self.load_puf),
             ('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.help_about),
@@ -1171,6 +1173,12 @@ class Naufrago:
   self.create_ui(self.window)
   self.vbox.pack_start(self.ui.get_widget('/Menubar'), expand=False)
   self.toolbar = self.ui.get_widget('/Toolbar')
+
+  ### START NEW  
+  widget = self.ui.get_widget("/Toolbar/Stop update")
+  widget.set_sensitive(False)
+  ### END NEW
+
   self.vbox.pack_start(self.toolbar, expand=False)
   # Creación del HPaned.
   self.hpaned = gtk.HPaned()
@@ -1256,6 +1264,7 @@ class Naufrago:
   self.treeview2.set_search_column(2)
   # Allow sorting on the column
   self.tvcolumn_fecha.set_sort_column_id(0)
+  self.tvcolumn_important.set_sort_column_id(1)
   self.tvcolumn_titulo.set_sort_column_id(2)
   self.scrolled_window2 = gtk.ScrolledWindow()
   self.scrolled_window2.add(self.treeview2)
@@ -1264,9 +1273,9 @@ class Naufrago:
   #self.scrolled_window2.set_size_request(self.c, self.d) # Sets an acceptable list sizing
   self.vpaned.add1(self.scrolled_window2)
 
-  ###########
-  # PARTE 3 #
-  ###########
+  ######################
+  # PARTE 3  (browser) #
+  ######################
   self.scrolled_window3 = gtk.ScrolledWindow()
   self.scrolled_window3.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
   self.webview = webkit.WebView()
@@ -1310,9 +1319,9 @@ class Naufrago:
   self.hpaned.add2(self.vpaned)
   self.vbox.pack_start(self.hpaned, True, True, 0)
 
-  ###########
-  # PARTE 4 #
-  ###########
+  ####################################
+  # PARTE 4 (statusbar & statusicon) #
+  ####################################
   self.hbox2 = gtk.HBox(homogeneous=False, spacing=0)
   self.throbber = gtk.Image()
   self.throbber.set_from_file(app_path + 'media/throbber.gif')
@@ -1623,7 +1632,7 @@ class Naufrago:
          if (row3 is not None) and (row3[0] <= 1):
           if os.path.exists(images_path + '/'+ str(i[1])):
            os.unlink(images_path + '/'+ str(i[1]))
-        self.lock.acquire()
+        #self.lock.acquire()
         cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
         self.conn.commit()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
@@ -1631,7 +1640,7 @@ class Naufrago:
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
       self.conn.commit()
-      self.lock.release()
+      #self.lock.release()
 
       # Actualizamos No-leidos e Importantes
       self.update_special_folder(9999)
@@ -2401,14 +2410,29 @@ class Naufrago:
    ts = split[1].split(':')
    t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
    secs = time.mktime(t.timetuple())
-  if(hasattr(dentry,'title')): title = dentry.title.encode("utf-8")
+  
+  if hasattr(dentry,'title'):
+   if dentry.title is not None: title = dentry.title.encode("utf-8")
+   else: title = _('Without title')
   else: title = _('Without title')
-  if(hasattr(dentry,'description')): description = dentry.description.encode("utf-8")
+
+  if hasattr(dentry,'description'):
+   if dentry.description is not None: description = dentry.description.encode("utf-8")
+   else: description = ''
   else: description = ''
-  if(hasattr(dentry,'link')): link = dentry.link.encode("utf-8")
+
+  if hasattr(dentry,'link'):
+   if dentry.link is not None: link = dentry.link.encode("utf-8")
+   else: link = _('Without link')
   else: link = _('Without link')
+
   if(hasattr(dentry,'id')):
-   id = dentry.id.encode("utf-8")
+   if dentry.id is not None: id = dentry.id.encode("utf-8")
+   else:
+    if description != '':
+     id = hashlib.md5(description).hexdigest().encode("utf-8")
+    else:
+     id = hashlib.md5(title).hexdigest().encode("utf-8")
   else:
    if description != '':
     id = hashlib.md5(description).hexdigest().encode("utf-8")
