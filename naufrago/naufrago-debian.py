@@ -1008,7 +1008,7 @@ class Naufrago:
             ('NetworkMenu', None, _('_Network')),
             ('Update', None, _('_Update'), '<control>U', _('Updates the selected feed'), self.update_feed),
             ('Update all', gtk.STOCK_REFRESH, _('Update all'), '<control>R', _('Update all feeds'), self.update_all_feeds),
-            ('Stop update', gtk.STOCK_STOP, _('Stop'), None, _('Stop update'), None),
+            ('Stop update', gtk.STOCK_STOP, _('Stop'), None, _('Stop update'), self.stop_feed_update),
             ('HelpMenu', None, _('_Help')),
             ('FAQ', gtk.STOCK_HELP, _('FAQ'), None, _('FAQ'), self.load_puf),
             ('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.help_about),
@@ -1971,7 +1971,7 @@ class Naufrago:
 
   dialog.set_size_request(275,250)
   dialog.set_border_width(2)
-  dialog.set_resizable(False)
+  dialog.set_resizable(True)
   dialog.set_has_separator(False)
  
   notebook = gtk.Notebook()
@@ -2389,6 +2389,11 @@ class Naufrago:
    t.start()
   return True
 
+ def stop_feed_update(self, data=None):
+  """Stop feeds update."""
+  self.stop_feed_update = True
+  print "Stopping feed update..."
+
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""
   if(hasattr(dentry,'date_parsed')):
@@ -2508,6 +2513,10 @@ class Naufrago:
   for item in item_list:
    widget = self.ui.get_widget(item)
    widget.set_sensitive(enable)
+  # Stop button
+  widget = self.ui.get_widget("/Toolbar/Stop update")
+  widget.set_sensitive(not enable)
+
   self.statusicon_menu.set_sensitive(enable)
   self.ui_lock = not enable
 
