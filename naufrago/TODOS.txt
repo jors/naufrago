@@ -159,11 +159,12 @@ ROADMAP 0.3:
 - NEW: Important column is now sortable. DONE
 - DISCARDED: Sort by article reading state (otra columna?).
 - Use system font style. Already handled (font & size, not style). DONE
-- Bold folders with unread articles.
-- Custom notification formats (title of the update).
+- SOLVED: Mostrar/esconder entradas leidas. DONE
+- NEW: Esconder la columna de la fecha. DONE
 - ONGOING: Posibilidad de cancelar el update (botón al lado de actualizar todo).
 - Fecha más larga (con hora).
-- Esconder la columna de la fecha.
+- Bold folders with unread articles.
+- Custom notification formats (title of the update).
 - Módulo multiprocessing vs threading?
 - Migración a pygi?
 

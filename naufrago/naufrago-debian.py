@@ -1030,12 +1030,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1072,6 +1072,7 @@ class Naufrago:
   self.toolbar_mode = int(row[11])
   self.show_newentries_notification = int(row[12])
   self.hide_readentries = int(row[13])
+  self.hide_dates = int(row[14])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1103,7 +1104,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -1508,6 +1509,7 @@ class Naufrago:
   cursor.close()
  
   p = re.compile(r'<[^<]*?/?>') # Removes HTML tags
+  p2 = re.compile('\s{2,}') # Translate 2 o + joined whitespaces to only one
   for row in rows:
    if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0): # NEW
     now = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -1518,7 +1520,7 @@ class Naufrago:
     if row[4] == 1: importante=True
     else: importante=False
     # We remove newlines, remove HTML tags and decode htmlentities.
-    self.liststore.append([fecha, importante, self.htmlentitydecode(p.sub('',row[1].replace('\n',''))), font_style, row[0]])
+    self.liststore.append([fecha, importante, self.htmlentitydecode(p2.sub('',p.sub('',row[1].replace('\n','')))), font_style, row[0]])
     any_row_to_show=True
 
   # Si no hay entries, no queremos su panel!
@@ -1953,6 +1955,15 @@ class Naufrago:
    self.show_trayicon = 0
    self.statusicon.set_visible(False)
 
+ def hide_read_entries(self, aux_hide_readentries):
+  """Restores the state of the read entry hidding of the preferences dialog."""
+  self.hide_readentries = aux_hide_readentries
+  (model, iter) = self.treeselection.get_selected()
+  if(iter is not None): # Si hay algún nodo seleccionado...
+   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+    id_selected_feed = self.treestore.get_value(iter, 2)
+    self.populate_entries(id_selected_feed)
+
  def hide_read_entries_cb(self, checkbox):
   """Controlls the read entry hidding of the preferences dialog."""
   (model, iter) = self.treeselection.get_selected()
@@ -1962,6 +1973,21 @@ class Naufrago:
     else: self.hide_readentries = 0
     id_selected_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_selected_feed)
+
+ def hide_date_column(self, aux_hide_dates):
+  """Restores the state of date column hidding of the preferences dialog."""
+  self.hide_dates = aux_hide_dates
+  if self.hide_dates == 1: self.tvcolumn_fecha.set_visible(False)
+  else: self.tvcolumn_fecha.set_visible(True)
+
+ def hide_date_column_cb(self, checkbox):
+  """Controlls the date column hidding of the preferences dialog."""
+  if checkbox.get_active():
+   self.hide_dates = 1
+   self.tvcolumn_fecha.set_visible(False)
+  else:
+   self.hide_dates = 0
+   self.tvcolumn_fecha.set_visible(True)
 
  def preferences(self, data=None):
   """Preferences dialog."""
@@ -2045,6 +2071,12 @@ class Naufrago:
   align3 = gtk.Alignment()
   align3.set_padding(10, 0, 15, 0)
 
+  checkbox7 = gtk.CheckButton(_("Hide dates"))
+  aux_hide_dates = self.hide_dates # Aux var to remember original state
+  if(self.hide_dates == 1): checkbox7.set_active(True)
+  else: checkbox7.set_active(False)
+  checkbox7.connect('toggled', self.hide_date_column_cb)
+  vbox4.pack_start(checkbox7, True, True, 5)
   checkbox5 = gtk.CheckButton(_("Notification on new entries"))
   if(self.show_newentries_notification == 1): checkbox5.set_active(True)
   else: checkbox5.set_active(False)
@@ -2099,6 +2131,8 @@ class Naufrago:
    else: self.show_newentries_notification = 0
    if(checkbox6.get_active()): self.hide_readentries = 1
    else: self.hide_readentries = 0
+   if(checkbox7.get_active()): self.hide_dates = 1
+   else: self.hide_dates = 0
 
    if checkbox1.get_active() and self.show_trayicon == 0:
     self.show_trayicon = 1
@@ -2112,7 +2146,8 @@ class Naufrago:
    self.change_toolbar_mode(self.toolbar_mode)
    self.statusicon.set_visible(aux_show_trayicon)
    self.show_trayicon = aux_show_trayicon
-   self.hide_readentries = aux_hide_readentries
+   self.hide_read_entries(aux_hide_readentries)
+   self.hide_date_column(aux_hide_dates)
 
  def treeview_copy_row(self, treeview, model, source, target, drop_position):
   """Copy tree model rows from treeiter source into, before or after treeiter target.
