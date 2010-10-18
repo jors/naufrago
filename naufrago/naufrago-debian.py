@@ -1349,6 +1349,8 @@ class Naufrago:
   self.scrolled_window2.set_size_request(0,0)
   self.scrolled_window2.hide()
   self.change_toolbar_mode(self.toolbar_mode)
+  self.hide_date_column(self.hide_dates)
+
   if self.show_trayicon == 0: self.statusicon.set_visible(False)
 
   # Finally, check init options!

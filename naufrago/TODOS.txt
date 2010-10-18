@@ -158,7 +158,7 @@ ROADMAP 0.3:
 - IMPROVED: Estabilizar crashes provocados por SQLite (thread blocking).
 - NEW: Important column is now sortable. DONE
 - DISCARDED: Sort by article reading state (otra columna?).
-- Use system font style. Already handled (font & size, not style). DONE
+- ALREADY. Use system font style. Already handled (font & size, not style).
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
 - ONGOING: Posibilidad de cancelar el update (botón al lado de actualizar todo).
