@@ -220,6 +220,17 @@ class Naufrago:
 
     if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999): # Si es HOJA...
 
+     # NEW
+     # Unbold category if needed.
+     iter_tmp = model.iter_parent(iter)
+     id_categoria = model.get_value(iter_tmp, 2)
+     q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+     cursor.execute(q)
+     row = cursor.fetchone()
+     if (row is None) and (row[0] == 0):
+      model.set(iter_tmp, 3, 'normal')
+     # NEW
+
      # 1º vamos a por el label del feed...
      # START NAME PARSING (nodo origen) #
      nombre_feed = model.get_value(iter, 0)
@@ -302,6 +313,11 @@ class Naufrago:
 
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
+
+     # NEW
+     # Unbold category.
+     model.set(iter, 3, 'normal')
+     # NEW
 
      # 1º vamos a por el label de los feeds...
      feed_ids = ''

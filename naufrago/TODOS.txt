@@ -139,7 +139,7 @@ BUGS:
 - Aceleradores más intuitivos. DONE
 - Intento de usar fechas correctas, pero el problema es de feedparser. DISCARDED
 - Todavía problemas de recuento en Unread. DONE
-- Marcar/desmarcar todos como leidos en las entries de una busqueda. PENDING
+- Marcar/desmarcar todos como leidos en las entries de una busqueda. DONE
 
 ROADMAP 0.2:
 - Poder cambiar el estilo de la toolbar o esconderla. DONE
@@ -166,9 +166,14 @@ ROADMAP 0.3:
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
 - NEW: Posibilidad de cancelar el update (botón al lado de actualizar todo). DONE
-- Bold folders with unread articles.
-- Fecha más larga (con hora).
+- Bold folders with unread articles. Checks for:
+  * 'Marcar todo como leido' en una categoría -> unbold. DONE (test!)
+  * 'Marcar todo como leido' en un feed -> sql. DONE (test!)
+  * 'Alternar leído/no-leído' en una entry -> sql.
+  * 'Alternar leído/no-leído todos' en una entry -> sql.
+- Open entry on double click.
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
+- DISCARDED: Fecha más larga (con hora).
 - Custom notification formats (title of the update).
 - Módulo multiprocessing vs threading?
 - Migración a pygi?
