@@ -118,6 +118,8 @@ KNOWN ISSUES:
   guarda su posición.
 - Algunas veces webkit se queda pájaro y no abre enlaces.
 
+*****************************************************************************************
+
 BUGS:
 - Actualizar el diccionario de iteradores al añadir y/o borrar feed y/o categoria. DONE
   (Funciones afectadas: add_feed, add_category, delete_feed, delete_category)
@@ -154,16 +156,19 @@ Además...
 - Guardado del ancho de la lista de feeds. DONE
 - Pequeños bugs de importar/exportar feeds. DONE
 
+*****************************************************************************************
+
 ROADMAP 0.3:
-- IMPROVED: Estabilizar crashes provocados por SQLite (thread blocking).
+- IMPROVED: Estabilizar crashes provocados por SQLite (thread blocking). DONE
 - NEW: Important column is now sortable. DONE
 - DISCARDED: Sort by article reading state (otra columna?).
-- ALREADY. Use system font style. Already handled (font & size, not style).
+- Use system font style. Already handled (font & size, not style). ALREADY PRESENT
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
-- ONGOING: Posibilidad de cancelar el update (botón al lado de actualizar todo).
-- Fecha más larga (con hora).
+- NEW: Posibilidad de cancelar el update (botón al lado de actualizar todo). DONE
 - Bold folders with unread articles.
+- Fecha más larga (con hora).
+- "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
 - Custom notification formats (title of the update).
 - Módulo multiprocessing vs threading?
 - Migración a pygi?

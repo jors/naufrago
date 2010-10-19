@@ -1084,6 +1084,8 @@ class Naufrago:
   
   # Valor del lock de los elementos de la ui...
   self.ui_lock = False
+  # Valor del lock del botón stop...
+  self.stop_feed_update_lock = False
 
  def save_config(self):
   """Saves user window configuration"""
@@ -1174,7 +1176,6 @@ class Naufrago:
   self.create_ui(self.window)
   self.vbox.pack_start(self.ui.get_widget('/Menubar'), expand=False)
   self.toolbar = self.ui.get_widget('/Toolbar')
-
   ### START NEW  
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(False)
@@ -2428,8 +2429,7 @@ class Naufrago:
 
  def stop_feed_update(self, data=None):
   """Stop feeds update."""
-  self.stop_feed_update = True
-  print "Stopping feed update..."
+  self.stop_feed_update_lock = True
 
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""
@@ -2610,8 +2610,9 @@ class Naufrago:
    (model, iter) = self.treeselection.get_selected() # We only want the model here...
    iter = model.get_iter_root() # Magic
    cursor = self.conn.cursor()
-   while iter is not None:
+   while (iter is not None) and (not self.stop_feed_update_lock):
     if(model.iter_depth(iter) == 0): # Si es padre
+     new_posts = False # Reset
      for i in range(model.iter_n_children(iter)):
       child = model.iter_nth_child(iter, i)
 
@@ -2719,9 +2720,9 @@ class Naufrago:
 
       # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
-       (model, iter2) = self.treeselection.get_selected()
+       (model2, iter2) = self.treeselection.get_selected()
        if(iter2 is not None): # Si hay algún nodo seleccionado...
-        if(model.iter_depth(iter2) == 1): # ... y es un nodo hijo
+        if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
          id_selected_feed = self.treestore.get_value(iter2, 2)
          if id_selected_feed == id_feed:
           self.populate_entries(id_feed)
@@ -2736,7 +2737,7 @@ class Naufrago:
        else:
         feed_label = nombre_feed + ' [' + str(row[0]) + ']'
         font_style = 'bold'
-       model.set(child, 0, feed_label, 3, font_style)
+       model2.set(child, 0, feed_label, 3, font_style)
        # Y luego el recuento de los No-leidos
        (model3, useless_iter) = self.treeselection.get_selected()
        dest_iter = self.treeindex[9999]
@@ -2746,6 +2747,15 @@ class Naufrago:
        row = cursor.fetchone()
        feed_label = nombre_feed_destino + ' [' + str(row[0]) + ']'
        model3.set(dest_iter, 0, feed_label, 3, 'bold')
+       # Y luego el resaltado de la categoría
+       model.set(iter, 3, 'bold')
+      else:
+       # Y luego el resaltado de la categoría
+       model.set(iter, 3, 'normal')
+
+      # ¿Hay cancelación?
+      if self.stop_feed_update_lock:
+       break
        
      iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
@@ -2873,9 +2883,9 @@ class Naufrago:
 
     # Actualizamos las entries del feed seleccionado
     if(count != 0):
-     (model, iter2) = self.treeselection.get_selected()
+     (model2, iter2) = self.treeselection.get_selected()
      if(iter2 is not None): # Si hay algún nodo seleccionado...
-      if(model.iter_depth(iter2) == 1): # ... y es un nodo hijo
+      if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
        id_selected_feed = self.treestore.get_value(iter2, 2)
        if id_selected_feed == id_feed:
         self.populate_entries(id_feed)
@@ -2890,7 +2900,7 @@ class Naufrago:
      else:
       feed_label = nombre_feed + ' [' + str(row[0]) + ']'
       font_style = 'bold'
-     model.set(child, 0, feed_label, 3, font_style)
+     model.set(child, 0, feed_label, 3, font_style) ### ¿¿¿ model o model2 ???
      # Y luego el recuento de los No-leidos
      (model3, useless_iter) = self.treeselection.get_selected()
      dest_iter = self.treeindex[9999]
@@ -2900,8 +2910,22 @@ class Naufrago:
      row = cursor.fetchone()
      feed_label = nombre_feed_destino + ' [' + str(row[0]) + ']'
      model3.set(dest_iter, 0, feed_label, 3, 'bold')
+     # Y luego el resaltado de la categoría
+     if(model.iter_depth(iter) == 0): # Si es padre
+      model.set(iter, 3, 'bold')
+    else:
+     # Y luego el resaltado de la categoría
+     if(model.iter_depth(iter) == 0): # Si es padre
+      model.set(iter, 3, 'normal')
+
+    # ¿Hay cancelación?
+    if self.stop_feed_update_lock:
+     break
 
    cursor.close()
+
+  # Restablecemos el indicador de cancelación
+  self.stop_feed_update_lock = False
 
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
