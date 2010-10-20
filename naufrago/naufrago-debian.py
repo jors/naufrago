@@ -208,6 +208,22 @@ class Naufrago:
    no_leidos = None
   return nombre_feed, no_leidos
 
+ def toggle_category_bold(self):
+  """Toggles bold or unbold in category folders."""
+  cursor = self.conn.cursor()
+  (model, iter) = self.treeselection.get_selected()
+  if(model.iter_depth(iter) == 1): # Si es hijo...
+   iter = model.iter_parent(iter) # ...queremos el padre
+  id_categoria = model.get_value(iter, 2)
+  q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+  cursor.execute(q)
+  row = cursor.fetchone()
+  if row[0] == 0:
+   model.set(iter, 3, 'normal')
+  else:
+   model.set(iter, 3, 'bold')
+  cursor.close()
+
  def toggle_leido(self, event, data=None):
   """Toggle entries between read/non-read states."""
   cursor = self.conn.cursor()
@@ -222,13 +238,14 @@ class Naufrago:
 
      # NEW
      # Unbold category if needed.
-     iter_tmp = model.iter_parent(iter)
-     id_categoria = model.get_value(iter_tmp, 2)
-     q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
-     cursor.execute(q)
-     row = cursor.fetchone()
-     if (row is None) and (row[0] == 0):
-      model.set(iter_tmp, 3, 'normal')
+     #self.toggle_category_bold()
+     #iter_tmp = model.iter_parent(iter)
+     #id_categoria = model.get_value(iter_tmp, 2)
+     #q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+     #cursor.execute(q)
+     #row = cursor.fetchone()
+     #if (row is None) and (row[0] == 0):
+     # model.set(iter_tmp, 3, 'normal')
      # NEW
 
      # 1º vamos a por el label del feed...
@@ -311,12 +328,16 @@ class Naufrago:
       self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
 
+     # NEW
+     # Unbold category if needed.
+     self.toggle_category_bold()
+     # NEW
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
 
      # NEW
      # Unbold category.
-     model.set(iter, 3, 'normal')
+     #model.set(iter, 3, 'normal')
      # NEW
 
      # 1º vamos a por el label de los feeds...
@@ -355,6 +376,11 @@ class Naufrago:
      # Destino: Importantes
      self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
+
+     # NEW
+     # Unbold category.
+     model.set(iter, 3, 'normal')
+     # NEW
 
     cursor.close()
 
@@ -682,6 +708,11 @@ class Naufrago:
 
      cursor.close()
 
+    # NEW
+    # Unbold category if needed.
+    self.toggle_category_bold()
+    # NEW
+
  def abrir_browser(self, event=None, data=None):
   """Opens a given url in the user sensible web browser."""
   (model, iter) = self.treeselection2.get_selected()
@@ -837,6 +868,11 @@ class Naufrago:
      if flag_importante == True:
       self.update_special_folder(9998)
     # END NAME PARSING (nodo destino) #
+
+   # NEW
+   # Unbold category if needed.
+   self.toggle_category_bold()
+   # NEW
 
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
@@ -2446,6 +2482,8 @@ class Naufrago:
  def stop_feed_update(self, data=None):
   """Stop feeds update."""
   self.stop_feed_update_lock = True
+  widget = self.ui.get_widget("/Toolbar/Stop update")
+  widget.set_sensitive(False)
 
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""

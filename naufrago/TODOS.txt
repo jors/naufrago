@@ -159,7 +159,7 @@ Además...
 *****************************************************************************************
 
 ROADMAP 0.3:
-- IMPROVED: Estabilizar crashes provocados por SQLite (thread blocking). DONE
+- IMPROVED: Estabilizar race conditions provocados por SQLite (thread blocking). DONE
 - NEW: Important column is now sortable. DONE
 - DISCARDED: Sort by article reading state (otra columna?).
 - Use system font style. Already handled (font & size, not style). ALREADY PRESENT
@@ -167,13 +167,17 @@ ROADMAP 0.3:
 - NEW: Esconder la columna de la fecha. DONE
 - NEW: Posibilidad de cancelar el update (botón al lado de actualizar todo). DONE
 - Bold folders with unread articles. Checks for:
-  * 'Marcar todo como leido' en una categoría -> unbold. DONE (test!)
-  * 'Marcar todo como leido' en un feed -> sql. DONE (test!)
-  * 'Alternar leído/no-leído' en una entry -> sql.
-  * 'Alternar leído/no-leído todos' en una entry -> sql.
+  * 'Marcar todo como leido' en una categoría -> unbold. DONE
+  * 'Marcar todo como leido' en un feed -> sql. DONE
+  * 'Alternar leído/no-leído' en una entry -> sql. DONE
+  * 'Alternar leído/no-leído todos' en una entry -> sql. DONE
+  * Seleccionar entry -> sql. DONE
+  * Añadir un feed (lo mismo que actualizarlo).
+  * Borrar un feed.
 - Open entry on double click.
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
 - DISCARDED: Fecha más larga (con hora).
+- DISCARDED: Open links in inline browser.
 - Custom notification formats (title of the update).
 - Módulo multiprocessing vs threading?
 - Migración a pygi?
