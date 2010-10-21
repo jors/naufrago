@@ -172,7 +172,8 @@ ROADMAP 0.3:
   * 'Alternar leído/no-leído' en una entry -> sql. DONE
   * 'Alternar leído/no-leído todos' en una entry -> sql. DONE
   * Seleccionar entry -> sql. DONE
-  * Añadir un feed (lo mismo que actualizarlo).
+  * Al iniciar la app. DONE
+  * Añadir o actualizar un feed. DONE
   * Borrar un feed.
 - Open entry on double click.
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.

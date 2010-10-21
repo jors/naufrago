@@ -208,20 +208,24 @@ class Naufrago:
    no_leidos = None
   return nombre_feed, no_leidos
 
- def toggle_category_bold(self):
+ def toggle_category_bold(self, id_cat=None):
   """Toggles bold or unbold in category folders."""
+  id_cat_aux = id_cat
+  if id_cat is None:
+   (model, iter) = self.treeselection.get_selected()
+   if(model.iter_depth(iter) == 1): # Si es hijo...
+    iter = model.iter_parent(iter) # ...queremos el padre
+   id_cat = model.get_value(iter, 2)
   cursor = self.conn.cursor()
-  (model, iter) = self.treeselection.get_selected()
-  if(model.iter_depth(iter) == 1): # Si es hijo...
-   iter = model.iter_parent(iter) # ...queremos el padre
-  id_categoria = model.get_value(iter, 2)
-  q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+  q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_cat)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
   cursor.execute(q)
   row = cursor.fetchone()
   if row[0] == 0:
-   model.set(iter, 3, 'normal')
+   if id_cat_aux is None: model.set(iter, 3, 'normal')
+   else: return 'normal'
   else:
-   model.set(iter, 3, 'bold')
+   if id_cat_aux is None: model.set(iter, 3, 'bold')
+   else: return 'bold'
   cursor.close()
 
  def toggle_leido(self, event, data=None):
@@ -235,18 +239,6 @@ class Naufrago:
     id_feed = self.treestore.get_value(iter, 2)
 
     if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999): # Si es HOJA...
-
-     # NEW
-     # Unbold category if needed.
-     #self.toggle_category_bold()
-     #iter_tmp = model.iter_parent(iter)
-     #id_categoria = model.get_value(iter_tmp, 2)
-     #q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_categoria)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
-     #cursor.execute(q)
-     #row = cursor.fetchone()
-     #if (row is None) and (row[0] == 0):
-     # model.set(iter_tmp, 3, 'normal')
-     # NEW
 
      # 1º vamos a por el label del feed...
      # START NAME PARSING (nodo origen) #
@@ -335,33 +327,28 @@ class Naufrago:
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
 
-     # NEW
-     # Unbold category.
-     #model.set(iter, 3, 'normal')
-     # NEW
-
      # 1º vamos a por el label de los feeds...
      feed_ids = ''
      feed_ids_list = []
-     iter = model.iter_children(iter)
-     while iter:
-      id_feed = self.treestore.get_value(iter, 2)
+     iter2 = model.iter_children(iter)
+     while iter2:
+      id_feed = self.treestore.get_value(iter2, 2)
       feed_ids += str(id_feed)+','
       feed_ids_list.append(str(id_feed))
       # START NAME PARSING (nodo origen) #
-      nombre_feed = model.get_value(iter, 0)
+      nombre_feed = model.get_value(iter2, 0)
       nombre_feed = self.simple_name_parsing(nombre_feed)
-      model.set(iter, 0, nombre_feed, 3, 'normal')
+      model.set(iter2, 0, nombre_feed, 3, 'normal')
       # END NAME PARSING (nodo origen) #
-      iter = self.treestore.iter_next(iter)
+      iter2 = self.treestore.iter_next(iter2)
      feed_ids = feed_ids[0:-1]
 
      # 2º vamos a por las entries de los feeds...
-     (model2, iter) = self.treeselection2.get_selected()
-     iter = model2.get_iter_root() # Magic
-     while iter:
-      self.liststore.set_value(iter, 3, 'normal')
-      iter = self.liststore.iter_next(iter)
+     (model2, iter2) = self.treeselection2.get_selected()
+     iter2 = model2.get_iter_root() # Magic
+     while iter2:
+      self.liststore.set_value(iter2, 3, 'normal')
+      iter2 = self.liststore.iter_next(iter2)
 
      # ...y 3º a por los datos
      q = 'UPDATE articulo SET leido=1 WHERE id_feed IN (' + feed_ids + ')'
@@ -1506,7 +1493,9 @@ class Naufrago:
   cursor.execute('SELECT id,nombre FROM categoria ORDER BY nombre ASC')
   rows = cursor.fetchall()
   for row in rows:
-   dad = self.treestore.append(None, [row[1], category_icon, row[0], 'normal']) # Initial tree creation
+   boldornot = self.toggle_category_bold(row[0])
+   dad = self.treestore.append(None, [row[1], category_icon, row[0], boldornot]) # Initial tree creation
+   #dad = self.treestore.append(None, [row[1], category_icon, row[0], 'normal']) # Initial tree creation
    self.treeindex_cat[row[0]] = dad # NEW
    cursor.execute('SELECT id,nombre FROM feed WHERE id_categoria = ' + str(row[0]) + ' ORDER BY nombre ASC')
    rows2 = cursor.fetchall()
@@ -1862,11 +1851,14 @@ class Naufrago:
     if(response == gtk.RESPONSE_OK):
      nombre_feed = self.treestore.get_value(iter, 0)
      id_feed = self.treestore.get_value(iter, 2)
+     iter2 = model.iter_parent(iter) # Obtenemos el padre
+     id_cat = model.get_value(iter2, 2)
+
      result = self.treestore.remove(iter)
      del self.treeindex[id_feed] # Update feeds dict
      self.liststore.clear() # Limpieza de tabla de entries/articulos
-     cursor = self.conn.cursor()
 
+     cursor = self.conn.cursor()
      cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [id_feed])
      articles = cursor.fetchall()
      for art in articles:
@@ -1890,6 +1882,11 @@ class Naufrago:
      cursor.close()
      if os.path.exists(favicon_path + '/'+ str(id_feed)):
       os.unlink(favicon_path + '/'+ str(id_feed))
+
+     # NEW
+     # Unbold category if needed.
+     self.toggle_category_bold(id_cat)
+     # NEW
 
      # Actualizamos No-leidos e Importantes
      self.update_special_folder(9999)
@@ -2803,9 +2800,9 @@ class Naufrago:
        model3.set(dest_iter, 0, feed_label, 3, 'bold')
        # Y luego el resaltado de la categoría
        model.set(iter, 3, 'bold')
-      else:
+      #else:
        # Y luego el resaltado de la categoría
-       model.set(iter, 3, 'normal')
+       #model.set(iter, 3, 'normal')
 
       # ¿Hay cancelación?
       if self.stop_feed_update_lock:
@@ -2967,10 +2964,10 @@ class Naufrago:
      # Y luego el resaltado de la categoría
      if(model.iter_depth(iter) == 0): # Si es padre
       model.set(iter, 3, 'bold')
-    else:
+    #else:
      # Y luego el resaltado de la categoría
-     if(model.iter_depth(iter) == 0): # Si es padre
-      model.set(iter, 3, 'normal')
+     #if(model.iter_depth(iter) == 0): # Si es padre
+     # model.set(iter, 3, 'normal')
 
     # ¿Hay cancelación?
     if self.stop_feed_update_lock:
@@ -2983,7 +2980,8 @@ class Naufrago:
 
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
-   if (new_posts == True) and (num_new_posts_total > 0):
+   #if (new_posts == True) and (num_new_posts_total > 0):
+   if num_new_posts_total > 0:
     n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts_total) + " entrada/s", self.imageURI)
     n.attach_to_status_icon(self.statusicon)
     n.show()
