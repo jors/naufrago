@@ -1,0 +1,12 @@
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed
+
+(naufrago.py:1875): libsoup-CRITICAL **: soup_message_set_first_party: assertion `first_party != NULL' failed

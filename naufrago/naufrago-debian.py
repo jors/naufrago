@@ -23,30 +23,35 @@
 #                                                                           #
 #############################################################################
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-gobject.threads_init()
-import os
-import sqlite3
-import feedparser
-import time
-import datetime
-import webkit
-import threading
-import webbrowser
-import pango
-import urllib2
-import re
-from xml.etree import ElementTree
-from htmlentitydefs import name2codepoint
-import hashlib
-import xml.sax.saxutils
-import locale
-import gettext
-import pynotify
-import socket
+try:
+ import sys
+ import pygtk
+ pygtk.require('2.0')
+ import gtk
+ import gobject
+ gobject.threads_init()
+ import os
+ import sqlite3
+ import feedparser
+ import time
+ import datetime
+ import webkit
+ import threading
+ import webbrowser
+ import pango
+ import urllib2
+ import re
+ from xml.etree import ElementTree
+ from htmlentitydefs import name2codepoint
+ import hashlib
+ import xml.sax.saxutils
+ import locale
+ import gettext
+ import pynotify
+ import socket
+except ImportError:
+ print _('Error importing modules: ') + str(sys.exc_info()[1])
+ sys.exit(1)
 
 ABOUT_PAGE = ''
 PUF_PAGE = ''

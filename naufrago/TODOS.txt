@@ -166,7 +166,7 @@ ROADMAP 0.3:
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
 - NEW: Posibilidad de cancelar el update (botón al lado de actualizar todo). DONE
-- Bold folders with unread articles. Checks for:
+- NEW: Bold folders with unread articles. Checks for:
   * 'Marcar todo como leido' en una categoría -> unbold. DONE
   * 'Marcar todo como leido' en un feed -> sql. DONE
   * 'Alternar leído/no-leído' en una entry -> sql. DONE
@@ -175,6 +175,7 @@ ROADMAP 0.3:
   * Al iniciar la app. DONE
   * Añadir o actualizar un feed. DONE
   * Borrar un feed.
+- NEW: Module import error warning. DONE
 - Open entry on double click.
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
 - DISCARDED: Fecha más larga (con hora).
