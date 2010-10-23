@@ -174,7 +174,7 @@ ROADMAP 0.3:
   * Seleccionar entry -> sql. DONE
   * Al iniciar la app. DONE
   * Añadir o actualizar un feed. DONE
-  * Borrar un feed.
+  * Borrar un feed. DONE
 - NEW: Module import error warning. DONE
 - Open entry on double click.
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.

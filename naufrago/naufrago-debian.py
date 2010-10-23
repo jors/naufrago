@@ -1856,12 +1856,6 @@ class Naufrago:
     if(response == gtk.RESPONSE_OK):
      nombre_feed = self.treestore.get_value(iter, 0)
      id_feed = self.treestore.get_value(iter, 2)
-     iter2 = model.iter_parent(iter) # Obtenemos el padre
-     id_cat = model.get_value(iter2, 2)
-
-     result = self.treestore.remove(iter)
-     del self.treeindex[id_feed] # Update feeds dict
-     self.liststore.clear() # Limpieza de tabla de entries/articulos
 
      cursor = self.conn.cursor()
      cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [id_feed])
@@ -1890,8 +1884,12 @@ class Naufrago:
 
      # NEW
      # Unbold category if needed.
-     self.toggle_category_bold(id_cat)
+     self.toggle_category_bold()
      # NEW
+
+     result = self.treestore.remove(iter)
+     del self.treeindex[id_feed] # Update feeds dict
+     self.liststore.clear() # Limpieza de tabla de entries/articulos
 
      # Actualizamos No-leidos e Importantes
      self.update_special_folder(9999)
