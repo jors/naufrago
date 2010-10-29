@@ -2374,7 +2374,9 @@ class Naufrago:
 
  def tree2_button_press_event(self, treeview, event):
   """Fires the tree2 menu popup. This one handles entries options."""
-  if event.button == 3:
+  if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+   self.abrir_browser()
+  elif event.button == 3:
    x = int(event.x)
    y = int(event.y)
    time = event.time

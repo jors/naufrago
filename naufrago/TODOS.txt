@@ -161,7 +161,6 @@ Además...
 ROADMAP 0.3:
 - IMPROVED: Estabilizar race conditions provocados por SQLite (thread blocking). DONE
 - NEW: Important column is now sortable. DONE
-- DISCARDED: Sort by article reading state (otra columna?).
 - Use system font style. Already handled (font & size, not style). ALREADY PRESENT
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
@@ -176,11 +175,13 @@ ROADMAP 0.3:
   * Añadir o actualizar un feed. DONE
   * Borrar un feed. DONE
 - NEW: Module import error warning. DONE
-- Open entry on double click.
+- Open entry in browser on double click. DONE
 - "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
+- User-definable feed timeout.
+- DISCARDED: Sort by article reading state (otra columna?).
 - DISCARDED: Fecha más larga (con hora).
 - DISCARDED: Open links in inline browser.
-- Custom notification formats (title of the update).
+- DISCARDED: Custom notification formats (title of the update).
 - Módulo multiprocessing vs threading?
 - Migración a pygi?
 
