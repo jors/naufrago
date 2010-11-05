@@ -2993,7 +2993,7 @@ class Naufrago:
 
   self.statusbar.set_text('')
   # Fires tray icon blinking
-  if((new_posts == True) and (window_visible == False) and (self.show_trayicon == 1)):
+  if((num_new_posts_total > 0) and (window_visible == False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
   self.throbber.hide()
   self.toggle_menuitems_sensitiveness(enable=True)

@@ -182,6 +182,5 @@ ROADMAP 0.3:
 - DISCARDED: Fecha más larga (con hora).
 - DISCARDED: Open links in inline browser.
 - DISCARDED: Custom notification formats (title of the update).
-- Módulo multiprocessing vs threading?
 - Migración a pygi?
 
