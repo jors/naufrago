@@ -1492,8 +1492,8 @@ class Naufrago:
   if self.init_unfolded_tree == 1: category_icon = gtk.STOCK_OPEN
   else: category_icon = gtk.STOCK_DIRECTORY
 
-  self.treeindex = {} # NEW: A dictionary of feed iters stored by their id
-  self.treeindex_cat = {} # NEW: A dictionary of category iters stored by their id
+  self.treeindex = {} # A dictionary of feed iters stored by their id
+  self.treeindex_cat = {} # A dictionary of category iters stored by their id
   cursor = self.conn.cursor()
   cursor.execute('SELECT id,nombre FROM categoria ORDER BY nombre ASC')
   rows = cursor.fetchall()
@@ -1501,7 +1501,7 @@ class Naufrago:
    boldornot = self.toggle_category_bold(row[0])
    dad = self.treestore.append(None, [row[1], category_icon, row[0], boldornot]) # Initial tree creation
    #dad = self.treestore.append(None, [row[1], category_icon, row[0], 'normal']) # Initial tree creation
-   self.treeindex_cat[row[0]] = dad # NEW
+   self.treeindex_cat[row[0]] = dad
    cursor.execute('SELECT id,nombre FROM feed WHERE id_categoria = ' + str(row[0]) + ' ORDER BY nombre ASC')
    rows2 = cursor.fetchall()
    for row2 in rows2:
@@ -1517,7 +1517,14 @@ class Naufrago:
      son = self.treestore.append(dad, [feed_label, str(row2[0]), row2[0], font_style]) # Initial tree creation
     else:
      son = self.treestore.append(dad, [feed_label, 'rss-image', row2[0], font_style]) # Initial tree creation
-    self.treeindex[row2[0]] = son # NEW
+    self.treeindex[row2[0]] = son
+   # NEW: Driven mode?
+   #if self.driven_mode == 1:
+   # (model, useless_iter) = self.treeselection.get_selected()
+   # if boldornot == 'normal':
+   #  self.treeview.collapse_row(model.get_path(dad))
+   # else:
+   #  self.treeview.expand_row(model.get_path(dad), open_all=False)
 
   # These ones are "special" folders...
   self.add_icon_to_factory('importantes')
@@ -1621,10 +1628,12 @@ class Naufrago:
      cursor.execute('SELECT nombre FROM categoria WHERE id = ?', [data])
      nombre_categoria = cursor.fetchone()[0]
      if(text != nombre_categoria):
-      self.lock.acquire()
-      cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
       (model, iter) = self.treeselection.get_selected()
       model.set(iter, 0, text)
+      self.lock.acquire()
+      cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
+      #(model, iter) = self.treeselection.get_selected()
+      #model.set(iter, 0, text)
     else:
      cursor.execute('SELECT MAX(id) FROM categoria')
      row = cursor.fetchone()
@@ -2479,6 +2488,7 @@ class Naufrago:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
    t = threading.Thread(target=self.get_feed, args=())
    t.start()
+   
   return True
 
  def stop_feed_update(self, data=None):
@@ -2668,6 +2678,7 @@ class Naufrago:
    cursor = self.conn.cursor()
    while (iter is not None) and (not self.stop_feed_update_lock):
     if(model.iter_depth(iter) == 0): # Si es padre
+     print '*Parent node: ' + `model.get_value(iter, 0)`
      new_posts = False # Reset
      for i in range(model.iter_n_children(iter)):
       child = model.iter_nth_child(iter, i)
@@ -2675,6 +2686,7 @@ class Naufrago:
       # START NAME PARSING #
       nombre_feed = model.get_value(child, 0)
       nombre_feed = self.simple_name_parsing(nombre_feed)
+      print '***Child node: ' + nombre_feed
       # END NAME PARSING #
 
       id_feed = model.get_value(child, 2)
@@ -2683,10 +2695,15 @@ class Naufrago:
       url = cursor.fetchone()[0]
       self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
+      print 'Entering thread...'
       gtk.gdk.threads_enter()
       d = feedparser.parse(url)
       dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
-      if dont_parse: continue
+      #if dont_parse: continue
+      if dont_parse:
+       gtk.gdk.threads_leave()
+       print 'Leaving thread prematurely!'
+       continue
 
       feed_link = ''
       if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
@@ -2773,6 +2790,7 @@ class Naufrago:
         # END Offline mode image retrieving
 
       gtk.gdk.threads_leave()
+      print 'Leaving thread!'
 
       # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
@@ -2983,15 +3001,16 @@ class Naufrago:
   # Restablecemos el indicador de cancelación
   self.stop_feed_update_lock = False
 
+  print 'New messages notification!'
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
-   #if (new_posts == True) and (num_new_posts_total > 0):
    if num_new_posts_total > 0:
     n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts_total) + " entrada/s", self.imageURI)
-    n.attach_to_status_icon(self.statusicon)
+    #n.attach_to_status_icon(self.statusicon)
     n.show()
 
   self.statusbar.set_text('')
+  print 'NOT Firing tray icon blinking...'
   # Fires tray icon blinking
   if((num_new_posts_total > 0) and (window_visible == False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
@@ -3172,7 +3191,7 @@ class Naufrago:
  ########
 
  def __init__(self):
-  self.lock = threading.Lock()
+  self.lock = threading.RLock()
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
   # Obtiene la config de la app
@@ -3183,7 +3202,8 @@ class Naufrago:
 def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
- timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
+ ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
+ timer_id = gobject.timeout_add(30*60*1000, naufrago.update_all_feeds)
  # In case we would want to stop the timer...
  #gobject.source_remove(timer_id)
  gtk.main()
