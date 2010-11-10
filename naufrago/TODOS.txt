@@ -175,14 +175,17 @@ ROADMAP 0.3:
   * Añadir o actualizar un feed. DONE
   * Borrar un feed. DONE
 - NEW: Module import error warning. DONE
-- Open entry in browser on double click. DONE
-- "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
-- Add sqlite as a dependency!!!
-- User-definable feed timeout.
+- IMPROVED: Open entry in browser on double click. DONE
+- SOLVED: Hanging/freezing problem with pynotify. DONE
+- SOLVED: Add sqlite as a dependency. DONE
+- NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no. DONE
+
+- IMPROVED: Lower the feed update time (less than an hour).
+
+- DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
 - DISCARDED: Fecha más larga (con hora).
 - DISCARDED: Open links in inline browser.
 - DISCARDED: Custom notification formats (title of the update).
-- DISCARDED: Lower the feed update time (less than an hour).
 - Migración a pygi?
 

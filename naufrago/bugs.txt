@@ -1,0 +1,17 @@
+python: ../../src/xcb_io.c:249: process_responses: La declaración `(((long) (dpy->last_request_read) - (long) (dpy->request)) <= 0)' no se cumple.
+Abortado
+
+http://bugs.freedesktop.org/show_bug.cgi?id=26511
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=569036
+http://markmail.org/message/tmt4cn6624e5vvv6#query:+page:1+mid:zwsicvh2zgh6jem3+state:results
+https://bugs.launchpad.net/ubuntu/+source/wxwidgets2.8/+bug/563207
+
+---
+
+*** glibc detected *** python: double free or corruption (out): 0xb291b0b8**
+Gdk:ERROR:/build/buildd-gtk+2.0_2.20.1-2-i386-TNeM25/gtk+2.0-2.20.1/gdk/gdkregion-generic.c:1108:miUnionNonO: assertion failed: (y1 < y2)
+Abortado
+
+---
+
+Parecen errores de los bindings para Gtk de Python!!!

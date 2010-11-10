@@ -221,16 +221,23 @@ class Naufrago:
    if(model.iter_depth(iter) == 1): # Si es hijo...
     iter = model.iter_parent(iter) # ...queremos el padre
    id_cat = model.get_value(iter, 2)
+
   cursor = self.conn.cursor()
   q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_cat)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
   cursor.execute(q)
   row = cursor.fetchone()
   if row[0] == 0:
-   if id_cat_aux is None: model.set(iter, 3, 'normal')
-   else: return 'normal'
+   #if id_cat_aux is None: model.set(iter, 3, 'normal')
+   #else: return 'normal'
+   if id_cat_aux is None:
+    model.set(iter, 3, 'normal')
+   return 'normal' # Sometimes we don't need return values, but.. life goes on
   else:
-   if id_cat_aux is None: model.set(iter, 3, 'bold')
-   else: return 'bold'
+   #if id_cat_aux is None: model.set(iter, 3, 'bold')
+   #else: return 'bold'
+   if id_cat_aux is None:
+    model.set(iter, 3, 'bold')
+   return 'bold' # Sometimes we don't need return values, but.. life goes on
   cursor.close()
 
  def toggle_leido(self, event, data=None):
@@ -1074,12 +1081,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1117,6 +1124,7 @@ class Naufrago:
   self.show_newentries_notification = int(row[12])
   self.hide_readentries = int(row[13])
   self.hide_dates = int(row[14])
+  self.driven_mode = int(row[15])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1150,7 +1158,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -1199,7 +1207,7 @@ class Naufrago:
    self.eb_image_zoom.hide()
    self.populate_feeds()
    self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
-   if(self.init_unfolded_tree == 1): self.treeview.expand_all()
+   if (self.driven_mode == 0) and (self.init_unfolded_tree == 1): self.treeview.expand_all()
 
  def create_main_window(self):
   """Creates the main window with all it's widgets"""
@@ -1232,17 +1240,17 @@ class Naufrago:
   # Creación del Tree izquierdo para los feeds
   # Campos: nombre, icono, id_categoria_o_feed, font-style
   self.treestore = gtk.TreeStore(str, str, int, str)
-  self.populate_feeds() # Propaga los feeds del usuario
   # Create the TreeView using treestore
   self.treeview = gtk.TreeView(self.treestore)
+  self.treeselection = self.treeview.get_selection()
+
+  self.populate_feeds() # Propaga los feeds del usuario
   # Control de eventos de ratón y teclado del tree.
   self.treeview.connect("button_press_event", self.tree_button_press_event)
   self.treeview.connect("key_press_event", self.tree_key_press_event)
   self.treeview.connect("row-activated", self.tree_row_activated)
   self.treeview.connect("row-collapsed", self.tree_row_collapsed)
   self.treeview.connect("row-expanded", self.tree_row_expanded)
-
-  self.treeselection = self.treeview.get_selection()
   self.treeselection.connect("changed", self.tree_row_selection)
   self.tvcolumn = gtk.TreeViewColumn(_("Feeds"))
   # Add tvcolumn to treeview
@@ -1489,7 +1497,7 @@ class Naufrago:
   """Obtains the user feed tree structure"""
   self.populate_favicons() # Populate all favicons we have prior to use them
   
-  if self.init_unfolded_tree == 1: category_icon = gtk.STOCK_OPEN
+  if (self.init_unfolded_tree == 1): category_icon = gtk.STOCK_OPEN
   else: category_icon = gtk.STOCK_DIRECTORY
 
   self.treeindex = {} # A dictionary of feed iters stored by their id
@@ -1499,8 +1507,12 @@ class Naufrago:
   rows = cursor.fetchall()
   for row in rows:
    boldornot = self.toggle_category_bold(row[0])
+   # START NEW: Driven mode
+   if (self.driven_mode == 1):
+    if boldornot == 'normal': category_icon = gtk.STOCK_DIRECTORY
+    else: category_icon = gtk.STOCK_OPEN
+   # START NEW: Driven mode
    dad = self.treestore.append(None, [row[1], category_icon, row[0], boldornot]) # Initial tree creation
-   #dad = self.treestore.append(None, [row[1], category_icon, row[0], 'normal']) # Initial tree creation
    self.treeindex_cat[row[0]] = dad
    cursor.execute('SELECT id,nombre FROM feed WHERE id_categoria = ' + str(row[0]) + ' ORDER BY nombre ASC')
    rows2 = cursor.fetchall()
@@ -1518,13 +1530,14 @@ class Naufrago:
     else:
      son = self.treestore.append(dad, [feed_label, 'rss-image', row2[0], font_style]) # Initial tree creation
     self.treeindex[row2[0]] = son
-   # NEW: Driven mode?
-   #if self.driven_mode == 1:
-   # (model, useless_iter) = self.treeselection.get_selected()
-   # if boldornot == 'normal':
-   #  self.treeview.collapse_row(model.get_path(dad))
-   # else:
-   #  self.treeview.expand_row(model.get_path(dad), open_all=False)
+   # START NEW: Driven mode
+   if (self.driven_mode == 1):
+    (model, useless_iter) = self.treeselection.get_selected()
+    if boldornot == 'normal':
+     self.treeview.collapse_row(model.get_path(dad))
+    else:
+     self.treeview.expand_row(model.get_path(dad), open_all=False)
+   # END NEW: Driven mode
 
   # These ones are "special" folders...
   self.add_icon_to_factory('importantes')
@@ -2053,6 +2066,48 @@ class Naufrago:
    self.hide_dates = 0
    self.tvcolumn_fecha.set_visible(True)
 
+ def driven_mode_action(self):
+  """Collapse or expands parent nodes based on unread items within its feeds."""
+  (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+  iter = model.get_iter_root() # Magic
+  while (iter is not None):
+   if(model.iter_depth(iter) == 0): # Si es padre
+    boldornot = model.get_value(iter, 3)
+    if boldornot == 'normal':
+     self.treeview.collapse_row(model.get_path(iter))
+    elif boldornot == 'bold':
+     self.treeview.expand_row(model.get_path(iter), open_all=False)
+   iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
+
+ def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode):
+  """Restores the state of the linked checkboxes unfolded_tree and driven_mode."""
+  if aux_init_unfolded_tree == 1:
+   self.treeview.expand_all()
+  elif aux_driven_mode == 1:
+   self.driven_mode_action()
+  else:
+   self.treeview.collapse_all()
+
+ def unfolded_or_driven_toggle_cb(self, checkboxparent, checkboxchild, caller_id):
+  """Controlls the linked checkboxes unfolded_tree and driven_mode."""
+  if checkboxparent.get_active():
+   checkboxchild.set_active(False)
+   if caller_id == 1:
+    self.init_unfolded_tree == 1
+    self.driven_mode == 0
+    self.treeview.expand_all()
+   else:
+    self.init_unfolded_tree == 0
+    self.driven_mode == 1
+    self.driven_mode_action()
+  else:
+   if caller_id == 1:
+    self.init_unfolded_tree == 0
+    self.treeview.collapse_all()
+   elif caller_id == 2:
+    self.driven_mode == 0
+    self.treeview.collapse_all()
+
  def preferences(self, data=None):
   """Preferences dialog."""
   dialog = gtk.Dialog(_("Preferences"), self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, None)
@@ -2071,8 +2126,11 @@ class Naufrago:
   align = gtk.Alignment()
   align.set_padding(10, 0, 15, 0)
   checkbox = gtk.CheckButton(_("Start with unfolded tree"))
-  if(self.init_unfolded_tree == 1): checkbox.set_active(True)
+  aux_init_unfolded_tree = self.init_unfolded_tree
+  if(self.init_unfolded_tree == 1) and (self.driven_mode == 0): checkbox.set_active(True)
   else: checkbox.set_active(False)
+  checkbox8 = gtk.CheckButton(_("Driven mode"))
+  checkbox.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox8, 1) ###
   vbox2.pack_start(checkbox, True, True, 5)
   checkbox2 = gtk.CheckButton(_("Start in Tray Icon"))
   if self.show_trayicon == 1:
@@ -2103,7 +2161,6 @@ class Naufrago:
   spin_button.set_value(self.num_entries)
   hbox.pack_start(spin_button, True, True, 2)
   vbox3.pack_start(hbox, True, True, 5)
-
   hbox2 = gtk.HBox()
   label2 = gtk.Label(_("Update every (hours)"))
   hbox2.pack_start(label2, True, True, 2)
@@ -2115,26 +2172,22 @@ class Naufrago:
   spin_button2.set_value(self.update_freq)
   hbox2.pack_start(spin_button2, True, True, 2)
   vbox3.pack_start(hbox2, True, True, 5)
-
-  checkbox0 = gtk.CheckButton(_("Offline mode (slower!)"))
-  if(self.offline_mode == 1): checkbox0.set_active(True)
-  else: checkbox0.set_active(False)
-  vbox3.pack_start(checkbox0, True, True, 5)
-
+  #checkbox0 = gtk.CheckButton(_("Offline mode (slower!)"))
+  #if(self.offline_mode == 1): checkbox0.set_active(True)
+  #else: checkbox0.set_active(False)
+  #vbox3.pack_start(checkbox0, True, True, 5)
   checkbox6 = gtk.CheckButton(_("Hide read entries"))
   aux_hide_readentries = self.hide_readentries # Aux var to remember original state
   if(self.hide_readentries == 1): checkbox6.set_active(True)
   else: checkbox6.set_active(False)
   checkbox6.connect('toggled', self.hide_read_entries_cb)
   vbox3.pack_start(checkbox6, True, True, 5)
-
   align2.add(vbox3)
   notebook.append_page(align2, gtk.Label(_("Feeds & articles")))
 
   vbox4 = gtk.VBox(homogeneous=True)
   align3 = gtk.Alignment()
   align3.set_padding(10, 0, 15, 0)
-
   checkbox7 = gtk.CheckButton(_("Hide dates"))
   aux_hide_dates = self.hide_dates # Aux var to remember original state
   if(self.hide_dates == 1): checkbox7.set_active(True)
@@ -2165,6 +2218,24 @@ class Naufrago:
   vbox4.pack_start(hbox3, True, True, 5)
   align3.add(vbox4)
   notebook.append_page(align3, gtk.Label(_("Interface")))
+
+  # START NEW
+  vbox5 = gtk.VBox(homogeneous=True)
+  align4 = gtk.Alignment()
+  align4.set_padding(10, 0, 15, 0)
+  checkbox0 = gtk.CheckButton(_("Offline mode (slower!)"))
+  if(self.offline_mode == 1): checkbox0.set_active(True)
+  else: checkbox0.set_active(False)
+  vbox5.pack_start(checkbox0, True, True, 5)
+  #checkbox8 = gtk.CheckButton(_("Driven mode")) # Declared a while ago...
+  aux_driven_mode = self.driven_mode
+  if(self.driven_mode == 1) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
+  else: checkbox8.set_active(False)
+  checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, 2) ###
+  vbox5.pack_start(checkbox8, True, True, 5)
+  align4.add(vbox5)
+  notebook.append_page(align4, gtk.Label(_("Modes")))
+  # END NEW
 
   dialog.vbox.pack_start(notebook)
   dialog.show_all()
@@ -2197,6 +2268,8 @@ class Naufrago:
    else: self.hide_readentries = 0
    if(checkbox7.get_active()): self.hide_dates = 1
    else: self.hide_dates = 0
+   if(checkbox8.get_active()): self.driven_mode = 1
+   else: self.driven_mode = 0
 
    if checkbox1.get_active() and self.show_trayicon == 0:
     self.show_trayicon = 1
@@ -2212,6 +2285,7 @@ class Naufrago:
    self.show_trayicon = aux_show_trayicon
    self.hide_read_entries(aux_hide_readentries)
    self.hide_date_column(aux_hide_dates)
+   self.unfolded_or_driven_toggle(aux_init_unfolded_tree, aux_driven_mode)
 
  def treeview_copy_row(self, treeview, model, source, target, drop_position):
   """Copy tree model rows from treeiter source into, before or after treeiter target.
@@ -2669,7 +2743,7 @@ class Naufrago:
   self.toggle_menuitems_sensitiveness(enable=False)
   self.throbber.show()
   new_posts = False # Reset
-  num_new_posts_total = 0 # Overall
+  aux_num_new_posts_total = num_new_posts_total = 0 # Overall
 
   if(data is None): # Iterarlo todo
 
@@ -2679,7 +2753,9 @@ class Naufrago:
    while (iter is not None) and (not self.stop_feed_update_lock):
     if(model.iter_depth(iter) == 0): # Si es padre
      print '*Parent node: ' + `model.get_value(iter, 0)`
+     id_category = model.get_value(iter, 2)
      new_posts = False # Reset
+     aux_num_new_posts_total = num_new_posts_total
      for i in range(model.iter_n_children(iter)):
       child = model.iter_nth_child(iter, i)
 
@@ -2823,14 +2899,30 @@ class Naufrago:
        model3.set(dest_iter, 0, feed_label, 3, 'bold')
        # Y luego el resaltado de la categoría
        model.set(iter, 3, 'bold')
-      #else:
-       # Y luego el resaltado de la categoría
-       #model.set(iter, 3, 'normal')
+
+      # START NEW: Driven mode, parte 1
+      # Cualquier feed con nuevas entradas expanderá la categoria.
+      if (self.driven_mode == 1):
+       if new_posts == True:
+        print 'Expandimos categoria...'
+        self.treeview.expand_row(model.get_path(iter), open_all=False)
+      # END NEW: Driven mode, parte 1
 
       # ¿Hay cancelación?
       if self.stop_feed_update_lock:
        break
-       
+
+     # START NEW: Driven mode, parte 2
+     # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
+     # contraeremos la categoria.
+     if (self.driven_mode == 1):
+      if num_new_posts_total == aux_num_new_posts_total:
+       boldornot = self.toggle_category_bold(id_category)
+       if boldornot == 'normal':
+        print 'Contraemos categoria...'
+        self.treeview.collapse_row(model.get_path(iter))
+     # END NEW: Driven mode, parte 2
+
      iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
 
@@ -2987,14 +3079,29 @@ class Naufrago:
      # Y luego el resaltado de la categoría
      if(model.iter_depth(iter) == 0): # Si es padre
       model.set(iter, 3, 'bold')
-    #else:
-     # Y luego el resaltado de la categoría
-     #if(model.iter_depth(iter) == 0): # Si es padre
-     # model.set(iter, 3, 'normal')
+
+    # START NEW: Driven mode, parte 1
+    # Cualquier feed con nuevas entradas expanderá la categoria.
+    if (self.driven_mode == 1):
+     if new_posts == True:
+      print 'Expandimos categoria...'
+      self.treeview.expand_row(model.get_path(iter), open_all=False)
+    # END NEW: Driven mode, parte 1
 
     # ¿Hay cancelación?
     if self.stop_feed_update_lock:
      break
+
+   # START NEW: Driven mode, parte 2
+   # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
+   # contraeremos la categoria.
+   if (self.driven_mode == 1):
+    if num_new_posts_total == 0:
+     boldornot = self.toggle_category_bold()
+     if boldornot == 'normal':
+      print 'Contraemos categoria...'
+      self.treeview.collapse_row(model.get_path(iter))
+   # END NEW: Driven mode, parte 2
 
    cursor.close()
 
@@ -3006,7 +3113,7 @@ class Naufrago:
   if self.show_newentries_notification:
    if num_new_posts_total > 0:
     n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + str(num_new_posts_total) + " entrada/s", self.imageURI)
-    #n.attach_to_status_icon(self.statusicon)
+    #n.attach_to_status_icon(self.statusicon) # <-- This fucks up the whole thing!!!
     n.show()
 
   self.statusbar.set_text('')
@@ -3209,8 +3316,8 @@ def main():
  gtk.main()
  
 if __name__ == "__main__":
- try:
-  naufrago = Naufrago()
-  main()
- except MyError as e:
-  print 'My exception occurred, value:', e.value
+ #try:
+ naufrago = Naufrago()
+ main()
+ #except MyError as e:
+ # print 'My exception occurred, value:', e.value

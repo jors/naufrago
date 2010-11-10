@@ -1,0 +1,4 @@
+0.3 devel:
+----------
+Arranque en frio (carga de todo desde 0): 16 secs
+Arranque en caliente (ya en ram): 6 secs
