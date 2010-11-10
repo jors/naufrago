@@ -2562,7 +2562,6 @@ class Naufrago:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
    t = threading.Thread(target=self.get_feed, args=())
    t.start()
-   
   return True
 
  def stop_feed_update(self, data=None):
