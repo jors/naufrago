@@ -218,6 +218,7 @@ class Naufrago:
   id_cat_aux = id_cat
   if id_cat is None:
    (model, iter) = self.treeselection.get_selected()
+   #print iter
    if(model.iter_depth(iter) == 1): # Si es hijo...
     iter = model.iter_parent(iter) # ...queremos el padre
    id_cat = model.get_value(iter, 2)
@@ -1081,12 +1082,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1125,6 +1126,7 @@ class Naufrago:
   self.hide_readentries = int(row[13])
   self.hide_dates = int(row[14])
   self.driven_mode = int(row[15])
+  self.update_freq_timemode = int(row[16])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1158,7 +1160,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -2020,6 +2022,18 @@ class Naufrago:
   elif toolbar_mode == 3:
    self.toolbar.hide()
 
+ def change_timemode(self, aux):
+  """Restores the time (hour/min) of feeds update."""
+  self.update_freq_timemode = aux
+
+ def change_timemode_cb(self, combobox2):
+  """Changes the time (hour/min) of feeds update."""
+  time_mode = combobox2.get_active()
+  if time_mode == 0:
+   self.update_freq_timemode = 0 # hour
+  else:
+   self.update_freq_timemode = 1 # min
+
  def trayicon_toggle_cb(self, checkboxparent, checkboxchild):
   """Controlls the linked trayicon checkboxes of the preferences dialog."""
   if checkboxparent.get_active():
@@ -2162,20 +2176,23 @@ class Naufrago:
   hbox.pack_start(spin_button, True, True, 2)
   vbox3.pack_start(hbox, True, True, 5)
   hbox2 = gtk.HBox()
-  label2 = gtk.Label(_("Update every (hours)"))
+  label2 = gtk.Label(_("Update every"))
   hbox2.pack_start(label2, True, True, 2)
   # Spin button 2
-  adjustment2 = gtk.Adjustment(value=1, lower=1, upper=24, step_incr=1, page_incr=1, page_size=0)
+  adjustment2 = gtk.Adjustment(value=1, lower=1, upper=60, step_incr=1, page_incr=1, page_size=0)
   spin_button2 = gtk.SpinButton(adjustment=adjustment2, climb_rate=0.0, digits=0)
   spin_button2.set_numeric(numeric=True) # Only numbers can be typed
   spin_button2.set_update_policy(gtk.UPDATE_IF_VALID) # Only update on valid changes
   spin_button2.set_value(self.update_freq)
   hbox2.pack_start(spin_button2, True, True, 2)
+  aux_update_freq_timemode = self.update_freq_timemode
+  combobox2 = gtk.combo_box_new_text()
+  combobox2.append_text(_("hour"))
+  combobox2.append_text(_("min"))
+  combobox2.set_active(self.update_freq_timemode)
+  combobox2.connect('changed', self.change_timemode_cb)
+  hbox2.pack_start(combobox2, True, True, 2) # NEW
   vbox3.pack_start(hbox2, True, True, 5)
-  #checkbox0 = gtk.CheckButton(_("Offline mode (slower!)"))
-  #if(self.offline_mode == 1): checkbox0.set_active(True)
-  #else: checkbox0.set_active(False)
-  #vbox3.pack_start(checkbox0, True, True, 5)
   checkbox6 = gtk.CheckButton(_("Hide read entries"))
   aux_hide_readentries = self.hide_readentries # Aux var to remember original state
   if(self.hide_readentries == 1): checkbox6.set_active(True)
@@ -2219,7 +2236,6 @@ class Naufrago:
   align3.add(vbox4)
   notebook.append_page(align3, gtk.Label(_("Interface")))
 
-  # START NEW
   vbox5 = gtk.VBox(homogeneous=True)
   align4 = gtk.Alignment()
   align4.set_padding(10, 0, 15, 0)
@@ -2235,7 +2251,6 @@ class Naufrago:
   vbox5.pack_start(checkbox8, True, True, 5)
   align4.add(vbox5)
   notebook.append_page(align4, gtk.Label(_("Modes")))
-  # END NEW
 
   dialog.vbox.pack_start(notebook)
   dialog.show_all()
@@ -2281,6 +2296,7 @@ class Naufrago:
 
   else: # Restore things back...
    self.change_toolbar_mode(self.toolbar_mode)
+   self.change_timemode(aux_update_freq_timemode)
    self.statusicon.set_visible(aux_show_trayicon)
    self.show_trayicon = aux_show_trayicon
    self.hide_read_entries(aux_hide_readentries)
@@ -3116,7 +3132,6 @@ class Naufrago:
     n.show()
 
   self.statusbar.set_text('')
-  print 'NOT Firing tray icon blinking...'
   # Fires tray icon blinking
   if((num_new_posts_total > 0) and (window_visible == False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
@@ -3309,14 +3324,14 @@ def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
  ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
- timer_id = gobject.timeout_add(30*60*1000, naufrago.update_all_feeds)
+ #timer_id = gobject.timeout_add(30*60*1000, naufrago.update_all_feeds)
+ if naufrago.update_freq_timemode == 0: mult = 3600
+ elif naufrago.update_freq_timemode == 1: mult = 60
+ timer_id = gobject.timeout_add(naufrago.update_freq*mult*1000, naufrago.update_all_feeds)
  # In case we would want to stop the timer...
  #gobject.source_remove(timer_id)
  gtk.main()
  
 if __name__ == "__main__":
- #try:
  naufrago = Naufrago()
  main()
- #except MyError as e:
- # print 'My exception occurred, value:', e.value

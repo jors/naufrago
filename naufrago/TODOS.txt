@@ -180,8 +180,6 @@ ROADMAP 0.3:
 - SOLVED: Add sqlite as a dependency. DONE
 - NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no. DONE
 
-- IMPROVED: Lower the feed update time (less than an hour).
-
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
 - DISCARDED: Fecha más larga (con hora).
