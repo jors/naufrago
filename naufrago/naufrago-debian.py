@@ -42,9 +42,10 @@ try:
  import urllib2
  import re
  from xml.etree import ElementTree
- from htmlentitydefs import name2codepoint
+ #from htmlentitydefs import name2codepoint
+ import htmlentitydefs
  import hashlib
- import xml.sax.saxutils
+ #import xml.sax.saxutils
  import locale
  import gettext
  import pynotify
@@ -380,6 +381,10 @@ class Naufrago:
      # NEW
      # Unbold category.
      model.set(iter, 3, 'normal')
+     # And fold category (if applies).
+     if (self.driven_mode == 1):
+      print 'Contraemos categoria...'
+      self.treeview.collapse_row(model.get_path(iter))
      # NEW
 
     cursor.close()
@@ -743,9 +748,27 @@ class Naufrago:
    clipboard.set_text(link.encode("utf8"))
    clipboard.store()
 
- def htmlentitydecode(self, s):
-  """Escapes htmlentities."""
-  return re.sub('&(%s);' % '|'.join(name2codepoint), lambda m: unichr(name2codepoint[m.group(1)]), s)
+ #def htmlentitydecode(self, s):
+ # """Escapes htmlentities."""
+ # return re.sub('&(%s);' % '|'.join(name2codepoint), lambda m: unichr(name2codepoint[m.group(1)]), s)
+
+ def htmlentitydecode(self, text):
+  """Escapes htmlentities. Thanks to Fredrik Lundh!"""
+  def fixup(m):
+   text = m.group(0)
+   if text[:2] == "&#": # character reference
+    try:
+     if text[:3] == "&#x":
+      return unichr(int(text[3:-1], 16))
+     else:
+      return unichr(int(text[2:-1]))
+    except ValueError: pass
+   else: # named entity
+    try:
+     text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+    except KeyError: pass
+   return text # leave as is
+  return re.sub("&#?\w+;", fixup, text)
 
  def list_row_selection(self, event):
   """List row change detector"""
@@ -766,7 +789,8 @@ class Naufrago:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB"))
 
    # This prevents htmlentities from doing weird things to the headerlink!
-   self.headerlink.set_markup('<b><u><span foreground="blue">'+xml.sax.saxutils.escape(titulo)+'</span></u></b>')
+   #self.headerlink.set_markup('<b><u><span foreground="blue">'+xml.sax.saxutils.escape(titulo)+'</span></u></b>')
+   self.headerlink.set_markup('<b><u><span foreground="blue">'+self.htmlentitydecode(titulo)+'</span></u></b>')
    self.headerlink.set_justify(gtk.JUSTIFY_CENTER)
    self.headerlink.set_ellipsize(pango.ELLIPSIZE_END)
    self.eb.show()
@@ -2675,7 +2699,7 @@ class Naufrago:
     self.conn.commit()
     self.lock.release()
     try:
-     web_file = urllib2.urlopen(i)
+     web_file = urllib2.urlopen(i, timeout=10)
      image = images_path + '/' + str(id_entry_max)
      local_file = open(image, 'w')
      local_file.write(web_file.read())
@@ -3290,7 +3314,7 @@ class Naufrago:
   try:
    split = url.split("/")
    favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
-   web_file = urllib2.urlopen(favicon_url)
+   web_file = urllib2.urlopen(favicon_url, timeout=10)
    favicon = favicon_path + '/' + str(id_feed)
    local_file = open(favicon, 'w')
    local_file.write(web_file.read())

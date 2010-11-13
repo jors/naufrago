@@ -9,4 +9,3 @@ def unescape(s):
 #print unescape("Rep&aacute;mpanos")
 print saxutils.unescape("Rep&aacute;mpanos")
 print saxutils.unescape("A bunch of text with entities: &amp; &gt; &lt;")
-
