@@ -1295,7 +1295,7 @@ class Naufrago:
   # Allow sorting on the column
   self.tvcolumn.set_sort_column_id(0)
   # Allow drag and drop reordering of rows
-  self.treeview.set_reorderable(True)
+  ###self.treeview.set_reorderable(True)
   self.treeview_setup_dnd(self.treeview)
   self.scrolled_window1 = gtk.ScrolledWindow()
   self.scrolled_window1.add(self.treeview)
@@ -1676,13 +1676,49 @@ class Naufrago:
     else:
      cursor.execute('SELECT MAX(id) FROM categoria')
      row = cursor.fetchone()
-     dad = self.treestore.append(None, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+     ###dad = self.treestore.append(None, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+     dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
     self.conn.commit()
     self.lock.release()
    cursor.close()
+
+ def alphabetical_category_insertion(self, categoria_a_insertar, category_data):
+  """Inserts a new category in the feed list alphabetically."""
+  iter = self.treestore.get_iter_root() # Magic
+  iter = self.do_comparison(categoria_a_insertar, iter)
+  self.treestore.insert_before(None, iter, category_data)
+  return iter
+
+ def do_comparison(self, categoria_a_insertar, iter_categoria_curr):
+  """Recursion also does magic!"""
+  categoria_curr = self.treestore.get_value(iter_categoria_curr, 0)
+  id_categoria_curr = self.treestore.get_value(iter_categoria_curr, 2)
+  if (id_categoria_curr == 9998) or (id_categoria_curr == 9999):
+   #print 'Special category targeted, inserting...'
+   return iter_categoria_curr
+
+  #print 'Comparing ' + categoria_a_insertar + ' and ' + categoria_curr
+  res = cmp(categoria_a_insertar, categoria_curr)
+  #print 'res: ' + `res`
+  if res == 0: # Same strings
+   #print 'Same as ***'+categoria_curr+'***, inserting...'
+   return iter_categoria_curr
+  elif res == -1: # 'categoria_a_insertar' goes before
+   #print 'Goes before ***'+categoria_curr+'***, inserting...'
+   return iter_categoria_curr
+  elif res == 1: # 'categoria_a_insertar' goes after
+   #s = 'Goes after ***'+categoria_curr+'***; '
+   iter = self.treestore.iter_next(iter_categoria_curr) # Pasamos al siguiente Padre...
+   if (iter is not None):
+    #print s + 'calling to recursion...'
+    iter = self.do_comparison(categoria_a_insertar, iter)
+    return iter
+   else:
+    #print s + 'final category, inserting...'
+    return iter_categoria_curr
 
  def delete_category(self, data=None):
   """Deletes a category from the user feed tree structure"""

@@ -180,6 +180,7 @@ ROADMAP 0.3:
 - SOLVED: Add sqlite as a dependency. DONE
 - NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no. DONE
 - SOLVED: Some htmlentities are shown uncorrectly on entry titles. DONE
+- IMPROVED: Reorder treeview on new category.
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
