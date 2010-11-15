@@ -383,7 +383,7 @@ class Naufrago:
      model.set(iter, 3, 'normal')
      # And fold category (if applies).
      if (self.driven_mode == 1):
-      print 'Contraemos categoria...'
+      #print 'Contraemos categoria...'
       self.treeview.collapse_row(model.get_path(iter))
      # NEW
 
@@ -1671,8 +1671,6 @@ class Naufrago:
       model.set(iter, 0, text)
       self.lock.acquire()
       cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
-      #(model, iter) = self.treeselection.get_selected()
-      #model.set(iter, 0, text)
     else:
      cursor.execute('SELECT MAX(id) FROM categoria')
      row = cursor.fetchone()
@@ -1697,27 +1695,19 @@ class Naufrago:
   categoria_curr = self.treestore.get_value(iter_categoria_curr, 0)
   id_categoria_curr = self.treestore.get_value(iter_categoria_curr, 2)
   if (id_categoria_curr == 9998) or (id_categoria_curr == 9999):
-   #print 'Special category targeted, inserting...'
    return iter_categoria_curr
 
-  #print 'Comparing ' + categoria_a_insertar + ' and ' + categoria_curr
   res = cmp(categoria_a_insertar, categoria_curr)
-  #print 'res: ' + `res`
   if res == 0: # Same strings
-   #print 'Same as ***'+categoria_curr+'***, inserting...'
    return iter_categoria_curr
   elif res == -1: # 'categoria_a_insertar' goes before
-   #print 'Goes before ***'+categoria_curr+'***, inserting...'
    return iter_categoria_curr
   elif res == 1: # 'categoria_a_insertar' goes after
-   #s = 'Goes after ***'+categoria_curr+'***; '
    iter = self.treestore.iter_next(iter_categoria_curr) # Pasamos al siguiente Padre...
    if (iter is not None):
-    #print s + 'calling to recursion...'
     iter = self.do_comparison(categoria_a_insertar, iter)
     return iter
    else:
-    #print s + 'final category, inserting...'
     return iter_categoria_curr
 
  def delete_category(self, data=None):
@@ -1767,7 +1757,6 @@ class Naufrago:
          if (row3 is not None) and (row3[0] <= 1):
           if os.path.exists(images_path + '/'+ str(i[1])):
            os.unlink(images_path + '/'+ str(i[1]))
-        #self.lock.acquire()
         cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
         self.conn.commit()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
@@ -1775,7 +1764,6 @@ class Naufrago:
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
       self.conn.commit()
-      #self.lock.release()
 
       # Actualizamos No-leidos e Importantes
       self.update_special_folder(9999)
@@ -2827,7 +2815,7 @@ class Naufrago:
    cursor = self.conn.cursor()
    while (iter is not None) and (not self.stop_feed_update_lock):
     if(model.iter_depth(iter) == 0): # Si es padre
-     print '*Parent node: ' + `model.get_value(iter, 0)`
+     #print '*Parent node: ' + `model.get_value(iter, 0)`
      id_category = model.get_value(iter, 2)
      new_posts = False # Reset
      aux_num_new_posts_total = num_new_posts_total
@@ -2837,7 +2825,7 @@ class Naufrago:
       # START NAME PARSING #
       nombre_feed = model.get_value(child, 0)
       nombre_feed = self.simple_name_parsing(nombre_feed)
-      print '***Child node: ' + nombre_feed
+      #print '***Child node: ' + nombre_feed
       # END NAME PARSING #
 
       id_feed = model.get_value(child, 2)
@@ -2846,14 +2834,14 @@ class Naufrago:
       url = cursor.fetchone()[0]
       self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
-      print 'Entering thread...'
+      #print 'Entering thread...'
       gtk.gdk.threads_enter()
       d = feedparser.parse(url)
       dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
       #if dont_parse: continue
       if dont_parse:
        gtk.gdk.threads_leave()
-       print 'Leaving thread prematurely!'
+       #print 'Leaving thread prematurely!'
        continue
 
       feed_link = ''
@@ -2941,7 +2929,7 @@ class Naufrago:
         # END Offline mode image retrieving
 
       gtk.gdk.threads_leave()
-      print 'Leaving thread!'
+      #print 'Leaving thread!'
 
       # Actualizamos la lista de entries del feed seleccionado
       if(count != 0):
@@ -2979,7 +2967,7 @@ class Naufrago:
       # Cualquier feed con nuevas entradas expanderá la categoria.
       if (self.driven_mode == 1):
        if new_posts == True:
-        print 'Expandimos categoria...'
+        #print 'Expandimos categoria...'
         self.treeview.expand_row(model.get_path(iter), open_all=False)
       # END NEW: Driven mode, parte 1
 
@@ -2994,7 +2982,7 @@ class Naufrago:
       if num_new_posts_total == aux_num_new_posts_total:
        boldornot = self.toggle_category_bold(id_category)
        if boldornot == 'normal':
-        print 'Contraemos categoria...'
+        #print 'Contraemos categoria...'
         self.treeview.collapse_row(model.get_path(iter))
      # END NEW: Driven mode, parte 2
 
@@ -3159,7 +3147,7 @@ class Naufrago:
     # Cualquier feed con nuevas entradas expanderá la categoria.
     if (self.driven_mode == 1):
      if new_posts == True:
-      print 'Expandimos categoria...'
+      #print 'Expandimos categoria...'
       self.treeview.expand_row(model.get_path(iter), open_all=False)
     # END NEW: Driven mode, parte 1
 
@@ -3174,7 +3162,7 @@ class Naufrago:
     if num_new_posts_total == 0:
      boldornot = self.toggle_category_bold()
      if boldornot == 'normal':
-      print 'Contraemos categoria...'
+      #print 'Contraemos categoria...'
       self.treeview.collapse_row(model.get_path(iter))
    # END NEW: Driven mode, parte 2
 
@@ -3183,7 +3171,7 @@ class Naufrago:
   # Restablecemos el indicador de cancelación
   self.stop_feed_update_lock = False
 
-  print 'New messages notification!'
+  #print 'New messages notification!'
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
    if num_new_posts_total > 0:
