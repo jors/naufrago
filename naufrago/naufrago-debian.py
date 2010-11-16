@@ -129,7 +129,7 @@ class Naufrago:
  def tree_key_press_event(self, widget, event):
   """Tells which keyboard button was pressed"""
   key = gtk.gdk.keyval_name(event.keyval)
-  if(key == 'Delete'):
+  if(key == 'Delete'): # ARBOL DE FEEDS
    (model, iter) = self.treeselection.get_selected()
    if(iter is not None): # Si hay algún nodo seleccionado...
     text = self.treestore.get_value(iter, 0)
@@ -137,6 +137,8 @@ class Naufrago:
      self.delete_category()
     elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
      self.delete_feed()
+  elif(key == 'Return'): # LISTA DE ENTRIES
+   self.abrir_browser()
 
  def make_pb(self, tvcolumn, cell, model, iter):
   """Renders the parameter received icons"""
@@ -1299,7 +1301,7 @@ class Naufrago:
   self.treeview_setup_dnd(self.treeview)
   self.scrolled_window1 = gtk.ScrolledWindow()
   self.scrolled_window1.add(self.treeview)
-  self.scrolled_window1.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+  self.scrolled_window1.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
   self.scrolled_window1.set_size_request(self.a, self.b) # Sets an acceptable tree sizing
   self.hpaned.add1(self.scrolled_window1)
 
@@ -1316,6 +1318,7 @@ class Naufrago:
   self.treeview2 = gtk.TreeView(self.liststore)
   self.treeview2.set_rules_hint(True) # differentiate rows...
   self.treeview2.connect("button_press_event", self.tree2_button_press_event)
+  self.treeview2.connect("key_press_event", self.tree_key_press_event)
   self.treeselection2 = self.treeview2.get_selection()
   self.treeselection2.connect("changed", self.list_row_selection)
 

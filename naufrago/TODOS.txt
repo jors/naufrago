@@ -180,12 +180,14 @@ ROADMAP 0.3:
 - SOLVED: Add sqlite as a dependency. DONE
 - NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no. DONE
 - SOLVED: Some htmlentities are shown uncorrectly on entry titles. DONE
-- IMPROVED: Reorder treeview on new category.
+- IMPROVED: Reorder treeview on new category. DONE
+- IMPROVED: No horizontal scrollbar for feed list. DONE
+- IMPROVED: Open entry in browser on pressing return. DONE
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
 - DISCARDED: Fecha más larga (con hora).
 - DISCARDED: Open links in inline browser.
-- DISCARDED: Custom notification formats (title of the update).
+- DISCARDED: Custom new entries notification formats (title of the update).
 - Migración a pygi?
 
