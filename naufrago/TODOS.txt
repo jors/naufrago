@@ -178,11 +178,24 @@ ROADMAP 0.3:
 - IMPROVED: Open entry in browser on double click. DONE
 - SOLVED: Hanging/freezing problem with pynotify. DONE
 - SOLVED: Add sqlite as a dependency. DONE
-- NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no. DONE
+- NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
+  * At app startup. DONE
+  * At get_feed. DONE
+  * On 'Mark all as read' while applied to a category. DONE
+  * On 'Mark all as read' while applied to a special folder (Unread and Important). DONE
+  * On 'Mark all as read' while applied to a feed AND all entry feeds of that category are read.
+  
 - SOLVED: Some htmlentities are shown uncorrectly on entry titles. DONE
 - IMPROVED: Reorder treeview on new category. DONE
 - IMPROVED: No horizontal scrollbar for feed list. DONE
 - IMPROVED: Open entry in browser on pressing return. DONE
+
+BUGS DEL CASI:
+- 'Hide read entries' debe esconder entradas SI hay un feed seleccionado
+  y se usa 'Marcar todos como leidos'.
+- El recuento individual de 'Unread' (con string parsings) no acaba de chutar,
+  así que mejor tirar por consulta sql.
+- La ordenación de feeds descoloca los special folders (unread e importantes). DONE
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
