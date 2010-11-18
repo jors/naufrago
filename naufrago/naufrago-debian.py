@@ -308,9 +308,10 @@ class Naufrago:
        ### START: ¡También cabe actualizar su compañero de batallas!
        self.update_special_folder(9998) # Actualizamos Important
        ### END: ¡También cabe actualizar su compañero de batallas!
+       # Bold/unbold de TODAS las categorias
+       self.toggle_category_bold('all')
        # Y si aplica, fold de TODAS las categorias
        if (self.driven_mode == 1):
-        self.toggle_category_bold('all')
         self.treeview.collapse_all() # Fold de todo!
 
      elif nombre_feed == _("Important"):
@@ -339,30 +340,38 @@ class Naufrago:
        ### START: ¡También cabe actualizar su compañero de batallas!
        self.update_special_folder(9999) # Actualizamos Unread
        ### END: ¡También cabe actualizar su compañero de batallas!
+       # Bold/unbold de ALGUNAS categorias
+       (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+       iter = model.get_iter_root() # Magic
+       while (iter is not None):
+        if(model.iter_depth(iter) == 0): # Si es padre
+         id_cat = model.get_value(iter, 2)
+         if (id_cat != 9998) and (id_cat != 9999):
+          self.toggle_category_bold(id_cat, True)
+        iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
        # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
        if (self.driven_mode == 1):
-        (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-        iter = model.get_iter_root() # Magic
-        while (iter is not None):
-         if(model.iter_depth(iter) == 0): # Si es padre
-          id_cat = model.get_value(iter, 2)
-          if (id_cat != 9998) and (id_cat != 9999):
-           self.toggle_category_bold(id_cat, True)
-         iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
         self.driven_mode_action() # Fold de lo que esté 'vacio'
 
 
      else:
+      # Bold/unbold de la categoria
+      self.toggle_category_bold()
+      # Y si aplica, fold de la categoria
+      if (self.driven_mode == 1):
+       self.driven_mode_action()
+       # Seleccionamos el nodo padre (para provocar el escondido de las entries y el mostrado de
+       # los datos de la categoria en el browser), tal y como se hace al seleccionar una categoría a mano.
+       iter_parent = model.iter_parent(iter)
+       self.treeselection.select_iter(iter_parent)
       # Destino: No leídos
       self.update_special_folder(9999)
       # Destino: Importantes
       self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
 
-      # NEW
-      # Unbold category if needed.
-      self.toggle_category_bold()
-      # NEW
+     if self.hide_readentries:
+      self.liststore.clear()
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
 

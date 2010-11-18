@@ -183,7 +183,7 @@ ROADMAP 0.3:
   * At get_feed. DONE
   * On 'Mark all as read' while applied to a category. DONE
   * On 'Mark all as read' while applied to a special folder (Unread and Important). DONE
-  * On 'Mark all as read' while applied to a feed AND all entry feeds of that category are read.
+  * On 'Mark all as read' while applied to a feed AND all entry feeds of that category are read. DONE
   
 - SOLVED: Some htmlentities are shown uncorrectly on entry titles. DONE
 - IMPROVED: Reorder treeview on new category. DONE
@@ -195,7 +195,6 @@ BUGS DEL CASI:
   y se usa 'Marcar todos como leidos'.
 - El recuento individual de 'Unread' (con string parsings) no acaba de chutar,
   así que mejor tirar por consulta sql.
-- La ordenación de feeds descoloca los special folders (unread e importantes). DONE
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
