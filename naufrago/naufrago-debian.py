@@ -362,8 +362,8 @@ class Naufrago:
        self.driven_mode_action()
        # Seleccionamos el nodo padre (para provocar el escondido de las entries y el mostrado de
        # los datos de la categoria en el browser), tal y como se hace al seleccionar una categoría a mano.
-       iter_parent = model.iter_parent(iter)
-       self.treeselection.select_iter(iter_parent)
+       ###iter_parent = model.iter_parent(iter)
+       ###self.treeselection.select_iter(iter_parent)
       # Destino: No leídos
       self.update_special_folder(9999)
       # Destino: Importantes
@@ -2167,6 +2167,11 @@ class Naufrago:
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
      self.treeview.collapse_row(model.get_path(iter))
+     # Si la categoria actual coincide con el nodo padre del nodo hijo que había
+     # seleccionado, magia.
+     useless_iter_parent = model.iter_parent(useless_iter)
+     if iter is useless_iter_parent:
+      self.treeselection.select_iter(iter)
     elif boldornot == 'bold':
      self.treeview.expand_row(model.get_path(iter), open_all=False)
    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
