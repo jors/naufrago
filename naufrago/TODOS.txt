@@ -164,7 +164,6 @@ ROADMAP 0.3:
 - Use system font style. Already handled (font & size, not style). ALREADY PRESENT
 - SOLVED: Mostrar/esconder entradas leidas. DONE
 - NEW: Esconder la columna de la fecha. DONE
-- NEW: Posibilidad de cancelar el update (botón al lado de actualizar todo). DONE
 - NEW: Bold folders with unread articles. Checks for:
   * 'Marcar todo como leido' en una categoría -> unbold. DONE
   * 'Marcar todo como leido' en un feed -> sql. DONE
@@ -176,19 +175,19 @@ ROADMAP 0.3:
   * Borrar un feed. DONE
 - NEW: Module import error warning. DONE
 - IMPROVED: Open entry in browser on double click. DONE
+- IMPROVED: Open entry in browser on pressing return. DONE
 - SOLVED: Hanging/freezing problem with pynotify. DONE
-- SOLVED: Add sqlite as a dependency. DONE
 - NEW: "Driven mode": carpetas se abren cuando hay nuevos, se cierran cuando no.
   * At app startup. DONE
   * At get_feed. DONE
   * On 'Mark all as read' while applied to a category. DONE
   * On 'Mark all as read' while applied to a special folder (Unread and Important). DONE
   * On 'Mark all as read' while applied to a feed AND all entry feeds of that category are read. DONE
-  
 - SOLVED: Some htmlentities are shown uncorrectly on entry titles. DONE
 - IMPROVED: Reorder treeview on new category. DONE
 - IMPROVED: No horizontal scrollbar for feed list. DONE
-- IMPROVED: Open entry in browser on pressing return. DONE
+
+- NEW: Posibilidad de cancelar el update (botón de la toolbar y en la statusbar).
 
 BUGS DEL CASI:
 - 'Hide read entries' debe esconder entradas SI hay un feed seleccionado

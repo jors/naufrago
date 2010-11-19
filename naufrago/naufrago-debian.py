@@ -2165,9 +2165,10 @@ class Naufrago:
      self.treeview.collapse_row(model.get_path(iter))
      # Si la categoria actual coincide con el nodo padre del nodo hijo que había
      # seleccionado, magia.
-     useless_iter_parent = model.iter_parent(useless_iter)
-     if iter is useless_iter_parent:
-      self.treeselection.select_iter(iter)
+     if useless_iter is not None:
+      useless_iter_parent = model.iter_parent(useless_iter)
+      if iter is useless_iter_parent:
+       self.treeselection.select_iter(iter)
     elif boldornot == 'bold':
      self.treeview.expand_row(model.get_path(iter), open_all=False)
    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
