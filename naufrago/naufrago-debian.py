@@ -1521,18 +1521,23 @@ class Naufrago:
   # StatusIcon popup menu
   self.statusicon_menu = gtk.Menu()
   # Create the menu items
-  update_item = gtk.ImageMenuItem(_("Update all"))
-  icon = update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
-  update_item.set_image(gtk.image_new_from_pixbuf(icon))
-  quit_item = gtk.ImageMenuItem(_("Quit"))
-  icon = quit_item.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_BUTTON)
-  quit_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.update_item = gtk.ImageMenuItem(_("Update all"))
+  icon = self.update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
+  self.update_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.stop_item = gtk.ImageMenuItem(_("Stop"))
+  icon = self.stop_item.render_icon(gtk.STOCK_STOP, gtk.ICON_SIZE_BUTTON)
+  self.stop_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.quit_item = gtk.ImageMenuItem(_("Quit"))
+  icon = self.quit_item.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_BUTTON)
+  self.quit_item.set_image(gtk.image_new_from_pixbuf(icon))
   # Add them to the menu
-  self.statusicon_menu.append(update_item)
-  self.statusicon_menu.append(quit_item)
+  self.statusicon_menu.append(self.update_item)
+  self.statusicon_menu.append(self.stop_item)
+  self.statusicon_menu.append(self.quit_item)
   # Attach the callback functions to the activate signal
-  update_item.connect("activate", self.update_all_feeds)
-  quit_item.connect("activate", self.delete_event)
+  self.update_item.connect("activate", self.update_all_feeds)
+  self.stop_item.connect("activate", self.stop_feed_update)
+  self.quit_item.connect("activate", self.delete_event)
   self.statusicon_menu.show_all()
   self.statusicon.connect('popup-menu', self.statusicon_popup_menu)
 
@@ -2165,10 +2170,14 @@ class Naufrago:
      self.treeview.collapse_row(model.get_path(iter))
      # Si la categoria actual coincide con el nodo padre del nodo hijo que había
      # seleccionado, magia.
-     if useless_iter is not None:
-      useless_iter_parent = model.iter_parent(useless_iter)
-      if iter is useless_iter_parent:
-       self.treeselection.select_iter(iter)
+     if useless_iter is not None and self.hide_readentries == 1:
+      # Esconder la lista de feeds y mostrar en el navegador los datos de la categoría
+      self.liststore.clear() # Limpieza de tabla de entries/articulos
+      self.scrolled_window2.set_size_request(0,0)
+      self.scrolled_window2.hide()
+      self.webview.load_string("<h2>" + _("Category") + ": "+model.get_value(iter, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+      self.eb.hide()
+      self.eb_image_zoom.hide()
     elif boldornot == 'bold':
      self.treeview.expand_row(model.get_path(iter), open_all=False)
    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
@@ -2665,6 +2674,7 @@ class Naufrago:
   self.stop_feed_update_lock = True
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(False)
+  self.stop_item.set_sensitive(False)
 
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""
@@ -2790,7 +2800,12 @@ class Naufrago:
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(not enable)
 
-  self.statusicon_menu.set_sensitive(enable)
+  ###self.statusicon_menu.set_sensitive(enable)
+  # Statusicon menuitems...
+  self.update_item.set_sensitive(enable)
+  self.stop_item.set_sensitive(not enable)
+  self.quit_item.set_sensitive(enable)
+
   self.ui_lock = not enable
 
  def change_feed_icon(self, d, model, id_feed, cursor):
