@@ -188,7 +188,6 @@ ROADMAP 0.3:
 - IMPROVED: No horizontal scrollbar for feed list. DONE
 - IMPROVED: 'Hide read entries' debe esconder entradas SI hay un feed seleccionado
   y se usa 'Marcar todos como leidos'. DONE
-
 - NEW: Posibilidad de cancelar el update (botón de la toolbar y en la statusbar). DONE
 
 BUGS DEL CASI:
