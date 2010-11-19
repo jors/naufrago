@@ -360,10 +360,6 @@ class Naufrago:
       # Y si aplica, fold de la categoria
       if (self.driven_mode == 1):
        self.driven_mode_action()
-       # Seleccionamos el nodo padre (para provocar el escondido de las entries y el mostrado de
-       # los datos de la categoria en el browser), tal y como se hace al seleccionar una categoría a mano.
-       ###iter_parent = model.iter_parent(iter)
-       ###self.treeselection.select_iter(iter_parent)
       # Destino: No leídos
       self.update_special_folder(9999)
       # Destino: Importantes
@@ -2707,17 +2703,18 @@ class Naufrago:
   else: link = _('Without link')
 
   if(hasattr(dentry,'id')):
-   if dentry.id is not None: id = dentry.id.encode("utf-8")
+   if dentry.id is not None:
+    id = dentry.id.encode("utf-8")
    else:
-    if description != '':
-     id = hashlib.md5(description).hexdigest().encode("utf-8")
-    else:
+    if title != '':
      id = hashlib.md5(title).hexdigest().encode("utf-8")
+    else:
+     id = hashlib.md5(description).hexdigest().encode("utf-8")
   else:
-   if description != '':
-    id = hashlib.md5(description).hexdigest().encode("utf-8")
-   else:
+   if title != '':
     id = hashlib.md5(title).hexdigest().encode("utf-8")
+   else:
+    id = hashlib.md5(description).hexdigest().encode("utf-8")
 
   return (secs, title, description, link, id)
 
