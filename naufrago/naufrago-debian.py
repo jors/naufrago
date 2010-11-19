@@ -42,10 +42,9 @@ try:
  import urllib2
  import re
  from xml.etree import ElementTree
- #from htmlentitydefs import name2codepoint
+ from xml.sax import saxutils
  import htmlentitydefs
  import hashlib
- #import xml.sax.saxutils
  import locale
  import gettext
  import pynotify
@@ -814,7 +813,7 @@ class Naufrago:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB"))
 
    # This prevents htmlentities from doing weird things to the headerlink!
-   self.headerlink.set_markup('<b><u><span foreground="blue">'+self.htmlentitydecode(titulo)+'</span></u></b>')
+   self.headerlink.set_markup('<b><u><span foreground="blue">'+saxutils.escape(self.htmlentitydecode(titulo))+'</span></u></b>')
    self.headerlink.set_justify(gtk.JUSTIFY_CENTER)
    self.headerlink.set_ellipsize(pango.ELLIPSIZE_END)
    self.eb.show()

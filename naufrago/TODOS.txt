@@ -192,6 +192,7 @@ ROADMAP 0.3:
 - NEW: Posibilidad de cancelar el update (botón de la toolbar y en la statusbar). DONE
 
 BUGS DEL CASI:
+- Bug regresivo: títulos con & (u otras entidades html) cascan! DONE
 - El recuento individual de 'Unread' (con string parsings) no acaba de chutar,
   así que mejor tirar por consulta sql.
 
