@@ -1,0 +1,30 @@
+Naufrago! 0.3 roadmap
+---------------------
+
+- <b>Application stabilization</b> <i>avoiding race conditions</i> caused by insertion/modification queries against SQLite (by thread <i>blocking</i>).
+- Chance of <b>ordering by important column</b>.
+- Fix to show/hide read entries (shown in real time).
+- Chance of <b>hiding date column</b> (to see more post title, if it is long).
+- Chance of <b>canceling ongoing feed updates</b> (via both a button on the toolbar and an option on the in the trayicon menu).
+- <b>Mark/unmark categories in bold</b> whether the contain unread/read feed entries, respectively.
+- Checking and <b>warning messages when required modules are not present/detectable</b> (for a better dependency check).
+- Added double click or pressing return to open an entry in a browser (the latter for those who are more used to keyboard navigation).
+- Fix for pynotify in order to avoid application from freezing.
+- <b>Driven mode</b>: new mode for the application to use some kind of intelligence on folding/unfolding categories depending on whether you have read/unread feed entries.
+- Fix to render propperly for some html entities.
+- Fix to insert new categores in the correct -alphabetical- position.
+- The list of feeds will not have horizontal scroll bar.
+- Optimization of the feed retrieving function (reusing a good portion of code), plus a workaround to avoid repeated entries.
+- New timing for obtaining <b>feeds</b> to be able to choose between <b>hours or minutes</b>.
+- Remodeling of the Preferences dialog to suit new options and features.
+
+
+There was a implementation suggestion of using the system font on the app. AFAICT, this is present already. This is true for font type and size, but not for font style (because the app uses it for different meanings; in instance, read/unread feed entries).
+
+Other discarded suggestions (at least, for the moment):
+
+- Definable timeout for obtaining favicons/images/feed entries.
+- Order by read status.
+- Longer date field (including hour/min/sec).
+- Open links in embedded browser.
+- Custom notification messages.
