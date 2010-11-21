@@ -1,4 +1,3 @@
 #!/bin/sh
-#python -W ignore /usr/share/naufrago/naufrago.py &> /dev/null
-#python -W ignore /usr/share/naufrago/naufrago.py >/dev/null 2&>1
-python -W ignore /usr/share/naufrago/naufrago.py >/dev/null
+n_path='/usr/share/naufrago/'
+python ${n_path}naufrago.py >${n_path}naufrago.log 2>${n_path}naufrago.log

@@ -191,12 +191,11 @@ ROADMAP 0.3:
 - NEW: Posibilidad de cancelar el update (botón de la toolbar y en la statusbar). DONE
 
 BUGS DEL CASI y otros PENDING:
-- Bug regresivo: títulos con & (u otras entidades html) cascan! DONE
 - El recuento individual de 'Unread' (con string parsings) no acaba de chutar,
   así que mejor tirar por consulta sql.
-- Comprobador de versión nueva.
 - Parseo personalizado de fechas de las entradas de los feeds. Casi?
 - Modificación del script lanzador para loguear errores.
+- Comprobador de versión nueva.
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).
