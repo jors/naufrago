@@ -53,6 +53,7 @@ except ImportError:
  print _('Error importing modules: ') + str(sys.exc_info()[1])
  sys.exit(1)
 
+APP_VERSION = '0.3'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -1008,6 +1009,7 @@ class Naufrago:
 
  def help_about(self, action):
   """Shows the about message dialog"""
+  global APP_VERSION
   LICENSE = """   
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -1025,7 +1027,7 @@ class Naufrago:
   about = gtk.AboutDialog()
   about.set_transient_for(self.window)
   about.set_program_name("Naufrago!")
-  about.set_version("0.3")
+  about.set_version(APP_VERSION)
   about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
