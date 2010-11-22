@@ -1007,6 +1007,23 @@ class Naufrago:
   self.eb_image_zoom.hide()
   self.webview.load_string(PUF_PAGE, "text/html", "utf-8", "file://"+puf_path)
 
+ def check_app_updates(self, action):
+  """Check if a new version of the application exists."""
+  global APP_VERSION
+  #gtk.gdk.threads_enter()
+  try:
+   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version', timeout=20)
+   read = web_file.read().rstrip()
+   web_file.close()
+   if APP_VERSION == read:
+    print 'Same version!'
+   else:
+    print 'Different version! UPGRADE to version !' + `read.rstrip()`
+  except:
+   print 'Coult not contact server. Try again later!'
+   pass
+  #gtk.gdk.threads_leave()
+
  def help_about(self, action):
   """Shows the about message dialog"""
   global APP_VERSION
@@ -1062,6 +1079,7 @@ class Naufrago:
                 </menu>
                 <menu action='HelpMenu'>
                  <menuitem action='FAQ'/>
+                 <menuitem action='Check updates'/>
                  <menuitem action='About'/>
                 </menu>
                </menubar>
@@ -1112,6 +1130,7 @@ class Naufrago:
             ('Stop update', gtk.STOCK_STOP, _('Stop'), None, _('Stop update'), self.stop_feed_update),
             ('HelpMenu', None, _('_Help')),
             ('FAQ', gtk.STOCK_HELP, _('FAQ'), None, _('FAQ'), self.load_puf),
+            ('Check updates', None, _('Check updates'), None, _('Check updates'), self.check_app_updates),
             ('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.help_about),
             ]
 
@@ -1539,6 +1558,11 @@ class Naufrago:
   self.update_item.connect("activate", self.update_all_feeds)
   self.stop_item.connect("activate", self.stop_feed_update)
   self.quit_item.connect("activate", self.delete_event)
+  # Should we enable stop function when showing popup menu? It depends...
+  if self.stop_feed_update_lock == True:
+   self.stop_item.set_sensitive(True)
+  else:
+   self.stop_item.set_sensitive(False)
   self.statusicon_menu.show_all()
   self.statusicon.connect('popup-menu', self.statusicon_popup_menu)
 
