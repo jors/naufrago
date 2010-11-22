@@ -2991,6 +2991,8 @@ class Naufrago:
     if count[0] > 0:
      feed_label = nombre_feed_destino + ' [' + str(count[0]) + ']'
      font_style = 'bold'
+     # Y luego el resaltado de la categoría
+     model.set(iter, 3, 'bold')
     else:
      feed_label = nombre_feed_destino
      font_style = 'normal'
@@ -2999,7 +3001,7 @@ class Naufrago:
     font_style = 'normal'
    model3.set(dest_iter, 0, feed_label, 3, font_style)
    # Y luego el resaltado de la categoría
-   model.set(iter, 3, 'bold')
+   #model.set(iter, 3, 'bold')
 
   # START NEW: Driven mode, parte 1
   # Cualquier feed con nuevas entradas expanderá la categoria.
