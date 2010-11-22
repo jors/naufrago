@@ -2986,9 +2986,18 @@ class Naufrago:
    nombre_feed_destino = model3.get_value(dest_iter, 0)
    nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
    cursor.execute('SELECT count(id) FROM articulo WHERE leido = 0')
-   row = cursor.fetchone()
-   feed_label = nombre_feed_destino + ' [' + str(row[0]) + ']'
-   model3.set(dest_iter, 0, feed_label, 3, 'bold')
+   count = cursor.fetchone()
+   if count is not None:
+    if count[0] > 0:
+     feed_label = nombre_feed_destino + ' [' + str(count[0]) + ']'
+     font_style = 'bold'
+    else:
+     feed_label = nombre_feed_destino
+     font_style = 'normal'
+   else:
+    feed_label = nombre_feed_destino
+    font_style = 'normal'
+   model3.set(dest_iter, 0, feed_label, 3, font_style)
    # Y luego el resaltado de la categoría
    model.set(iter, 3, 'bold')
 
