@@ -53,7 +53,8 @@ except ImportError:
  print _('Error importing modules: ') + str(sys.exc_info()[1])
  sys.exit(1)
 
-APP_VERSION = '0.3'
+#APP_VERSION = '0.3'
+APP_VERSION = '0.2'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -1007,7 +1008,7 @@ class Naufrago:
   self.eb_image_zoom.hide()
   self.webview.load_string(PUF_PAGE, "text/html", "utf-8", "file://"+puf_path)
 
- def check_app_updates(self, action):
+ def check_app_updates(self, action=None):
   """Check if a new version of the application exists."""
   global APP_VERSION
   #gtk.gdk.threads_enter()
@@ -1016,12 +1017,42 @@ class Naufrago:
    read = web_file.read().rstrip()
    web_file.close()
    if APP_VERSION == read:
-    print 'Same version!'
+    if type(action) is gtk.Action:
+     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+     dialog.set_size_request(300,75)
+     dialog.set_has_separator(False)
+     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+     label = gtk.Label(_("No updates available, sorry"))
+     dialog.vbox.pack_start(label)
+     dialog.show_all()
+     response = dialog.run()
+     dialog.destroy()
    else:
-    print 'Different version! UPGRADE to version !' + `read.rstrip()`
+    dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+    dialog.set_size_request(300,100)
+    dialog.set_has_separator(False)
+    dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+    label = gtk.Label("")
+    label.set_markup("Naufrago! version <b>"+read+"</b> is available! Get it at:")
+    download_url = 'http://sourceforge.net/projects/naufrago/files/'
+    url_button = gtk.LinkButton(download_url, download_url)
+    dialog.vbox.pack_start(label)
+    dialog.vbox.pack_start(url_button)
+    dialog.show_all()
+    response = dialog.run()
+    dialog.destroy()
   except:
-   print 'Coult not contact server. Try again later!'
-   pass
+   if type(action) is gtk.Action:
+    dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+    dialog.set_size_request(300,75)
+    dialog.set_has_separator(False)
+    dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+    label = gtk.Label(_("Coult not contact server. Try again later!"))
+    dialog.vbox.pack_start(label)
+    dialog.show_all()
+    response = dialog.run()
+    dialog.destroy()
+    pass
   #gtk.gdk.threads_leave()
 
  def help_about(self, action):
@@ -1150,12 +1181,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1195,6 +1226,7 @@ class Naufrago:
   self.hide_dates = int(row[14])
   self.driven_mode = int(row[15])
   self.update_freq_timemode = int(row[16])
+  self.init_check_app_updates = int(row[17])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1228,7 +1260,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -1527,6 +1559,7 @@ class Naufrago:
   """Checks & applies init options."""
   if(self.init_unfolded_tree == 1): self.treeview.expand_all()
   if(self.init_tray == 1): self.statusicon_activate()
+  if(self.init_check_app_updates == 1): self.check_app_updates()
   if(self.init_update_all == 1): self.update_all_feeds()
 
  def create_trayicon(self):
@@ -2272,6 +2305,10 @@ class Naufrago:
   if(self.init_update_all == 1): checkbox3.set_active(True)
   else: checkbox3.set_active(False)
   vbox2.pack_start(checkbox3, True, True, 5)
+  checkbox9 = gtk.CheckButton(_("Check application updates on start"))
+  if(self.init_check_app_updates == 1): checkbox9.set_active(True)
+  else: checkbox9.set_active(False)
+  vbox2.pack_start(checkbox9, True, True, 5)
   align.add(vbox2)
   notebook.append_page(align, gtk.Label(_("Start")))
 
@@ -2399,6 +2436,8 @@ class Naufrago:
    else: self.hide_dates = 0
    if(checkbox8.get_active()): self.driven_mode = 1
    else: self.driven_mode = 0
+   if(checkbox9.get_active()): self.init_check_app_updates = 1
+   else: self.init_check_app_updates = 0
 
    if checkbox1.get_active() and self.show_trayicon == 0:
     self.show_trayicon = 1
@@ -2815,8 +2854,8 @@ class Naufrago:
                "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
                "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
                "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
-               "/Menubar/NetworkMenu/Update all", "/Toolbar/Update all", "/Toolbar/Search",
-               "/Toolbar/Preferences"]
+               "/Menubar/NetworkMenu/Update all", "/Menubar/HelpMenu/Check updates",
+               "/Toolbar/Update all", "/Toolbar/Search", "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
@@ -3281,7 +3320,8 @@ class Naufrago:
  ########
 
  def __init__(self):
-  self.lock = threading.RLock()
+  ###self.lock = threading.RLock()
+  self.lock = threading.Lock()
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
   # Obtiene la config de la app
