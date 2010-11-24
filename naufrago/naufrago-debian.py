@@ -24,6 +24,7 @@
 #############################################################################
 
 try:
+ import time
  import sys
  import pygtk
  pygtk.require('2.0')
@@ -53,8 +54,7 @@ except ImportError:
  print _('Error importing modules: ') + str(sys.exc_info()[1])
  sys.exit(1)
 
-#APP_VERSION = '0.3'
-APP_VERSION = '0.2'
+APP_VERSION = '0.3'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -123,6 +123,7 @@ class Naufrago:
 
  def delete_event(self, event, data=None):
   """Closes the app through window manager signal"""
+  self.t_check_app_updates.cancel()
   self.save_config()
   gtk.main_quit()
   return False
@@ -1009,13 +1010,19 @@ class Naufrago:
   self.webview.load_string(PUF_PAGE, "text/html", "utf-8", "file://"+puf_path)
 
  def check_app_updates(self, action=None):
+  """Launches the corresponding core function threaded."""
+  self.t_check_app_updates = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
+  self.t_check_app_updates.start()
+
+ def check_app_updates_helper(self, action=None):
   """Check if a new version of the application exists."""
   global APP_VERSION
-  #gtk.gdk.threads_enter()
   try:
-   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version', timeout=20)
+   gtk.gdk.threads_enter()
+   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
    read = web_file.read().rstrip()
    web_file.close()
+   gtk.gdk.threads_leave()
    if APP_VERSION == read:
     if type(action) is gtk.Action:
      dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
@@ -1053,7 +1060,6 @@ class Naufrago:
     response = dialog.run()
     dialog.destroy()
     pass
-  #gtk.gdk.threads_leave()
 
  def help_about(self, action):
   """Shows the about message dialog"""
@@ -3341,5 +3347,7 @@ def main():
  gtk.main()
  
 if __name__ == "__main__":
+ t0 = time.time()
  naufrago = Naufrago()
+ print 'time: ' + `time.time()-t0`
  main()
