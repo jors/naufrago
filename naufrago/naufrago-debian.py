@@ -1029,7 +1029,7 @@ class Naufrago:
      dialog.set_size_request(300,75)
      dialog.set_has_separator(False)
      dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
-     label = gtk.Label(_("No updates available, sorry"))
+     label = gtk.Label(_("No updates available."))
      dialog.vbox.pack_start(label)
      dialog.show_all()
      response = dialog.run()
@@ -1685,14 +1685,20 @@ class Naufrago:
   any_row_to_show=False
   self.liststore.clear()
   cursor = self.conn.cursor()
+  # START NEW: sorting by arrival
   if id_feed == 9998:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY id DESC'
   elif id_feed == 9999:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY id DESC'
   elif search_request_entry_ids is not None:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY id DESC'
   else:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY id DESC'
+  # END NEW: sorting by arrival
   cursor.execute(q)
   rows = cursor.fetchall()
   cursor.close()
@@ -2941,6 +2947,10 @@ class Naufrago:
 
   feed_link = ''
   if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
+
+  # START NEW: sorting by arrival
+  d.entries.reverse()
+  # END NEW: sorting by arrival
 
   limit = count = len(d.entries)
   if count > self.num_entries:

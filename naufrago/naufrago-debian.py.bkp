@@ -24,6 +24,7 @@
 #############################################################################
 
 try:
+ import time
  import sys
  import pygtk
  pygtk.require('2.0')
@@ -42,10 +43,9 @@ try:
  import urllib2
  import re
  from xml.etree import ElementTree
- #from htmlentitydefs import name2codepoint
+ from xml.sax import saxutils
  import htmlentitydefs
  import hashlib
- #import xml.sax.saxutils
  import locale
  import gettext
  import pynotify
@@ -54,6 +54,7 @@ except ImportError:
  print _('Error importing modules: ') + str(sys.exc_info()[1])
  sys.exit(1)
 
+APP_VERSION = '0.3'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -122,6 +123,7 @@ class Naufrago:
 
  def delete_event(self, event, data=None):
   """Closes the app through window manager signal"""
+  self.t_check_app_updates.cancel()
   self.save_config()
   gtk.main_quit()
   return False
@@ -216,12 +218,25 @@ class Naufrago:
    no_leidos = None
   return nombre_feed, no_leidos
 
- def toggle_category_bold(self, id_cat=None):
+ def toggle_category_bold(self, id_cat=None, special_folder=False):
   """Toggles bold or unbold in category folders."""
   id_cat_aux = id_cat
-  if id_cat is None:
+  if id_cat == 'all':
+   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+   iter = model.get_iter_root() # Magic
+   while (iter is not None):
+    if(model.iter_depth(iter) == 0): # Si es padre
+     model.set(iter, 3, 'normal')
+    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
+   return
+
+  elif (special_folder is True) and (id_cat != '9998') and (id_cat != '9999'):
+   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+   iter = self.treeindex_cat[id_cat]
+   id_cat_aux = None
+
+  elif id_cat is None:
    (model, iter) = self.treeselection.get_selected()
-   #print iter
    if(model.iter_depth(iter) == 1): # Si es hijo...
     iter = model.iter_parent(iter) # ...queremos el padre
    id_cat = model.get_value(iter, 2)
@@ -230,19 +245,15 @@ class Naufrago:
   q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_cat)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
   cursor.execute(q)
   row = cursor.fetchone()
+  cursor.close()
   if row[0] == 0:
-   #if id_cat_aux is None: model.set(iter, 3, 'normal')
-   #else: return 'normal'
    if id_cat_aux is None:
     model.set(iter, 3, 'normal')
    return 'normal' # Sometimes we don't need return values, but.. life goes on
   else:
-   #if id_cat_aux is None: model.set(iter, 3, 'bold')
-   #else: return 'bold'
    if id_cat_aux is None:
     model.set(iter, 3, 'bold')
    return 'bold' # Sometimes we don't need return values, but.. life goes on
-  cursor.close()
 
  def toggle_leido(self, event, data=None):
   """Toggle entries between read/non-read states."""
@@ -297,9 +308,13 @@ class Naufrago:
         font_style = 'normal'
         model.set(dest_iter, 0, feed_label, 3, font_style)
        ### START: ¡También cabe actualizar su compañero de batallas!
-       # Actualizamos Important
-       self.update_special_folder(9998)
+       self.update_special_folder(9998) # Actualizamos Important
        ### END: ¡También cabe actualizar su compañero de batallas!
+       # Bold/unbold de TODAS las categorias
+       self.toggle_category_bold('all')
+       # Y si aplica, fold de TODAS las categorias
+       if (self.driven_mode == 1):
+        self.treeview.collapse_all() # Fold de todo!
 
      elif nombre_feed == _("Important"):
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
@@ -325,21 +340,36 @@ class Naufrago:
          font_style = 'normal'
         model.set(dest_iter, 0, feed_label, 3, font_style)
        ### START: ¡También cabe actualizar su compañero de batallas!
-       # Actualizamos Unread
-       self.update_special_folder(9999)
+       self.update_special_folder(9999) # Actualizamos Unread
        ### END: ¡También cabe actualizar su compañero de batallas!
+       # Bold/unbold de ALGUNAS categorias
+       (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+       iter = model.get_iter_root() # Magic
+       while (iter is not None):
+        if(model.iter_depth(iter) == 0): # Si es padre
+         id_cat = model.get_value(iter, 2)
+         if (id_cat != 9998) and (id_cat != 9999):
+          self.toggle_category_bold(id_cat, True)
+        iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
+       # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
+       if (self.driven_mode == 1):
+        self.driven_mode_action() # Fold de lo que esté 'vacio'
+
 
      else:
+      # Bold/unbold de la categoria
+      self.toggle_category_bold()
+      # Y si aplica, fold de la categoria
+      if (self.driven_mode == 1):
+       self.driven_mode_action()
       # Destino: No leídos
       self.update_special_folder(9999)
       # Destino: Importantes
       self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
 
-     # NEW
-     # Unbold category if needed.
-     self.toggle_category_bold()
-     # NEW
+     if self.hide_readentries:
+      self.liststore.clear()
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
 
@@ -385,7 +415,6 @@ class Naufrago:
      model.set(iter, 3, 'normal')
      # And fold category (if applies).
      if (self.driven_mode == 1):
-      #print 'Contraemos categoria...'
       self.treeview.collapse_row(model.get_path(iter))
      # NEW
 
@@ -787,7 +816,7 @@ class Naufrago:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB"))
 
    # This prevents htmlentities from doing weird things to the headerlink!
-   self.headerlink.set_markup('<b><u><span foreground="blue">'+self.htmlentitydecode(titulo)+'</span></u></b>')
+   self.headerlink.set_markup('<b><u><span foreground="blue">'+saxutils.escape(self.htmlentitydecode(titulo))+'</span></u></b>')
    self.headerlink.set_justify(gtk.JUSTIFY_CENTER)
    self.headerlink.set_ellipsize(pango.ELLIPSIZE_END)
    self.eb.show()
@@ -980,8 +1009,61 @@ class Naufrago:
   self.eb_image_zoom.hide()
   self.webview.load_string(PUF_PAGE, "text/html", "utf-8", "file://"+puf_path)
 
+ def check_app_updates(self, action=None):
+  """Launches the corresponding core function threaded."""
+  self.t_check_app_updates = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
+  self.t_check_app_updates.start()
+
+ def check_app_updates_helper(self, action=None):
+  """Check if a new version of the application exists."""
+  global APP_VERSION
+  try:
+   gtk.gdk.threads_enter()
+   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
+   read = web_file.read().rstrip()
+   web_file.close()
+   gtk.gdk.threads_leave()
+   if APP_VERSION == read:
+    if type(action) is gtk.Action:
+     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+     dialog.set_size_request(300,75)
+     dialog.set_has_separator(False)
+     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+     label = gtk.Label(_("No updates available."))
+     dialog.vbox.pack_start(label)
+     dialog.show_all()
+     response = dialog.run()
+     dialog.destroy()
+   else:
+    dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+    dialog.set_size_request(300,100)
+    dialog.set_has_separator(False)
+    dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+    label = gtk.Label("")
+    label.set_markup("Naufrago! version <b>"+read+"</b> is available! Get it at:")
+    download_url = 'http://sourceforge.net/projects/naufrago/files/'
+    url_button = gtk.LinkButton(download_url, download_url)
+    dialog.vbox.pack_start(label)
+    dialog.vbox.pack_start(url_button)
+    dialog.show_all()
+    response = dialog.run()
+    dialog.destroy()
+  except:
+   if type(action) is gtk.Action:
+    dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
+    dialog.set_size_request(300,75)
+    dialog.set_has_separator(False)
+    dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
+    label = gtk.Label(_("Coult not contact server. Try again later!"))
+    dialog.vbox.pack_start(label)
+    dialog.show_all()
+    response = dialog.run()
+    dialog.destroy()
+    pass
+
  def help_about(self, action):
   """Shows the about message dialog"""
+  global APP_VERSION
   LICENSE = """   
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -999,7 +1081,7 @@ class Naufrago:
   about = gtk.AboutDialog()
   about.set_transient_for(self.window)
   about.set_program_name("Naufrago!")
-  about.set_version("0.3")
+  about.set_version(APP_VERSION)
   about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
@@ -1034,6 +1116,7 @@ class Naufrago:
                 </menu>
                 <menu action='HelpMenu'>
                  <menuitem action='FAQ'/>
+                 <menuitem action='Check updates'/>
                  <menuitem action='About'/>
                 </menu>
                </menubar>
@@ -1084,6 +1167,7 @@ class Naufrago:
             ('Stop update', gtk.STOCK_STOP, _('Stop'), None, _('Stop update'), self.stop_feed_update),
             ('HelpMenu', None, _('_Help')),
             ('FAQ', gtk.STOCK_HELP, _('FAQ'), None, _('FAQ'), self.load_puf),
+            ('Check updates', None, _('Check updates'), None, _('Check updates'), self.check_app_updates),
             ('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.help_about),
             ]
 
@@ -1103,12 +1187,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1148,6 +1232,7 @@ class Naufrago:
   self.hide_dates = int(row[14])
   self.driven_mode = int(row[15])
   self.update_freq_timemode = int(row[16])
+  self.init_check_app_updates = int(row[17])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1181,7 +1266,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -1290,7 +1375,7 @@ class Naufrago:
      self.tvcolumn.set_attributes(self.cellpb, stock_id=1)
   self.tvcolumn.set_attributes(self.cell, text=0, font=3)
   # Allow sorting on the column
-  self.tvcolumn.set_sort_column_id(0)
+  ###self.tvcolumn.set_sort_column_id(0)
   # Allow drag and drop reordering of rows
   ###self.treeview.set_reorderable(True)
   self.treeview_setup_dnd(self.treeview)
@@ -1480,6 +1565,7 @@ class Naufrago:
   """Checks & applies init options."""
   if(self.init_unfolded_tree == 1): self.treeview.expand_all()
   if(self.init_tray == 1): self.statusicon_activate()
+  if(self.init_check_app_updates == 1): self.check_app_updates()
   if(self.init_update_all == 1): self.update_all_feeds()
 
  def create_trayicon(self):
@@ -1494,18 +1580,28 @@ class Naufrago:
   # StatusIcon popup menu
   self.statusicon_menu = gtk.Menu()
   # Create the menu items
-  update_item = gtk.ImageMenuItem(_("Update all"))
-  icon = update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
-  update_item.set_image(gtk.image_new_from_pixbuf(icon))
-  quit_item = gtk.ImageMenuItem(_("Quit"))
-  icon = quit_item.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_BUTTON)
-  quit_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.update_item = gtk.ImageMenuItem(_("Update all"))
+  icon = self.update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
+  self.update_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.stop_item = gtk.ImageMenuItem(_("Stop"))
+  icon = self.stop_item.render_icon(gtk.STOCK_STOP, gtk.ICON_SIZE_BUTTON)
+  self.stop_item.set_image(gtk.image_new_from_pixbuf(icon))
+  self.quit_item = gtk.ImageMenuItem(_("Quit"))
+  icon = self.quit_item.render_icon(gtk.STOCK_QUIT, gtk.ICON_SIZE_BUTTON)
+  self.quit_item.set_image(gtk.image_new_from_pixbuf(icon))
   # Add them to the menu
-  self.statusicon_menu.append(update_item)
-  self.statusicon_menu.append(quit_item)
+  self.statusicon_menu.append(self.update_item)
+  self.statusicon_menu.append(self.stop_item)
+  self.statusicon_menu.append(self.quit_item)
   # Attach the callback functions to the activate signal
-  update_item.connect("activate", self.update_all_feeds)
-  quit_item.connect("activate", self.delete_event)
+  self.update_item.connect("activate", self.update_all_feeds)
+  self.stop_item.connect("activate", self.stop_feed_update)
+  self.quit_item.connect("activate", self.delete_event)
+  # Should we enable stop function when showing popup menu? It depends...
+  if self.stop_feed_update_lock == True:
+   self.stop_item.set_sensitive(True)
+  else:
+   self.stop_item.set_sensitive(False)
   self.statusicon_menu.show_all()
   self.statusicon.connect('popup-menu', self.statusicon_popup_menu)
 
@@ -1899,6 +1995,7 @@ class Naufrago:
   cursor = self.conn.cursor()
   cursor.execute(q)
   count = cursor.fetchone()[0]
+  cursor.close()
   if count is not None:
    if count > 0:
     feed_label = nombre_feed_destino + ' [' + str(count) + ']'
@@ -2135,6 +2232,16 @@ class Naufrago:
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
      self.treeview.collapse_row(model.get_path(iter))
+     # Si la categoria actual coincide con el nodo padre del nodo hijo que había
+     # seleccionado, magia.
+     if useless_iter is not None and self.hide_readentries == 1:
+      # Esconder la lista de feeds y mostrar en el navegador los datos de la categoría
+      self.liststore.clear() # Limpieza de tabla de entries/articulos
+      self.scrolled_window2.set_size_request(0,0)
+      self.scrolled_window2.hide()
+      self.webview.load_string("<h2>" + _("Category") + ": "+model.get_value(iter, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+      self.eb.hide()
+      self.eb_image_zoom.hide()
     elif boldornot == 'bold':
      self.treeview.expand_row(model.get_path(iter), open_all=False)
    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
@@ -2174,7 +2281,7 @@ class Naufrago:
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
-  dialog.set_size_request(275,250)
+  dialog.set_size_request(300,250)
   dialog.set_border_width(2)
   dialog.set_resizable(True)
   dialog.set_has_separator(False)
@@ -2204,6 +2311,10 @@ class Naufrago:
   if(self.init_update_all == 1): checkbox3.set_active(True)
   else: checkbox3.set_active(False)
   vbox2.pack_start(checkbox3, True, True, 5)
+  checkbox9 = gtk.CheckButton(_("Check application updates on start"))
+  if(self.init_check_app_updates == 1): checkbox9.set_active(True)
+  else: checkbox9.set_active(False)
+  vbox2.pack_start(checkbox9, True, True, 5)
   align.add(vbox2)
   notebook.append_page(align, gtk.Label(_("Start")))
 
@@ -2331,6 +2442,8 @@ class Naufrago:
    else: self.hide_dates = 0
    if(checkbox8.get_active()): self.driven_mode = 1
    else: self.driven_mode = 0
+   if(checkbox9.get_active()): self.init_check_app_updates = 1
+   else: self.init_check_app_updates = 0
 
    if checkbox1.get_active() and self.show_trayicon == 0:
     self.show_trayicon = 1
@@ -2631,6 +2744,7 @@ class Naufrago:
   self.stop_feed_update_lock = True
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(False)
+  self.stop_item.set_sensitive(False)
 
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""
@@ -2670,17 +2784,18 @@ class Naufrago:
   else: link = _('Without link')
 
   if(hasattr(dentry,'id')):
-   if dentry.id is not None: id = dentry.id.encode("utf-8")
+   if dentry.id is not None:
+    id = dentry.id.encode("utf-8")
    else:
-    if description != '':
-     id = hashlib.md5(description).hexdigest().encode("utf-8")
-    else:
+    if title != '':
      id = hashlib.md5(title).hexdigest().encode("utf-8")
+    else:
+     id = hashlib.md5(description).hexdigest().encode("utf-8")
   else:
-   if description != '':
-    id = hashlib.md5(description).hexdigest().encode("utf-8")
-   else:
+   if title != '':
     id = hashlib.md5(title).hexdigest().encode("utf-8")
+   else:
+    id = hashlib.md5(description).hexdigest().encode("utf-8")
 
   return (secs, title, description, link, id)
 
@@ -2745,8 +2860,8 @@ class Naufrago:
                "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
                "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
                "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
-               "/Menubar/NetworkMenu/Update all", "/Toolbar/Update all", "/Toolbar/Search",
-               "/Toolbar/Preferences"]
+               "/Menubar/NetworkMenu/Update all", "/Menubar/HelpMenu/Check updates",
+               "/Toolbar/Update all", "/Toolbar/Search", "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
@@ -2755,7 +2870,12 @@ class Naufrago:
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(not enable)
 
-  self.statusicon_menu.set_sensitive(enable)
+  ###self.statusicon_menu.set_sensitive(enable)
+  # Statusicon menuitems...
+  self.update_item.set_sensitive(enable)
+  self.stop_item.set_sensitive(not enable)
+  self.quit_item.set_sensitive(enable)
+
   self.ui_lock = not enable
 
  def change_feed_icon(self, d, model, id_feed, cursor):
@@ -2797,10 +2917,190 @@ class Naufrago:
   else:
    return False
 
+ def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None):
+  """Exploits the entry retrieving for both getting all feeds or only the selected
+     category or feed."""
+
+  # START NAME PARSING #
+  nombre_feed = model.get_value(child, 0)
+  nombre_feed = self.simple_name_parsing(nombre_feed)
+  # END NAME PARSING #
+
+  # Primero obtenemos el feed (los datos)...
+  cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
+  url = cursor.fetchone()[0]
+  self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
+
+  gtk.gdk.threads_enter()
+  d = feedparser.parse(url)
+  dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
+  if dont_parse:
+   gtk.gdk.threads_leave()
+   #continue
+   return (new_posts, num_new_posts_total, False)
+
+  feed_link = ''
+  if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
+
+  limit = count = len(d.entries)
+  if count > self.num_entries:
+   limit = self.num_entries
+  # Check for article existence...
+  for i in range(0, limit):
+   (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
+   cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
+   unique = cursor.fetchone()
+   images = ''
+   # Non-existant entry? Insert!
+   if(unique is None):
+    # Check first is the feed is full
+    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
+    row2 = cursor.fetchone()
+    if((row2 is not None) and (row2[0]>=self.num_entries)):
+     cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
+     id_articulo, fecha = cursor.fetchone()
+     if secs > fecha:
+      # If so, do some purging first...
+      # Ahora borramos las imagenes del filesystem, si procede
+      cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
+      images = cursor.fetchall()
+      for i in images:
+       cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
+       row3 = cursor.fetchone()
+       if (row3 is not None) and (row3[0] <= 1):
+        if os.path.exists(images_path + '/'+ str(i[0])):
+         os.unlink(images_path + '/'+ str(i[0]))
+      self.lock.acquire()
+      cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
+      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
+      self.conn.commit()
+      self.lock.release()
+      images = self.find_entry_images(feed_link, description)
+      self.lock.acquire()
+      cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
+      self.conn.commit()
+      self.lock.release()
+      cursor.execute('SELECT MAX(id) FROM articulo')
+      unique = cursor.fetchone()
+      # START Offline mode image retrieving
+      if (self.offline_mode == 1) and (images != ''):
+       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
+       images_present = cursor.fetchone()
+       if images_present is None:
+        self.retrieve_entry_images(unique[0], images)
+      # END Offline mode image retrieving
+      new_posts = True
+      num_new_posts_total += 1
+    else:
+     images = self.find_entry_images(feed_link, description)
+     self.lock.acquire()
+     cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
+     self.conn.commit()
+     self.lock.release()
+     cursor.execute('SELECT MAX(id) FROM articulo')
+     unique = cursor.fetchone()
+     # START Offline mode image retrieving
+     if (self.offline_mode == 1):
+      cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
+      imagenes = cursor.fetchone()
+      if (imagenes is not None) and (imagenes[0] != ''):
+       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
+       images_present = cursor.fetchone()
+       if images_present is None:
+        self.retrieve_entry_images(unique[0], imagenes[0])
+     # END Offline mode image retrieving
+     new_posts = True
+     num_new_posts_total += 1
+   else:
+    # START Offline mode image retrieving
+    if (self.offline_mode == 1):
+     cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
+     imagenes = cursor.fetchone()
+     if (imagenes is not None) and (imagenes[0] != ''):
+      cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
+      images_present = cursor.fetchone()
+      if images_present is None:
+       self.retrieve_entry_images(unique[0], imagenes[0])
+    # END Offline mode image retrieving
+
+  gtk.gdk.threads_leave()
+
+  # Actualizamos la lista de entries del feed seleccionado
+  if(count != 0):
+   (model2, iter2) = self.treeselection.get_selected()
+   if(iter2 is not None): # Si hay algún nodo seleccionado...
+    if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
+     id_selected_feed = self.treestore.get_value(iter2, 2)
+     if id_selected_feed == id_feed:
+      self.populate_entries(id_feed)
+
+  # Luego el recuento del feed
+  if new_posts == True:
+   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
+   row = cursor.fetchone()
+   if row[0] == 0:
+    feed_label = nombre_feed
+    font_style = 'normal'
+   else:
+    feed_label = nombre_feed + ' [' + str(row[0]) + ']'
+    font_style = 'bold'
+   if (count != 0):
+    if mode == 'all':
+     model2.set(child, 0, feed_label, 3, font_style)
+    else:
+     model.set(child, 0, feed_label, 3, font_style)
+   # Y luego el recuento de los No-leidos
+   (model3, useless_iter) = self.treeselection.get_selected()
+   dest_iter = self.treeindex[9999]
+   nombre_feed_destino = model3.get_value(dest_iter, 0)
+   nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+   cursor.execute('SELECT count(id) FROM articulo WHERE leido = 0')
+   count = cursor.fetchone()
+   if count is not None:
+    if count[0] > 0:
+     feed_label = nombre_feed_destino + ' [' + str(count[0]) + ']'
+     font_style = 'bold'
+     # Y luego el resaltado de la categoría
+     model.set(iter, 3, 'bold')
+    else:
+     feed_label = nombre_feed_destino
+     font_style = 'normal'
+   else:
+    feed_label = nombre_feed_destino
+    font_style = 'normal'
+   model3.set(dest_iter, 0, feed_label, 3, font_style)
+   # Y luego el resaltado de la categoría
+   #model.set(iter, 3, 'bold')
+
+  # START NEW: Driven mode, parte 1
+  # Cualquier feed con nuevas entradas expanderá la categoria.
+  if (self.driven_mode == 1):
+   if new_posts == True:
+    self.treeview.expand_row(model.get_path(iter), open_all=False)
+  # END NEW: Driven mode, parte 1
+
+  # ¿Hay cancelación?
+  if self.stop_feed_update_lock:
+   #break
+   return (new_posts, num_new_posts_total, True)
+
+  # START NEW: Driven mode, parte 2
+  # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
+  # contraeremos la categoria.
+  if (self.driven_mode == 1):
+   if num_new_posts_total == aux_num_new_posts_total:
+    if mode == 'all':
+     boldornot = self.toggle_category_bold(id_category)
+    else: # mode == 'single'
+     boldornot = self.toggle_category_bold()
+    if boldornot == 'normal':
+     self.treeview.collapse_row(model.get_path(iter))
+  # END NEW: Driven mode, parte 2
+
+  return (new_posts, num_new_posts_total, False)
+
  def get_feed(self, data=None, new=False):
-  """Obtains & stores the feeds (thanks feedparser!). This function is, in some way,
-     the heart of the app. Maybe it should be splitted in subfunctions in order to
-     don't turn mad."""
+  """Obtains & stores the feeds (thanks feedparser!)."""
   self.toggle_menuitems_sensitiveness(enable=False)
   self.throbber.show()
   new_posts = False # Reset
@@ -2818,344 +3118,21 @@ class Naufrago:
      aux_num_new_posts_total = num_new_posts_total
      for i in range(model.iter_n_children(iter)):
       child = model.iter_nth_child(iter, i)
-
-      # START NAME PARSING #
-      nombre_feed = model.get_value(child, 0)
-      nombre_feed = self.simple_name_parsing(nombre_feed)
-      # END NAME PARSING #
-
       id_feed = model.get_value(child, 2)
-      # Primero obtenemos el feed (los datos)...
-      cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
-      url = cursor.fetchone()[0]
-      self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
-
-      gtk.gdk.threads_enter()
-      d = feedparser.parse(url)
-      dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
-      if dont_parse:
-       gtk.gdk.threads_leave()
-       continue
-
-      feed_link = ''
-      if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
-
-      limit = count = len(d.entries)
-      if count > self.num_entries:
-       limit = self.num_entries
-      # Check for article existence...
-      for i in range(0, limit):
-       (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
-       cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
-       unique = cursor.fetchone()
-       images = ''
-       # Non-existant entry? Insert!
-       if(unique is None):
-        # Check first is the feed is full
-        cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
-        row2 = cursor.fetchone()
-        if((row2 is not None) and (row2[0]>=self.num_entries)):
-         cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
-         id_articulo, fecha = cursor.fetchone()
-         if secs > fecha:
-          # If so, do some purging first...
-          # Ahora borramos las imagenes del filesystem, si procede
-          cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
-          images = cursor.fetchall()
-          for i in images:
-           cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
-           row3 = cursor.fetchone()
-           if (row3 is not None) and (row3[0] <= 1):
-            if os.path.exists(images_path + '/'+ str(i[0])):
-             os.unlink(images_path + '/'+ str(i[0]))
-          self.lock.acquire()
-          cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
-          cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
-          self.conn.commit()
-          self.lock.release()
-          images = self.find_entry_images(feed_link, description)
-          self.lock.acquire()
-          cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
-          self.conn.commit()
-          self.lock.release()
-          cursor.execute('SELECT MAX(id) FROM articulo')
-          unique = cursor.fetchone()
-          # START Offline mode image retrieving
-          if (self.offline_mode == 1) and (images != ''):
-           cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-           images_present = cursor.fetchone()
-           if images_present is None:
-            self.retrieve_entry_images(unique[0], images)
-          # END Offline mode image retrieving
-          new_posts = True
-          num_new_posts_total += 1
-        else:
-         images = self.find_entry_images(feed_link, description)
-         self.lock.acquire()
-         cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
-         self.conn.commit()
-         self.lock.release()
-         cursor.execute('SELECT MAX(id) FROM articulo')
-         unique = cursor.fetchone()
-         # START Offline mode image retrieving
-         if (self.offline_mode == 1):
-          cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
-          imagenes = cursor.fetchone()
-          if (imagenes is not None) and (imagenes[0] != ''):
-           cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-           images_present = cursor.fetchone()
-           if images_present is None:
-            self.retrieve_entry_images(unique[0], imagenes[0])
-         # END Offline mode image retrieving
-         new_posts = True
-         num_new_posts_total += 1
-       else:
-        # START Offline mode image retrieving
-        if (self.offline_mode == 1):
-         cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
-         imagenes = cursor.fetchone()
-         if (imagenes is not None) and (imagenes[0] != ''):
-          cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-          images_present = cursor.fetchone()
-          if images_present is None:
-           self.retrieve_entry_images(unique[0], imagenes[0])
-        # END Offline mode image retrieving
-
-      gtk.gdk.threads_leave()
-
-      # Actualizamos la lista de entries del feed seleccionado
-      if(count != 0):
-       (model2, iter2) = self.treeselection.get_selected()
-       if(iter2 is not None): # Si hay algún nodo seleccionado...
-        if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
-         id_selected_feed = self.treestore.get_value(iter2, 2)
-         if id_selected_feed == id_feed:
-          self.populate_entries(id_feed)
-
-      # Luego el recuento del feed
-      if new_posts == True:
-       cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
-       row = cursor.fetchone()
-       if row[0] == 0:
-        feed_label = nombre_feed
-        font_style = 'normal'
-       else:
-        feed_label = nombre_feed + ' [' + str(row[0]) + ']'
-        font_style = 'bold'
-       model2.set(child, 0, feed_label, 3, font_style)
-       # Y luego el recuento de los No-leidos
-       (model3, useless_iter) = self.treeselection.get_selected()
-       dest_iter = self.treeindex[9999]
-       nombre_feed_destino = model3.get_value(dest_iter, 0)
-       nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-       cursor.execute('SELECT count(id) FROM articulo WHERE leido = 0')
-       row = cursor.fetchone()
-       feed_label = nombre_feed_destino + ' [' + str(row[0]) + ']'
-       model3.set(dest_iter, 0, feed_label, 3, 'bold')
-       # Y luego el resaltado de la categoría
-       model.set(iter, 3, 'bold')
-
-      # START NEW: Driven mode, parte 1
-      # Cualquier feed con nuevas entradas expanderá la categoria.
-      if (self.driven_mode == 1):
-       if new_posts == True:
-        self.treeview.expand_row(model.get_path(iter), open_all=False)
-      # END NEW: Driven mode, parte 1
-
-      # ¿Hay cancelación?
-      if self.stop_feed_update_lock:
+      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category)
+      if break_flag:
        break
-
-     # START NEW: Driven mode, parte 2
-     # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
-     # contraeremos la categoria.
-     if (self.driven_mode == 1):
-      if num_new_posts_total == aux_num_new_posts_total:
-       boldornot = self.toggle_category_bold(id_category)
-       if boldornot == 'normal':
-        self.treeview.collapse_row(model.get_path(iter))
-     # END NEW: Driven mode, parte 2
-
-     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
+    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
 
   else: # Iterar sobre los elementos del diccionario recibido como data.
 
    (model, iter) = self.treeselection.get_selected() # We only want the model here...
    cursor = self.conn.cursor()
-   for k, v in data.iteritems():
-    #key: id_feed, value: feed_iter
-    id_feed = k
-    child = v
-
-    # START NAME PARSING #
-    nombre_feed = model.get_value(child, 0)
-    nombre_feed = self.simple_name_parsing(nombre_feed)
-    # END NAME PARSING #
-
-    # Primero obtenemos el feed (los datos)...
-    cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
-    url = cursor.fetchone()[0]
-    self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
-    gtk.gdk.threads_enter()
-    d = feedparser.parse(url)
-
-    dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
-    if dont_parse:
-     gtk.gdk.threads_leave()
-     continue
-
-    feed_link = ''
-    if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
-
-    # Si se trata de un feed nuevo, necesitamos el título antes de nada
-    if(new == True):
-     if(hasattr(d.feed,'title')):
-      nombre_feed = title = d.feed.title.encode('utf-8')
-      # Update db...
-      (model, iter) = self.treeselection.get_selected()
-      id_feed = model.get_value(iter, 2)
-      self.lock.acquire()
-      cursor.execute('UPDATE feed SET nombre = ? WHERE id = ?', [title.decode('utf-8'),id_feed])
-      self.conn.commit()
-      self.lock.release()
-      # Update feed tree...
-      model.set(iter, 0, title)
-
-    limit = count = len(d.entries)
-    if count > self.num_entries:
-     limit = self.num_entries
-    # Check for article existence...
-    for i in range(0, limit):
-     (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
-     cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode('utf-8'),id_feed])
-     unique = cursor.fetchone()
-     images = ''
-     # Non-existant entry? Insert!
-     if(unique is None):
-      # Check first is the feed is full
-      cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
-      row2 = cursor.fetchone()
-      if(row2 is not None) and (row2[0]>=self.num_entries):
-       cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
-       id_articulo, fecha = cursor.fetchone()
-       if secs > fecha:
-        # If so, do some purging first...
-        # Ahora borramos las imagenes del filesystem, si procede
-        cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
-        images = cursor.fetchall()
-        for i in images:
-         cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
-         row3 = cursor.fetchone()
-         if (row3 is not None) and (row3[0] <= 1):
-          if os.path.exists(images_path + '/'+ str(i[0])):
-           os.unlink(images_path + '/'+ str(i[0]))
-        self.lock.acquire()
-        cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
-        cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
-        self.conn.commit()
-        self.lock.release()
-        images = self.find_entry_images(feed_link, description)
-        self.lock.acquire()
-        cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
-        self.conn.commit()
-        self.lock.release()
-        cursor.execute('SELECT MAX(id) FROM articulo')
-        unique = cursor.fetchone()
-        # START Offline mode image retrieving
-        if (self.offline_mode == 1) and (images != ''):
-         cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-         images_present = cursor.fetchone()
-         if images_present is None:
-          self.retrieve_entry_images(unique[0], images)
-        # END Offline mode image retrieving
-        new_posts = True
-        num_new_posts_total += 1
-      else:
-       images = self.find_entry_images(feed_link, description)
-       self.lock.acquire()
-       cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
-       self.conn.commit()
-       self.lock.release()
-       cursor.execute('SELECT MAX(id) FROM articulo')
-       unique = cursor.fetchone()
-       # START Offline mode image retrieving
-       if (self.offline_mode == 1) and (images != ''):
-        cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-        images_present = cursor.fetchone()
-        if images_present is None:
-         self.retrieve_entry_images(unique[0], images)
-       # END Offline mode image retrieving
-       new_posts = True
-       num_new_posts_total += 1
-     else:
-      # START Offline mode image retrieving
-      if (self.offline_mode == 1):
-       cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
-       imagenes = cursor.fetchone()
-       if (imagenes is not None) and (imagenes[0] != ''):
-        cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-        images_present = cursor.fetchone()
-        if images_present is None:
-         self.retrieve_entry_images(unique[0], imagenes[0])
-      # END Offline mode image retrieving
-
-    gtk.gdk.threads_leave()
-
-    # Actualizamos las entries del feed seleccionado
-    if(count != 0):
-     (model2, iter2) = self.treeselection.get_selected()
-     if(iter2 is not None): # Si hay algún nodo seleccionado...
-      if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
-       id_selected_feed = self.treestore.get_value(iter2, 2)
-       if id_selected_feed == id_feed:
-        self.populate_entries(id_feed)
-
-    # Luego el recuento del feed
-    if new_posts == True:
-     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
-     row = cursor.fetchone()
-     if row[0] == 0:
-      feed_label = nombre_feed
-      font_style = 'normal'
-     else:
-      feed_label = nombre_feed + ' [' + str(row[0]) + ']'
-      font_style = 'bold'
-     model.set(child, 0, feed_label, 3, font_style) ### ¿¿¿ model o model2 ???
-     # Y luego el recuento de los No-leidos
-     (model3, useless_iter) = self.treeselection.get_selected()
-     dest_iter = self.treeindex[9999]
-     nombre_feed_destino = model3.get_value(dest_iter, 0)
-     nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-     cursor.execute('SELECT count(id) FROM articulo WHERE leido = 0')
-     row = cursor.fetchone()
-     feed_label = nombre_feed_destino + ' [' + str(row[0]) + ']'
-     model3.set(dest_iter, 0, feed_label, 3, 'bold')
-     # Y luego el resaltado de la categoría
-     if(model.iter_depth(iter) == 0): # Si es padre
-      model.set(iter, 3, 'bold')
-
-    # START NEW: Driven mode, parte 1
-    # Cualquier feed con nuevas entradas expanderá la categoria.
-    if (self.driven_mode == 1):
-     if new_posts == True:
-      self.treeview.expand_row(model.get_path(iter), open_all=False)
-    # END NEW: Driven mode, parte 1
-
-    # ¿Hay cancelación?
-    if self.stop_feed_update_lock:
+   for id_feed, child in data.iteritems():
+    (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'single')
+    if break_flag:
      break
-
-   # START NEW: Driven mode, parte 2
-   # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
-   # contraeremos la categoria.
-   if (self.driven_mode == 1):
-    if num_new_posts_total == 0:
-     boldornot = self.toggle_category_bold()
-     if boldornot == 'normal':
-      self.treeview.collapse_row(model.get_path(iter))
-   # END NEW: Driven mode, parte 2
-
    cursor.close()
 
   # Restablecemos el indicador de cancelación
@@ -3349,7 +3326,8 @@ class Naufrago:
  ########
 
  def __init__(self):
-  self.lock = threading.RLock()
+  ###self.lock = threading.RLock()
+  self.lock = threading.Lock()
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
   # Obtiene la config de la app
@@ -3369,5 +3347,7 @@ def main():
  gtk.main()
  
 if __name__ == "__main__":
+ t0 = time.time()
  naufrago = Naufrago()
+ print 'time: ' + `time.time()-t0`
  main()

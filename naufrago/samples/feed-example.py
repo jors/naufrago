@@ -5,7 +5,14 @@ import time
 import datetime
 import sys
 
-d = feedparser.parse("http://feeds2.feedburner.com/AscoDeVida")
+d = feedparser.parse("http://feeds.feedburner.com/VistoEnFacebook")
+#print type(d)
+#print type(d.feed)
+#print type(d.entries)
+#sys.exit(1)
+d.entries.reverse()
+
+#d = feedparser.parse("http://feeds2.feedburner.com/AscoDeVida")
 #d = feedparser.parse("http://www.hacktimes.com/feeds")
 #print d
 #sys.exit()
