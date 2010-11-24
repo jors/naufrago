@@ -196,6 +196,7 @@ BUGS DEL CASI y otros PENDING (addendums):
 - Parseo personalizado de fechas de las entradas de los feeds. Casi?
 - Modificación del script lanzador para loguear errores. DONE
 - Comprobador de versión nueva. DONE.
+- Cambiado el campo de ordenación de las entries (ahora van por orden de aparición). DONE
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).

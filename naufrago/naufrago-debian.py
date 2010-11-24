@@ -123,7 +123,6 @@ class Naufrago:
 
  def delete_event(self, event, data=None):
   """Closes the app through window manager signal"""
-  self.t_check_app_updates.cancel()
   self.save_config()
   gtk.main_quit()
   return False
@@ -1011,8 +1010,9 @@ class Naufrago:
 
  def check_app_updates(self, action=None):
   """Launches the corresponding core function threaded."""
-  self.t_check_app_updates = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
-  self.t_check_app_updates.start()
+  t = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
+  t.setDaemon(True) # This allows some kind of 'killable' threads... be careful!
+  t.start()
 
  def check_app_updates_helper(self, action=None):
   """Check if a new version of the application exists."""
