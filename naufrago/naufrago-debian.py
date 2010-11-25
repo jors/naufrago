@@ -24,7 +24,6 @@
 #############################################################################
 
 try:
- import time
  import sys
  import pygtk
  pygtk.require('2.0')
@@ -2876,7 +2875,6 @@ class Naufrago:
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(not enable)
 
-  ###self.statusicon_menu.set_sensitive(enable)
   # Statusicon menuitems...
   self.update_item.set_sensitive(enable)
   self.stop_item.set_sensitive(not enable)
@@ -3348,16 +3346,11 @@ class Naufrago:
 def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
- ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
  if naufrago.update_freq_timemode == 0: mult = 3600
  elif naufrago.update_freq_timemode == 1: mult = 60
  timer_id = gobject.timeout_add(naufrago.update_freq*mult*1000, naufrago.update_all_feeds)
- # In case we would want to stop the timer...
- #gobject.source_remove(timer_id)
  gtk.main()
  
 if __name__ == "__main__":
- t0 = time.time()
  naufrago = Naufrago()
- print 'time: ' + `time.time()-t0`
  main()
