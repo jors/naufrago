@@ -2953,8 +2953,15 @@ class Naufrago:
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
+   a = count - self.num_entries
+   b = count
+  else:
+   a = 0
+   b = limit
+
   # Check for article existence...
-  for i in range(0, limit):
+  #for i in range(0, limit):
+  for i in range(a, b):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    unique = cursor.fetchone()
