@@ -216,6 +216,17 @@ class Naufrago:
    no_leidos = None
   return nombre_feed, no_leidos
 
+ def toggle_category_bold_all(self):
+  """Toggles bold or unbold in ALL category folders."""
+  (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+  iter = model.get_iter_root() # Magic
+  while (iter is not None):
+   if(model.iter_depth(iter) == 0): # Si es padre
+    id_cat = model.get_value(iter, 2)
+    if (id_cat != 9998) and (id_cat != 9999):
+     self.toggle_category_bold(id_cat, True)
+   iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
+
  def toggle_category_bold(self, id_cat=None, special_folder=False):
   """Toggles bold or unbold in category folders."""
   id_cat_aux = id_cat
@@ -341,14 +352,15 @@ class Naufrago:
        self.update_special_folder(9999) # Actualizamos Unread
        ### END: ¡También cabe actualizar su compañero de batallas!
        # Bold/unbold de ALGUNAS categorias
-       (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-       iter = model.get_iter_root() # Magic
-       while (iter is not None):
-        if(model.iter_depth(iter) == 0): # Si es padre
-         id_cat = model.get_value(iter, 2)
-         if (id_cat != 9998) and (id_cat != 9999):
-          self.toggle_category_bold(id_cat, True)
-        iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
+       self.toggle_category_bold_all()
+       #(model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+       #iter = model.get_iter_root() # Magic
+       #while (iter is not None):
+       # if(model.iter_depth(iter) == 0): # Si es padre
+       #  id_cat = model.get_value(iter, 2)
+       #  if (id_cat != 9998) and (id_cat != 9999):
+       #   self.toggle_category_bold(id_cat, True)
+       # iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
        # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
        if (self.driven_mode == 1):
         self.driven_mode_action() # Fold de lo que esté 'vacio'
@@ -409,9 +421,9 @@ class Naufrago:
      # END NAME PARSING (nodo destino) #
 
      # NEW
-     # Unbold category.
+     # Unbold category...
      model.set(iter, 3, 'normal')
-     # And fold category (if applies).
+     # ... and fold category (if applies).
      if (self.driven_mode == 1):
       self.treeview.collapse_row(model.get_path(iter))
      # NEW
@@ -743,8 +755,16 @@ class Naufrago:
      cursor.close()
 
     # NEW
-    # Unbold category if needed.
-    self.toggle_category_bold()
+    # Unbold categories (if needed).
+    self.toggle_category_bold_all()
+    #(model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+    #iter = model.get_iter_root() # Magic
+    #while (iter is not None):
+    # if(model.iter_depth(iter) == 0): # Si es padre
+    #  id_cat = model.get_value(iter, 2)
+    #  if (id_cat != 9998) and (id_cat != 9999):
+    #   self.toggle_category_bold(id_cat, True)
+    # iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
     # NEW
 
  def abrir_browser(self, event=None, data=None):
@@ -909,6 +929,10 @@ class Naufrago:
       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
        model.set(dest_iter, 0, feed_label, 3, font_style)
      ### END: ¡También cabe actualizar su compañero de batallas!
+     # NEW
+     # Unbold categories (if needed).
+     self.toggle_category_bold_all()
+     # NEW
     else:
      # Destino: No leídos
      self.update_special_folder(9999)
@@ -916,11 +940,10 @@ class Naufrago:
      if flag_importante == True:
       self.update_special_folder(9998)
     # END NAME PARSING (nodo destino) #
-
-   # NEW
-   # Unbold category if needed.
-   self.toggle_category_bold()
-   # NEW
+    # NEW
+    # Unbold category if needed.
+    self.toggle_category_bold()
+    # NEW
 
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
