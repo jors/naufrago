@@ -2738,6 +2738,7 @@ class Naufrago:
     nodes[id_feed] = iter # Storing id_feed:iter pairs...
     # Old way: self.get_feed(id_feed)
    # New way:
+   print datetime.datetime.now()
    t = threading.Thread(target=self.get_feed, args=(nodes,new, ))
    t.start()
 
@@ -2746,6 +2747,7 @@ class Naufrago:
   # Old way: self.get_feed()
   # New way:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
+   print datetime.datetime.now()
    t = threading.Thread(target=self.get_feed, args=())
    t.start()
   return True
@@ -2970,7 +2972,10 @@ class Naufrago:
   for i in range(a, b):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
-   print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + ')'
+   # DBG
+   if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+    print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + ')'
+   # DBG
    unique = cursor.fetchone()
    images = ''
    # Non-existant entry? Insert!
