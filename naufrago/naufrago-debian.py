@@ -353,14 +353,6 @@ class Naufrago:
        ### END: ¡También cabe actualizar su compañero de batallas!
        # Bold/unbold de ALGUNAS categorias
        self.toggle_category_bold_all()
-       #(model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-       #iter = model.get_iter_root() # Magic
-       #while (iter is not None):
-       # if(model.iter_depth(iter) == 0): # Si es padre
-       #  id_cat = model.get_value(iter, 2)
-       #  if (id_cat != 9998) and (id_cat != 9999):
-       #   self.toggle_category_bold(id_cat, True)
-       # iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
        # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
        if (self.driven_mode == 1):
         self.driven_mode_action() # Fold de lo que esté 'vacio'
@@ -751,20 +743,11 @@ class Naufrago:
          model.set(iter, 0, feed_label, 3, font_style)
          i += 1
      # END NAME PARSING (nodo destino) #
-
      cursor.close()
 
     # NEW
     # Unbold categories (if needed).
     self.toggle_category_bold_all()
-    #(model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-    #iter = model.get_iter_root() # Magic
-    #while (iter is not None):
-    # if(model.iter_depth(iter) == 0): # Si es padre
-    #  id_cat = model.get_value(iter, 2)
-    #  if (id_cat != 9998) and (id_cat != 9999):
-    #   self.toggle_category_bold(id_cat, True)
-    # iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
     # NEW
 
  def abrir_browser(self, event=None, data=None):
@@ -2987,6 +2970,7 @@ class Naufrago:
   for i in range(a, b):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
+   print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + ')'
    unique = cursor.fetchone()
    images = ''
    # Non-existant entry? Insert!
