@@ -2987,41 +2987,42 @@ class Naufrago:
     # Check first is the feed is full
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
     row2 = cursor.fetchone()
-    if((row2 is not None) and (row2[0]>=self.num_entries)):
-     cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
-     id_articulo, fecha = cursor.fetchone()
-     if secs > fecha:
-      # If so, do some purging first...
-      # Ahora borramos las imagenes del filesystem, si procede
-      cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
-      images = cursor.fetchall()
-      for i in images:
-       cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
-       row3 = cursor.fetchone()
-       if (row3 is not None) and (row3[0] <= 1):
-        if os.path.exists(images_path + '/'+ str(i[0])):
-         os.unlink(images_path + '/'+ str(i[0]))
-      self.lock.acquire()
-      cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
-      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
-      self.conn.commit()
-      self.lock.release()
-      images = self.find_entry_images(feed_link, description)
-      self.lock.acquire()
-      cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
-      self.conn.commit()
-      self.lock.release()
-      cursor.execute('SELECT MAX(id) FROM articulo')
-      unique = cursor.fetchone()
-      # START Offline mode image retrieving
-      if (self.offline_mode == 1) and (images != ''):
-       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
-       images_present = cursor.fetchone()
-       if images_present is None:
-        self.retrieve_entry_images(unique[0], images)
-      # END Offline mode image retrieving
-      new_posts = True
-      num_new_posts_total += 1
+    if((row2 is not None) and (row2[0]>=self.num_entries)): # If so, do some purging first...
+     #cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
+     #id_articulo, fecha = cursor.fetchone()
+     # if secs > fecha:
+     cursor.execute('SELECT id FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY id ASC LIMIT 1', [id_feed])
+     id_articulo = cursor.fetchone()[0]
+     # Ahora borramos las imagenes del filesystem, si procede
+     cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
+     images = cursor.fetchall()
+     for i in images:
+      cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
+      row3 = cursor.fetchone()
+      if (row3 is not None) and (row3[0] <= 1):
+       if os.path.exists(images_path + '/'+ str(i[0])):
+        os.unlink(images_path + '/'+ str(i[0]))
+     self.lock.acquire()
+     cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
+     cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
+     self.conn.commit()
+     self.lock.release()
+     images = self.find_entry_images(feed_link, description)
+     self.lock.acquire()
+     cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
+     self.conn.commit()
+     self.lock.release()
+     cursor.execute('SELECT MAX(id) FROM articulo')
+     unique = cursor.fetchone()
+     # START Offline mode image retrieving
+     if (self.offline_mode == 1) and (images != ''):
+      cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
+      images_present = cursor.fetchone()
+      if images_present is None:
+       self.retrieve_entry_images(unique[0], images)
+     # END Offline mode image retrieving
+     new_posts = True
+     num_new_posts_total += 1
     else:
      images = self.find_entry_images(feed_link, description)
      self.lock.acquire()

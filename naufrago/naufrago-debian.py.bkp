@@ -24,7 +24,6 @@
 #############################################################################
 
 try:
- import time
  import sys
  import pygtk
  pygtk.require('2.0')
@@ -123,7 +122,6 @@ class Naufrago:
 
  def delete_event(self, event, data=None):
   """Closes the app through window manager signal"""
-  self.t_check_app_updates.cancel()
   self.save_config()
   gtk.main_quit()
   return False
@@ -217,6 +215,17 @@ class Naufrago:
   else:
    no_leidos = None
   return nombre_feed, no_leidos
+
+ def toggle_category_bold_all(self):
+  """Toggles bold or unbold in ALL category folders."""
+  (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+  iter = model.get_iter_root() # Magic
+  while (iter is not None):
+   if(model.iter_depth(iter) == 0): # Si es padre
+    id_cat = model.get_value(iter, 2)
+    if (id_cat != 9998) and (id_cat != 9999):
+     self.toggle_category_bold(id_cat, True)
+   iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
 
  def toggle_category_bold(self, id_cat=None, special_folder=False):
   """Toggles bold or unbold in category folders."""
@@ -343,14 +352,7 @@ class Naufrago:
        self.update_special_folder(9999) # Actualizamos Unread
        ### END: ¡También cabe actualizar su compañero de batallas!
        # Bold/unbold de ALGUNAS categorias
-       (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-       iter = model.get_iter_root() # Magic
-       while (iter is not None):
-        if(model.iter_depth(iter) == 0): # Si es padre
-         id_cat = model.get_value(iter, 2)
-         if (id_cat != 9998) and (id_cat != 9999):
-          self.toggle_category_bold(id_cat, True)
-        iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre..
+       self.toggle_category_bold_all()
        # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
        if (self.driven_mode == 1):
         self.driven_mode_action() # Fold de lo que esté 'vacio'
@@ -411,9 +413,9 @@ class Naufrago:
      # END NAME PARSING (nodo destino) #
 
      # NEW
-     # Unbold category.
+     # Unbold category...
      model.set(iter, 3, 'normal')
-     # And fold category (if applies).
+     # ... and fold category (if applies).
      if (self.driven_mode == 1):
       self.treeview.collapse_row(model.get_path(iter))
      # NEW
@@ -741,12 +743,11 @@ class Naufrago:
          model.set(iter, 0, feed_label, 3, font_style)
          i += 1
      # END NAME PARSING (nodo destino) #
-
      cursor.close()
 
     # NEW
-    # Unbold category if needed.
-    self.toggle_category_bold()
+    # Unbold categories (if needed).
+    self.toggle_category_bold_all()
     # NEW
 
  def abrir_browser(self, event=None, data=None):
@@ -911,6 +912,10 @@ class Naufrago:
       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
        model.set(dest_iter, 0, feed_label, 3, font_style)
      ### END: ¡También cabe actualizar su compañero de batallas!
+     # NEW
+     # Unbold categories (if needed).
+     self.toggle_category_bold_all()
+     # NEW
     else:
      # Destino: No leídos
      self.update_special_folder(9999)
@@ -918,11 +923,10 @@ class Naufrago:
      if flag_importante == True:
       self.update_special_folder(9998)
     # END NAME PARSING (nodo destino) #
-
-   # NEW
-   # Unbold category if needed.
-   self.toggle_category_bold()
-   # NEW
+    # NEW
+    # Unbold category if needed.
+    self.toggle_category_bold()
+    # NEW
 
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
@@ -1011,8 +1015,9 @@ class Naufrago:
 
  def check_app_updates(self, action=None):
   """Launches the corresponding core function threaded."""
-  self.t_check_app_updates = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
-  self.t_check_app_updates.start()
+  t = threading.Thread(target=self.check_app_updates_helper, args=(action, ))
+  t.setDaemon(True) # This allows some kind of 'killable' threads... be careful!
+  t.start()
 
  def check_app_updates_helper(self, action=None):
   """Check if a new version of the application exists."""
@@ -1685,14 +1690,20 @@ class Naufrago:
   any_row_to_show=False
   self.liststore.clear()
   cursor = self.conn.cursor()
+  # START NEW: sorting by arrival
   if id_feed == 9998:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY id DESC'
   elif id_feed == 9999:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY id DESC'
   elif search_request_entry_ids is not None:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY id DESC'
   else:
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY id DESC'
+  # END NEW: sorting by arrival
   cursor.execute(q)
   rows = cursor.fetchall()
   cursor.close()
@@ -2727,6 +2738,7 @@ class Naufrago:
     nodes[id_feed] = iter # Storing id_feed:iter pairs...
     # Old way: self.get_feed(id_feed)
    # New way:
+   print datetime.datetime.now()
    t = threading.Thread(target=self.get_feed, args=(nodes,new, ))
    t.start()
 
@@ -2735,6 +2747,7 @@ class Naufrago:
   # Old way: self.get_feed()
   # New way:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
+   print datetime.datetime.now()
    t = threading.Thread(target=self.get_feed, args=())
    t.start()
   return True
@@ -2870,7 +2883,6 @@ class Naufrago:
   widget = self.ui.get_widget("/Toolbar/Stop update")
   widget.set_sensitive(not enable)
 
-  ###self.statusicon_menu.set_sensitive(enable)
   # Statusicon menuitems...
   self.update_item.set_sensitive(enable)
   self.stop_item.set_sensitive(not enable)
@@ -2942,17 +2954,36 @@ class Naufrago:
   feed_link = ''
   if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
 
+  # START NEW: sorting by arrival
+  d.entries.reverse()
+  # END NEW: sorting by arrival
+
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
+   a = count - self.num_entries
+   b = count
+  else:
+   a = 0
+   b = limit
+
   # Check for article existence...
-  for i in range(0, limit):
+  #for i in range(0, limit):
+  for i in range(a, b):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
+   # DBG
+   if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+    print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + '), ',
+   # DBG
    unique = cursor.fetchone()
    images = ''
    # Non-existant entry? Insert!
    if(unique is None):
+    # DBG
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+     print 'UNIQUE!'
+    # DBG
     # Check first is the feed is full
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
     row2 = cursor.fetchone()
@@ -3012,6 +3043,10 @@ class Naufrago:
      new_posts = True
      num_new_posts_total += 1
    else:
+    # DBG
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+     print 'existant entry.'
+    # DBG
     # START Offline mode image retrieving
     if (self.offline_mode == 1):
      cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
@@ -3338,16 +3373,11 @@ class Naufrago:
 def main():
  # Params: interval in miliseconds, callback, callback_data
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
- ###timer_id = gobject.timeout_add(naufrago.update_freq*3600*1000, naufrago.update_all_feeds)
  if naufrago.update_freq_timemode == 0: mult = 3600
  elif naufrago.update_freq_timemode == 1: mult = 60
  timer_id = gobject.timeout_add(naufrago.update_freq*mult*1000, naufrago.update_all_feeds)
- # In case we would want to stop the timer...
- #gobject.source_remove(timer_id)
  gtk.main()
  
 if __name__ == "__main__":
- t0 = time.time()
  naufrago = Naufrago()
- print 'time: ' + `time.time()-t0`
  main()
