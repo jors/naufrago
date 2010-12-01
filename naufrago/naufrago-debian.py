@@ -2974,12 +2974,16 @@ class Naufrago:
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    # DBG
    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
-    print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + ')'
+    print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + '), ',
    # DBG
    unique = cursor.fetchone()
    images = ''
    # Non-existant entry? Insert!
    if(unique is None):
+    # DBG
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+     print 'UNIQUE!'
+    # DBG
     # Check first is the feed is full
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
     row2 = cursor.fetchone()
@@ -3039,6 +3043,10 @@ class Naufrago:
      new_posts = True
      num_new_posts_total += 1
    else:
+    # DBG
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+     print 'existant entry.'
+    # DBG
     # START Offline mode image retrieving
     if (self.offline_mode == 1):
      cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
