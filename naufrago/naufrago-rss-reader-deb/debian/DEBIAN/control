@@ -4,7 +4,7 @@ Architecture: all
 Maintainer: Jordi Oliveras Palacios (qat/jors) <worbynet@gmail.com>
 Conflicts: naufrago
 Installed-Size: 292
-Depends: python (>= 2.5), python-gtk2, python-feedparser, python-gobject, python-pysqlite2, python-webkit
+Depends: python (>= 2.5), python-gtk2, python-feedparser, python-gobject, python-pysqlite2, python-webkit, python-notify
 Section: net
 Priority: optional
 Homepage: http://www.enchufado.com/

@@ -47,8 +47,8 @@ try:
  import hashlib
  import locale
  import gettext
- import pynotify
  import socket
+ import pynotify
 except ImportError:
  print _('Error importing modules: ') + str(sys.exc_info()[1])
  sys.exit(1)
@@ -120,8 +120,14 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
 
 class Naufrago:
 
- def delete_event(self, event, data=None):
+ def delete_event(self, event=None, data=None):
   """Closes the app through window manager signal"""
+  # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
+  if self.on_a_feed_update == True:
+   self.stop_feed_update()
+   while self.stop_feed_update_lock == True:
+    time.sleep(0.1)
+  # Finalmente, salida efectiva
   self.save_config()
   gtk.main_quit()
   return False
@@ -1251,6 +1257,8 @@ class Naufrago:
   self.ui_lock = False
   # Valor del lock del botón stop...
   self.stop_feed_update_lock = False
+  # Booleano indicador de si estamos o no en un proceso de feed update
+  self.on_a_feed_update = False
 
  def save_config(self):
   """Saves user window configuration"""
@@ -1893,7 +1901,7 @@ class Naufrago:
   entryURL = gtk.Entry(max=1024)
   labelName = gtk.Label(_('Name '))
 
-  new = False
+  new_feed = False
   if((data is not None) and (type(data) is not gtk.Action)): #  Modo edición I
    labelURL = gtk.Label('URL       ')
    cursor = self.conn.cursor()
@@ -1910,7 +1918,7 @@ class Naufrago:
    dialog.set_title(_('Add feed'))
    dialog.set_markup(_('Please, insert <b>feed</b> address:'))
    dialog.add_button(_("Add"), gtk.RESPONSE_ACCEPT)
-   new = True
+   new_feed = True
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
   hbox1 = gtk.HBox()
@@ -1927,7 +1935,7 @@ class Naufrago:
   entryURL.set_activates_default(True) # Activates default response for this entry
   dialog.show_all()
 
-  if new == True:
+  if new_feed == True:
    labelName.hide()
    entryName.hide()
 
@@ -1990,7 +1998,7 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
      self.treeselection.select_iter(son)
-     self.update_feed(data=None, new=True)
+     self.update_feed(data=None, new_feed=True)
    cursor.close()
 
  def update_special_folder(self, id_folder):
@@ -2718,7 +2726,7 @@ class Naufrago:
   """Hides the link the headerlink points to in the statusbar."""
   self.statusbar.set_text("")
 
- def update_feed(self, data=None, new=False):
+ def update_feed(self, data=None, new_feed=False):
   """Updates a single (selected) feed or the ones from a (selected) category, if any."""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
@@ -2739,7 +2747,7 @@ class Naufrago:
     # Old way: self.get_feed(id_feed)
    # New way:
    print datetime.datetime.now()
-   t = threading.Thread(target=self.get_feed, args=(nodes,new, ))
+   t = threading.Thread(target=self.get_feed, args=(nodes,new_feed, ))
    t.start()
 
  def update_all_feeds(self, data=None):
@@ -2754,10 +2762,11 @@ class Naufrago:
 
  def stop_feed_update(self, data=None):
   """Stop feeds update."""
-  self.stop_feed_update_lock = True
-  widget = self.ui.get_widget("/Toolbar/Stop update")
-  widget.set_sensitive(False)
-  self.stop_item.set_sensitive(False)
+  if self.stop_feed_update_lock == False:
+   self.stop_feed_update_lock = True
+   widget = self.ui.get_widget("/Toolbar/Stop update")
+   widget.set_sensitive(False)
+   self.stop_item.set_sensitive(False)
 
  def check_feed_item(self, dentry):
   """Sets a default value for feed items if there's not any. Helper function of get_feed()."""
@@ -2929,7 +2938,7 @@ class Naufrago:
   else:
    return False
 
- def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None):
+ def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
      category or feed."""
 
@@ -2953,6 +2962,20 @@ class Naufrago:
 
   feed_link = ''
   if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
+
+  # Si se trata de un feed nuevo, necesitamos el título antes de nada
+  if(new_feed == True):
+   if(hasattr(d.feed,'title')):
+    nombre_feed = title = d.feed.title.encode('utf-8')
+    # Update db...
+    (model_tmp, iter_tmp) = self.treeselection.get_selected()
+    id_feed_tmp = model_tmp.get_value(iter_tmp, 2)
+    self.lock.acquire()
+    cursor.execute('UPDATE feed SET nombre = ? WHERE id = ?', [title.decode('utf-8'),id_feed_tmp])
+    self.conn.commit()
+    self.lock.release()
+    # Update feed tree...
+    model_tmp.set(iter_tmp, 0, title)
 
   # START NEW: sorting by arrival
   d.entries.reverse()
@@ -3135,12 +3158,13 @@ class Naufrago:
 
   return (new_posts, num_new_posts_total, False)
 
- def get_feed(self, data=None, new=False):
+ def get_feed(self, data=None, new_feed=False):
   """Obtains & stores the feeds (thanks feedparser!)."""
   self.toggle_menuitems_sensitiveness(enable=False)
   self.throbber.show()
   new_posts = False # Reset
   aux_num_new_posts_total = num_new_posts_total = 0 # Overall
+  self.on_a_feed_update = True # Booleano indicador de que estamos en un proceso de feed update
 
   if(data is None): # Iterarlo todo
 
@@ -3155,7 +3179,7 @@ class Naufrago:
      for i in range(model.iter_n_children(iter)):
       child = model.iter_nth_child(iter, i)
       id_feed = model.get_value(child, 2)
-      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category)
+      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
       if break_flag:
        break
     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
@@ -3166,13 +3190,14 @@ class Naufrago:
    (model, iter) = self.treeselection.get_selected() # We only want the model here...
    cursor = self.conn.cursor()
    for id_feed, child in data.iteritems():
-    (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'single')
+    (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'single', None, new_feed)
     if break_flag:
      break
    cursor.close()
 
   # Restablecemos el indicador de cancelación
   self.stop_feed_update_lock = False
+  self.on_a_feed_update = False
 
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
