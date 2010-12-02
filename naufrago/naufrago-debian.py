@@ -125,8 +125,9 @@ class Naufrago:
   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
   if self.on_a_feed_update == True:
    self.stop_feed_update()
-   while self.stop_feed_update_lock == True:
-    time.sleep(0.1)
+   #while self.stop_feed_update_lock == True:
+   # time.sleep(0.1)
+   self.t.join()
   # Finalmente, salida efectiva
   self.save_config()
   gtk.main_quit()
@@ -2747,8 +2748,8 @@ class Naufrago:
     # Old way: self.get_feed(id_feed)
    # New way:
    print datetime.datetime.now()
-   t = threading.Thread(target=self.get_feed, args=(nodes,new_feed, ))
-   t.start()
+   self.t = threading.Thread(target=self.get_feed, args=(nodes,new_feed, ))
+   self.t.start()
 
  def update_all_feeds(self, data=None):
   """Updates all feeds (no complications!)."""
@@ -2756,8 +2757,8 @@ class Naufrago:
   # New way:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
    print datetime.datetime.now()
-   t = threading.Thread(target=self.get_feed, args=())
-   t.start()
+   self.t = threading.Thread(target=self.get_feed, args=())
+   self.t.start()
   return True
 
  def stop_feed_update(self, data=None):
