@@ -11,7 +11,6 @@ import os
 # FUNCTIONS #
 def consulta():
  global lock
-
  lock.acquire()
  for i in range(10):
   q = 'SELECT * FROM a'
@@ -23,7 +22,6 @@ def consulta():
  
 def base():
  global lock
-
  lock.acquire()
  gtk.gdk.threads_enter()
  q = 'CREATE TABLE a(col1 varchar(16) NOT NULL, col2 varchar(16) NOT NULL)'

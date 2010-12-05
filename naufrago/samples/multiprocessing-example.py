@@ -3,11 +3,18 @@
 
 import multiprocessing
 
-def worker():
+def worker(q):
  print 'Worker ' + `i`
+ var = q.get() + 1
+ q.put(var)
 
-#jobs = []
-for i in range(5):
- p = multiprocessing.Process(target=worker)
- #jobs.append(p)
+var = 0
+queue = multiprocessing.Queue()
+queue.put(var)
+
+print 'inicial: ' + `var`
+for i in range(1):
+ p = multiprocessing.Process(target=worker, args=(queue,))
  p.start()
+ p.join()
+print 'final: ' + `queue.get()`

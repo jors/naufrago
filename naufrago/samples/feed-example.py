@@ -5,31 +5,14 @@ import time
 import datetime
 import sys
 
-d = feedparser.parse("http://feeds.feedburner.com/VistoEnFacebook")
+feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
+d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)
 #print type(d.entries)
 #sys.exit(1)
 d.entries.reverse()
 
-#d = feedparser.parse("http://feeds2.feedburner.com/AscoDeVida")
-#d = feedparser.parse("http://www.hacktimes.com/feeds")
-#print d
-#sys.exit()
-
-#d = feedparser.parse("http://www.hacktimes.com/feeds")
-#d = feedparser.parse("http://packetstormsecurity.org/headlines.xml")
-#d = feedparser.parse("http://www.mozillazine.org/contents.rdf")
-#d = feedparser.parse("http://planet.debian.org/rss20.xml")
-#d = feedparser.parse("http://feeds.feedburner.com/ElLadoDelMal")
-#d = feedparser.parse("http://enchufado.com/rss2.php")
-#d = feedparser.parse("http://www.hispasec.com/rss/unaaldia.xml")
-#d = feedparser.parse("http://meneame.net/rss2.php")
-#d = feedparser.parse("http://www.meloquitandelasmanos.es/rss2.php")
-#d = feedparser.parse("http://badopi.net/rss20.xml")
-#d = feedparser.parse("http://planet.gnome.org/atom.xml")
-#d = feedparser.parse("http://elladodelmal.blogspot.com/feeds/posts/default")
-#d = feedparser.parse("http://feedparser.org/docs/examples/atom10.xml")
 #print d.feed.title                    # get values attr-style or dict-style
 #print d.feed.subtitle                 # parses escaped HTML
 #print d.feed.description
@@ -50,23 +33,17 @@ else: print 'Sin link'
 count = len(d.entries)
 print '\nSearching... ' + str(count) + ' entries found:\n\n'
 for i in range(0, count):
- print d.entries[i]
- print ''
+ #print d.entries[i]
+ #print ''
 
- ###print 'Title: ' + d.entries[i].title.encode('utf-8')
  if(hasattr(d.entries[i],'title')): print 'Entry title: '+d.entries[i].title.encode('utf-8')
  else: print 'Sin titulo'
- ###print 'Link: ' + d.entries[i].link.encode('utf-8')
  if(hasattr(d.entries[i],'link')): print 'Entry link: '+d.entries[i].link.encode('utf-8')
  else: print 'Sin link'
- ###print 'Description: ' + d.entries[i].description.encode('utf-8')
  if(hasattr(d.entries[i],'description')): print 'Entry description: '+d.entries[i].description.encode('utf-8')
  else: print 'Sin description'
- ###print 'Date: ' + d.entries[i].date.encode('utf-8')
  if(hasattr(d.entries[i],'date')): print 'Entry date: '+str(d.entries[i].date.encode('iso8859-1'))
  else: print 'Sin date'
- ###dp = d.entries[i].date_parsed
- ###print 'Date parsed: ' + str(dp)
  if(hasattr(d.entries[i],'date_parsed')):
   print 'Entry date_parsed: '+str(d.entries[i].date_parsed).encode('utf-8')
  else:

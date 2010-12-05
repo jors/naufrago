@@ -7,11 +7,11 @@ import gtk
 import gobject
 gobject.threads_init()
 import time
+import os
 
 # FUNCTIONS #
 def consulta():
  global lock
-
  if lock == True:
   time.sleep(1)
   consulta()
@@ -27,7 +27,6 @@ def consulta():
  
 def base():
  global lock
-
  if lock == True:
   time.sleep(0.1)
   base()
@@ -55,3 +54,4 @@ t.start()
 t2 = threading.Thread(target=consulta, args=())
 t2.start()
 cursor.close()
+os.unlink('some.db')
