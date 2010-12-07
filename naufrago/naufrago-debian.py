@@ -1442,8 +1442,6 @@ class Naufrago:
   else:
      self.tvcolumn.set_attributes(self.cellpb, stock_id=1)
   self.tvcolumn.set_attributes(self.cell, text=0, font=3)
-  # Allow sorting on the column
-  ###self.tvcolumn.set_sort_column_id(0)
   # Allow drag and drop reordering of rows
   ###self.treeview.set_reorderable(True)
   self.treeview_setup_dnd(self.treeview)
@@ -2483,8 +2481,8 @@ class Naufrago:
   hbox2.pack_start(spin_button2, True, True, 2)
   aux_update_freq_timemode = self.update_freq_timemode
   combobox2 = gtk.combo_box_new_text()
-  combobox2.append_text(_("hour"))
-  combobox2.append_text(_("min"))
+  combobox2.append_text(_("hour/s"))
+  combobox2.append_text(_("minute/s"))
   combobox2.set_active(self.update_freq_timemode)
   combobox2.connect('changed', self.change_timemode_cb)
   hbox2.pack_start(combobox2, True, True, 2) # NEW
@@ -2868,7 +2866,6 @@ class Naufrago:
     nodes[id_feed] = iter # Storing id_feed:iter pairs...
     # Old way: self.get_feed(id_feed)
    # New way:
-   print datetime.datetime.now()
    self.t = threading.Thread(target=self.get_feed, args=(nodes,new_feed, ))
    self.t.start()
 
@@ -2877,7 +2874,6 @@ class Naufrago:
   # Old way: self.get_feed()
   # New way:
   if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
-   print datetime.datetime.now()
    self.t = threading.Thread(target=self.get_feed, args=())
    self.t.start()
   return True
@@ -3128,10 +3124,6 @@ class Naufrago:
   #for i in range(a, b):
   # END NEW: sorting by arrival
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
-   # DBG
-   if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-    print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + '), ',
-   # DBG
    self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    unique = cursor.fetchone()
@@ -3139,10 +3131,6 @@ class Naufrago:
    images = ''
    # Non-existant entry? Insert!
    if(unique is None):
-    # DBG
-    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-     print 'UNIQUE!'
-    # DBG
     # Check first is the feed is full
     self.lock.acquire()
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
@@ -3225,10 +3213,6 @@ class Naufrago:
      new_posts = True
      num_new_posts_total += 1
    else:
-    # DBG
-    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-     print 'existant entry.'
-    # DBG
     # START Offline mode image retrieving
     if (self.offline_mode == 1):
      self.lock.acquire()

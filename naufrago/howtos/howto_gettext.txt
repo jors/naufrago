@@ -28,7 +28,7 @@ msgfmt ca.po -o locale/ca/LC_MESSAGES/translate2.mo
 LANG=ca_ES.UTF-8 python translate2.py
 
 # * UPDATE PROCESS...
-xgettext --language=Python --keyword=_ --output=translate2.pot translate2.py
-msgmerge -U es.po translate2.pot
+xgettext --language=Python --keyword=_ --output=naufrago.pot naufrago.py
+msgmerge -U es.po naufrago.pot
 # Añadir la traducción (revisando y eliminado los tags 'fuzzy') de lo nuevo y...
-msgfmt ca.po -o locale/ca/LC_MESSAGES/translate2.mo
+msgfmt ca.po -o locale/ca/LC_MESSAGES/naufrago.mo
