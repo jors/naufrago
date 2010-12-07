@@ -5,13 +5,13 @@ import time
 import datetime
 import sys
 
-feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
+feed = "http://feeds.feedburner.com/VistoEnFacebook"
 d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)
 #print type(d.entries)
 #sys.exit(1)
-d.entries.reverse()
+###d.entries.reverse()
 
 #print d.feed.title                    # get values attr-style or dict-style
 #print d.feed.subtitle                 # parses escaped HTML
@@ -46,6 +46,8 @@ for i in range(0, count):
  else: print 'Sin date'
  if(hasattr(d.entries[i],'date_parsed')):
   print 'Entry date_parsed: '+str(d.entries[i].date_parsed).encode('utf-8')
+  dp = d.entries[i].date_parsed
+  secs = time.mktime(datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
  else:
   print 'No date found, the current was built: ' + str(datetime.datetime.now())
   split = str(datetime.datetime.now()).split(' ')
@@ -53,12 +55,7 @@ for i in range(0, count):
   ts = split[1].split(':')
   t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
   secs = time.mktime(t.timetuple())
-  print "Epoch Seconds: ", secs  
- #t = datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5])
- #secs = time.mktime(t.timetuple())
- ###secs = time.mktime(datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
- ###print 'Date epoch\'ed: ' + str(secs) + ' secs'
- #print 'ID: ' + d.entries[i].id.encode('utf-8')
+ print "Epoch Seconds: ", secs  
  if(hasattr(d.entries[i],'id')): print 'Entry id: '+d.entries[i].id.encode('utf-8')
  else: print 'Sin ID'
 

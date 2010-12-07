@@ -259,8 +259,10 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND categoria.id='+str(id_cat)+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+  self.lock.acquire()
   cursor.execute(q)
   row = cursor.fetchone()
+  self.lock.release()
   cursor.close()
   if row[0] == 0:
    if id_cat_aux is None:
@@ -313,8 +315,10 @@ class Naufrago:
      if nombre_feed == _("Unread"):
       #print 'Destino: feed normal'
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+      self.lock.acquire()
       cursor.execute(q)
       row = cursor.fetchall()
+      self.lock.release()
       if (row is not None) and (len(row)>0):
        for feed in row:
         dest_iter = self.treeindex[feed[0]]
@@ -334,16 +338,20 @@ class Naufrago:
 
      elif nombre_feed == _("Important"):
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+      self.lock.acquire()
       cursor.execute(q)
       row = cursor.fetchall()
+      self.lock.release()
       if (row is not None) and (len(row)>0):
        for feed in row:
         dest_iter = self.treeindex[feed[0]]
         nombre_feed_destino = model.get_value(dest_iter, 0)
         nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
         q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + str(feed[0]) + ' AND leido = 0'
+        self.lock.acquire()
         cursor.execute(q)
         count = cursor.fetchone()[0]
+        self.lock.release()
         if count is not None:
          if count > 0:
           feed_label = nombre_feed_destino + ' [' + str(count) + ']'
@@ -458,8 +466,10 @@ class Naufrago:
        nombre_feed = model.get_value(iter, 0)
       except: # Busqueda
        q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+       self.lock.acquire()
        cursor.execute(q)
        id_feed = cursor.fetchone()[0]
+       self.lock.release()
        iter = self.treeindex[id_feed]
        nombre_feed = model.get_value(iter, 0)
 
@@ -474,8 +484,10 @@ class Naufrago:
 
       # START NAME PARSING (nodo destino) #
       if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+       self.lock.acquire()
        cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
        id_feed = cursor.fetchone()[0]
+       self.lock.release()
        cursor.close()
        dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
        nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -522,8 +534,10 @@ class Naufrago:
        nombre_feed = model.get_value(iter, 0)
       except: # Busqueda
        q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+       self.lock.acquire()
        cursor.execute(q)
        id_feed = cursor.fetchone()[0]
+       self.lock.release()
        iter = self.treeindex[id_feed]
        nombre_feed = model.get_value(iter, 0)
 
@@ -544,8 +558,10 @@ class Naufrago:
 
       # START NAME PARSING (nodo destino) #
       if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+       self.lock.acquire()
        cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
        id_feed = cursor.fetchone()[0]
+       self.lock.release()
        cursor.close()
        dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
        nombre_feed_destino = model.get_value(dest_iter, 0)
@@ -615,8 +631,10 @@ class Naufrago:
      except: # Busqueda
       on_a_search = True
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+      self.lock.acquire()
       cursor.execute(q)
       id_feeds = cursor.fetchall()
+      self.lock.release()
       for id_feed in id_feeds:
        iter = self.treeindex[id_feed[0]]
        nombre_feeds.append(model.get_value(iter, 0))
@@ -634,8 +652,10 @@ class Naufrago:
         q = 'SELECT count(id) FROM articulo WHERE leido = 0'
        else:
         q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id = '+str(id_articulo)+')'
+       self.lock.acquire()
        cursor.execute(q)
        count = cursor.fetchone()
+       self.lock.release()
        if count is not None:
         if count[0] > 0:
          feed_label = nombre_feed + ' [' + str(count[0]) + ']'
@@ -654,13 +674,17 @@ class Naufrago:
       #print 'Destino: feed normal'
       if liststore_font_style == 'bold':
        q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+       self.lock.acquire()
        cursor.execute(q)
        row = cursor.fetchall()
+       self.lock.release()
        if (row is not None) and (len(row)>0):
         for feed in row:
          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' +str(feed[0])+ ' AND leido = 0'
+         self.lock.acquire()
          cursor.execute(q)
          count = cursor.fetchone()
+         self.lock.release()
          dest_iter = self.treeindex[feed[0]]
          nombre_feed_destino = model.get_value(dest_iter, 0)
          nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
@@ -685,13 +709,17 @@ class Naufrago:
          ### END: ¡También cabe actualizar su compañero de batallas!
       elif liststore_font_style == 'normal':
        q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+       self.lock.acquire()
        cursor.execute(q)
        row = cursor.fetchall()
+       self.lock.release()
        if row is not None:
         for feed in row:
          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' +str(feed[0])+ ' AND leido = 0'
+         self.lock.acquire()
          cursor.execute(q)
          count = cursor.fetchone()
+         self.lock.release()
          dest_iter = self.treeindex[feed[0]]
          nombre_feed_destino = model.get_value(dest_iter, 0)
          nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
@@ -734,8 +762,10 @@ class Naufrago:
         for nombre_feed in nombre_feeds:
          nombre_feed = self.simple_name_parsing(nombre_feed)
          q = 'SELECT count(id) FROM articulo WHERE id_feed = '+str(id_feeds[i][0])+' AND leido = 0'
+         self.lock.acquire()
          cursor.execute(q)
          count = cursor.fetchone()
+         self.lock.release()
          if count[0] is not None:
           if count[0] > 0:
            feed_label = nombre_feed + ' [' + str(count[0]) + ']'
@@ -766,8 +796,10 @@ class Naufrago:
    else:
     id_articulo = self.liststore.get_value(iter, 4)
     cursor = self.conn.cursor()
+    self.lock.acquire()
     cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
     link = cursor.fetchone()[0]
+    self.lock.release()
     cursor.close()
    webbrowser.open_new(link) # New win!
 
@@ -780,8 +812,10 @@ class Naufrago:
    else:
     id_articulo = self.liststore.get_value(iter, 4)
     cursor = self.conn.cursor()
+    self.lock.acquire()
     cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
     link = cursor.fetchone()[0]
+    self.lock.release()
     cursor.close()
    clipboard = gtk.clipboard_get()
    clipboard.set_text(link.encode("utf8"))
@@ -831,15 +865,19 @@ class Naufrago:
    self.eb_image_zoom.show()
 
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute('SELECT leido,contenido FROM articulo WHERE id = ?', [id_articulo])
    row = cursor.fetchone()
+   self.lock.release()
    contenido = row[1]
 
    # Offline mode image retrieving
    if self.offline_mode == 1:
     # Reemplazar los tags img para que apunten a local...
+    self.lock.acquire()
     cursor.execute('SELECT nombre,url FROM imagen WHERE id_articulo = ?', [id_articulo])
     row2 = cursor.fetchall()
+    self.lock.release()
     if (row2 is not None) and (len(row2)>0):
      for img in row2:
       # Sustituir los paths de imagenes remotas por los locales!
@@ -871,8 +909,10 @@ class Naufrago:
      nombre_feed = model.get_value(iter, 0)
     except:
      q = 'SELECT id_feed FROM articulo WHERE id = ' + str(id_articulo)
+     self.lock.acquire()
      cursor.execute(q)
      id_feed = cursor.fetchone()[0]
+     self.lock.release()
      iter = self.treeindex[id_feed]
      nombre_feed = model.get_value(iter, 0)
 
@@ -893,8 +933,10 @@ class Naufrago:
     # START NAME PARSING (nodo destino) #
     if nombre_feed == _("Important") or nombre_feed == _("Unread"):
      #print 'Destino: feed normal'
+     self.lock.acquire()
      cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
      id_feed = cursor.fetchone()[0]
+     self.lock.release()
      dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
      nombre_feed_destino = model.get_value(dest_iter, 0)
      (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
@@ -950,8 +992,10 @@ class Naufrago:
     self.populate_entries(id_feed)
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     cursor = self.conn.cursor()
+    self.lock.acquire()
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
     url = cursor.fetchone()[0]
+    self.lock.release()
     cursor.close()
     # START NAME PARSING #
     row_name = self.simple_name_parsing(row_name)
@@ -1220,8 +1264,10 @@ class Naufrago:
   global ABOUT_PAGE, PUF_PAGE
 
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute('SELECT * FROM config')
   row = cursor.fetchone()
+  self.lock.release()
   cursor.close()
   self.x = int(row[0].split(",")[0])
   self.y = int(row[0].split(",")[1])
@@ -1290,11 +1336,15 @@ class Naufrago:
      dialog if the number of entries per feed is shrunk."""
   updated_feed_ids = []
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute('SELECT id FROM feed')
   feeds = cursor.fetchall()
+  self.lock.release()
   for row in feeds:
+   self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante = 0 ORDER BY fecha DESC LIMIT ?,1000000', [row[0],self.num_entries])
    articles = cursor.fetchall()
+   self.lock.release()
    if articles is not None:
     id_articulos = ''
     for art in articles:
@@ -1302,11 +1352,15 @@ class Naufrago:
      # Aprovechamos el bucle para borrar las imagenes del filesystem, si procede.
      # Ojo, porque cabe controlar que esa imagen no sea usada también por otro artículo,
      # dado que éstas se comparten entre artículos si son la misma.
+     self.lock.acquire()
      cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [art[0]])
      images = cursor.fetchall()
+     self.lock.release()
      for i in images:
+      self.lock.acquire()
       cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
       row3 = cursor.fetchone()
+      self.lock.release()
       if (row3 is not None) and (row3[0] <= 1):
        if os.path.exists(images_path + '/'+ str(i[0])):
         os.unlink(images_path + '/'+ str(i[0]))
@@ -1637,8 +1691,10 @@ class Naufrago:
   self.treeindex = {} # A dictionary of feed iters stored by their id
   self.treeindex_cat = {} # A dictionary of category iters stored by their id
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute('SELECT id,nombre FROM categoria ORDER BY nombre ASC')
   rows = cursor.fetchall()
+  self.lock.release()
   for row in rows:
    boldornot = self.toggle_category_bold(row[0])
    # START NEW: Driven mode
@@ -1648,11 +1704,15 @@ class Naufrago:
    # START NEW: Driven mode
    dad = self.treestore.append(None, [row[1], category_icon, row[0], boldornot]) # Initial tree creation
    self.treeindex_cat[row[0]] = dad
+   self.lock.acquire()
    cursor.execute('SELECT id,nombre FROM feed WHERE id_categoria = ' + str(row[0]) + ' ORDER BY nombre ASC')
    rows2 = cursor.fetchall()
+   self.lock.release()
    for row2 in rows2:
+    self.lock.acquire()
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(row2[0]) + ' AND leido = 0')
     row3 = cursor.fetchone()
+    self.lock.release()
     if row3[0] == 0:
      feed_label = row2[1]
      font_style = 'normal'
@@ -1676,14 +1736,18 @@ class Naufrago:
   # These ones are "special" folders...
   self.add_icon_to_factory('importantes')
   self.add_icon_to_factory('no-leidos')
+  self.lock.acquire()
   cursor.execute('SELECT count(id) FROM articulo WHERE importante=1 AND leido=0')
   row3 = cursor.fetchone()
+  self.lock.release()
   if row3[0] == 0:
    special = self.treestore.append(None, [_("Important"), 'importantes', 9998, 'normal'])
   else:
    special = self.treestore.append(None, [_("Important")+' ['+str(row3[0])+']', 'importantes', 9998, 'bold'])
+  self.lock.acquire()
   cursor.execute('SELECT count(id) FROM articulo WHERE leido=0')
   row3 = cursor.fetchone()
+  self.lock.release()
   if row3[0] == 0:
    special2 = self.treestore.append(None, [_("Unread"), 'no-leidos', 9999, 'normal'])
   else:
@@ -1701,20 +1765,30 @@ class Naufrago:
   cursor = self.conn.cursor()
   # START NEW: sorting by arrival
   if id_feed == 9998:
-   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY id DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
+   # START NEW: sorting by arrival
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY id DESC'
+   # END NEW: sorting by arrival
   elif id_feed == 9999:
-   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY id DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY fecha DESC'
+   # START NEW: sorting by arrival
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 ORDER BY id DESC'
+   # END NEW: sorting by arrival
   elif search_request_entry_ids is not None:
-   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY id DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY fecha DESC'
+   # START NEW: sorting by arrival
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') ORDER BY id DESC'
+   # END NEW: sorting by arrival
   else:
-   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
-   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY id DESC'
+   q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY fecha DESC'
+   # START NEW: sorting by arrival
+   #q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+str(id_feed)+' ORDER BY id DESC'
+   # END NEW: sorting by arrival
   # END NEW: sorting by arrival
+  self.lock.acquire()
   cursor.execute(q)
   rows = cursor.fetchall()
+  self.lock.release()
   cursor.close()
  
   p = re.compile(r'<[^<]*?/?>') # Removes HTML tags
@@ -1748,8 +1822,10 @@ class Naufrago:
 
   if((data is not None) and (type(data) is not gtk.Action)): # Modo edición I
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute('SELECT nombre FROM categoria WHERE id = ?', [data])
    nombre_categoria = cursor.fetchone()[0]
+   self.lock.release()
    cursor.close()
    entry.set_text(nombre_categoria)
    dialog.set_title(_('Edit category'))
@@ -1774,20 +1850,26 @@ class Naufrago:
   if((text != '') and (response == gtk.RESPONSE_ACCEPT)):
    cursor = self.conn.cursor()
    # Create category in the database (if it does not exist!)
+   self.lock.acquire()
    cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [text.decode("utf-8")])
    row = cursor.fetchone()
+   self.lock.release()
    if(row is None):
     if((data is not None) and (type(data) is not gtk.Action)): # Modo edición II
+     self.lock.acquire()
      cursor.execute('SELECT nombre FROM categoria WHERE id = ?', [data])
      nombre_categoria = cursor.fetchone()[0]
+     self.lock.release()
      if(text != nombre_categoria):
       (model, iter) = self.treeselection.get_selected()
       model.set(iter, 0, text)
       self.lock.acquire()
       cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
     else:
+     self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM categoria')
      row = cursor.fetchone()
+     self.lock.release()
      ###dad = self.treestore.append(None, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      self.treeindex_cat[row[0]+1] = dad # Update category dict
@@ -1795,6 +1877,8 @@ class Naufrago:
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
     self.conn.commit()
     self.lock.release()
+   else:
+    self.warning_message(_('Category <b>already present</b>!'))
    cursor.close()
 
  def alphabetical_category_insertion(self, categoria_a_insertar, category_data):
@@ -1854,30 +1938,44 @@ class Naufrago:
       result = self.treestore.remove(iter)
       del self.treeindex_cat[id_categoria] # Update category dict
       cursor = self.conn.cursor()
+      self.lock.acquire()
       cursor.execute('SELECT id FROM feed WHERE id_categoria = ?', [id_categoria])
       feeds = cursor.fetchall()
+      self.lock.release()
       for feed in feeds:
        del self.treeindex[feed[0]] # Update feeds dict
        if os.path.exists(favicon_path + '/'+ str(feed[0])):
         os.unlink(favicon_path + '/'+ str(feed[0]))
+       self.lock.acquire()
        cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [feed[0]])
        articles = cursor.fetchall()
+       self.lock.release()
        for art in articles:
+        self.lock.acquire()
         cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
         images = cursor.fetchall()
+        self.lock.release()
         for i in images:
+         self.lock.acquire()
          cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
          row3 = cursor.fetchone()
+         self.lock.release()
          if (row3 is not None) and (row3[0] <= 1):
           if os.path.exists(images_path + '/'+ str(i[1])):
            os.unlink(images_path + '/'+ str(i[1]))
+        self.lock.acquire()
         cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
         self.conn.commit()
+        self.lock.release()
+       self.lock.acquire()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
        self.conn.commit()
+       self.lock.release()
+      self.lock.acquire()
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
       self.conn.commit()
+      self.lock.release()
 
       # Actualizamos No-leidos e Importantes
       self.update_special_folder(9999)
@@ -1906,8 +2004,10 @@ class Naufrago:
   if((data is not None) and (type(data) is not gtk.Action)): #  Modo edición I
    labelURL = gtk.Label('URL       ')
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute('SELECT url,nombre FROM feed WHERE id = ?', [data])
    row = cursor.fetchone()
+   self.lock.release()
    cursor.close()
    entryName.set_text(row[1])
    entryURL.set_text(row[0])
@@ -1958,8 +2058,10 @@ class Naufrago:
    cursor = self.conn.cursor()
    (model, iter) = self.treeselection.get_selected()
    if((data is not None) and (type(data) is not gtk.Action)): # Modo edición III
+    self.lock.acquire()
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(data) + ' AND leido = 0')
     row = cursor.fetchone()
+    self.lock.release()
     if row[0] == 0:
      feed_label = textName
     else:
@@ -1971,8 +2073,11 @@ class Naufrago:
     model.set(iter, 0, feed_label)
    else:
     # Create feed in the database (if it does not exist!)
+    self.lock.acquire()
     cursor.execute('SELECT id FROM feed WHERE url = ?', [textURL.decode("utf-8")])
-    if(cursor.fetchone() is None):
+    row = cursor.fetchone()
+    self.lock.release()
+    if(row is None):
      # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
      id_categoria = 1
      if(iter is not None): # Si hay algún nodo seleccionado..
@@ -1985,8 +2090,10 @@ class Naufrago:
        iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
      else:
       iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
+     self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM feed')
      row = cursor.fetchone()
+     self.lock.release()
      id_feed = 0
      if row[0] is not None:
       id_feed = row[0]
@@ -2000,6 +2107,8 @@ class Naufrago:
      self.lock.release()
      self.treeselection.select_iter(son)
      self.update_feed(data=None, new_feed=True)
+    else:
+     self.warning_message(_('Feed <b>already present</b>!'))
    cursor.close()
 
  def update_special_folder(self, id_folder):
@@ -2013,8 +2122,10 @@ class Naufrago:
   elif id_folder == 9998:
    q = 'SELECT count(id) FROM articulo WHERE leido = 0 AND importante = 1'
   cursor = self.conn.cursor()
+  self.lock.acquire()
   cursor.execute(q)
   count = cursor.fetchone()[0]
+  self.lock.release()
   cursor.close()
   if count is not None:
    if count > 0:
@@ -2045,14 +2156,20 @@ class Naufrago:
      id_feed = self.treestore.get_value(iter, 2)
 
      cursor = self.conn.cursor()
+     self.lock.acquire()
      cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [id_feed])
      articles = cursor.fetchall()
+     self.lock.release()
      for art in articles:
+      self.lock.acquire()
       cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
       images = cursor.fetchall()
+      self.lock.release()
       for i in images:
+       self.lock.acquire()
        cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
        row3 = cursor.fetchone()
+       self.lock.release()
        if (row3 is not None) and (row3[0] <= 1):
         if os.path.exists(images_path + '/'+ str(i[1])):
          os.unlink(images_path + '/'+ str(i[1]))
@@ -2137,8 +2254,10 @@ class Naufrago:
    self.treeselection.unselect_all()
 
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute("SELECT id FROM articulo WHERE titulo LIKE '%"+text+"%' OR contenido LIKE '%"+text+"%'")
    row = cursor.fetchall()
+   self.lock.release()
    cursor.close()
    entry_ids = ''
    if (row is not None) and (len(row)>0):
@@ -2718,8 +2837,10 @@ class Naufrago:
   if(iter is not None): # Hay alguna fila de la lista seleccionada
    id_articulo = self.liststore.get_value(iter, 4)
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
    link = cursor.fetchone()[0]
+   self.lock.release()
    cursor.close()
    self.statusbar.set_text(link.encode("utf8"))
 
@@ -2845,13 +2966,17 @@ class Naufrago:
   cursor = self.conn.cursor()
   # Comprueba que esa URL no exista ya en la BD...
   for i in images.split(","):
+   self.lock.acquire()
    cursor.execute('SELECT nombre FROM imagen WHERE url = ?', [i])
    row = cursor.fetchone()
+   self.lock.release()
    if(row is None):
     # a) Si no existe, guarda entrada en tabla imagen y descarga físicamente la imagen a /imagenes.
     self.statusbar.set_text(_('Obtaining image ') + i + '...'.encode("utf8"))
+    self.lock.acquire()
     cursor.execute('SELECT MAX(id) FROM imagen')
     id_entry_max = cursor.fetchone()[0]
+    self.lock.release()
     if id_entry_max is None: id_entry_max = 1
     else: id_entry_max += 1
     self.lock.acquire()
@@ -2908,8 +3033,10 @@ class Naufrago:
   dest_iter = self.treeindex[id_feed]
 
   if not len(d.entries) > 0: # Feed has no entries...
+   self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ?', [id_feed])
    num_entries = cursor.fetchone()[0]
+   self.lock.release()
    if num_entries == 0: # ... and never had! Fingerprinted as invalid!
     model.set(dest_iter, 1, 'crossout-image')
     dont_parse = True
@@ -2949,8 +3076,10 @@ class Naufrago:
   # END NAME PARSING #
 
   # Primero obtenemos el feed (los datos)...
+  self.lock.acquire()
   cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
   url = cursor.fetchone()[0]
+  self.lock.release()
   self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
   gtk.gdk.threads_enter()
@@ -2979,50 +3108,68 @@ class Naufrago:
     model_tmp.set(iter_tmp, 0, title)
 
   # START NEW: sorting by arrival
-  d.entries.reverse()
+  #d.entries.reverse()
   # END NEW: sorting by arrival
 
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
-   a = count - self.num_entries
-   b = count
-  else:
-   a = 0
-   b = limit
+  # START NEW: sorting by arrival
+  # a = count - self.num_entries
+  # b = count
+  #else:
+  # a = 0
+  # b = limit
+  # END NEW: sorting by arrival
 
   # Check for article existence...
-  #for i in range(0, limit):
-  for i in range(a, b):
+  for i in range(0, limit):
+  # START NEW: sorting by arrival
+  #for i in range(a, b):
+  # END NEW: sorting by arrival
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
-   cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    # DBG
-   if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+   if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
     print '[' + nombre_feed + '] -> ' + '\"' + title + '\" (' + id + '), ',
    # DBG
+   self.lock.acquire()
+   cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    unique = cursor.fetchone()
+   self.lock.release()
    images = ''
    # Non-existant entry? Insert!
    if(unique is None):
     # DBG
-    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
      print 'UNIQUE!'
     # DBG
     # Check first is the feed is full
+    self.lock.acquire()
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
     row2 = cursor.fetchone()
+    self.lock.release()
     if((row2 is not None) and (row2[0]>=self.num_entries)): # If so, do some purging first...
-     #cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
-     #id_articulo, fecha = cursor.fetchone()
+     self.lock.acquire()
+     cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
+     id_articulo, fecha = cursor.fetchone()
+     self.lock.release()
      # if secs > fecha:
-     cursor.execute('SELECT id FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY id ASC LIMIT 1', [id_feed])
-     id_articulo = cursor.fetchone()[0]
+     # START NEW: sorting by arrival
+     #self.lock.acquire()
+     #cursor.execute('SELECT id FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY id ASC LIMIT 1', [id_feed])
+     #id_articulo = cursor.fetchone()[0]
+     #self.lock.release()
+     # END NEW: sorting by arrival
      # Ahora borramos las imagenes del filesystem, si procede
+     self.lock.acquire()
      cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
      images = cursor.fetchall()
+     self.lock.release()
      for i in images:
+      self.lock.acquire()
       cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
       row3 = cursor.fetchone()
+      self.lock.release()
       if (row3 is not None) and (row3[0] <= 1):
        if os.path.exists(images_path + '/'+ str(i[0])):
         os.unlink(images_path + '/'+ str(i[0]))
@@ -3036,12 +3183,16 @@ class Naufrago:
      cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
      self.conn.commit()
      self.lock.release()
+     self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM articulo')
      unique = cursor.fetchone()
+     self.lock.release()
      # START Offline mode image retrieving
      if (self.offline_mode == 1) and (images != ''):
+      self.lock.acquire()
       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
       images_present = cursor.fetchone()
+      self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(unique[0], images)
      # END Offline mode image retrieving
@@ -3053,15 +3204,21 @@ class Naufrago:
      cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
      self.conn.commit()
      self.lock.release()
+     self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM articulo')
      unique = cursor.fetchone()
+     self.lock.release()
      # START Offline mode image retrieving
      if (self.offline_mode == 1):
+      self.lock.acquire()
       cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
       imagenes = cursor.fetchone()
+      self.lock.release()
       if (imagenes is not None) and (imagenes[0] != ''):
+       self.lock.acquire()
        cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
        images_present = cursor.fetchone()
+       self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
      # END Offline mode image retrieving
@@ -3069,16 +3226,20 @@ class Naufrago:
      num_new_posts_total += 1
    else:
     # DBG
-    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB':
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
      print 'existant entry.'
     # DBG
     # START Offline mode image retrieving
     if (self.offline_mode == 1):
+     self.lock.acquire()
      cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
      imagenes = cursor.fetchone()
+     self.lock.release()
      if (imagenes is not None) and (imagenes[0] != ''):
+      self.lock.acquire()
       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
       images_present = cursor.fetchone()
+      self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(unique[0], imagenes[0])
     # END Offline mode image retrieving
@@ -3096,8 +3257,10 @@ class Naufrago:
 
   # Luego el recuento del feed
   if new_posts == True:
+   self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + str(id_feed) + ' AND leido = 0')
    row = cursor.fetchone()
+   self.lock.release()
    if row[0] == 0:
     feed_label = nombre_feed
     font_style = 'normal'
@@ -3114,8 +3277,10 @@ class Naufrago:
    dest_iter = self.treeindex[9999]
    nombre_feed_destino = model3.get_value(dest_iter, 0)
    nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+   self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE leido = 0')
    count = cursor.fetchone()
+   self.lock.release()
    if count is not None:
     if count[0] > 0:
      feed_label = nombre_feed_destino + ' [' + str(count[0]) + ']'
@@ -3251,8 +3416,10 @@ class Naufrago:
     url = node.attrib.get('xmlUrl')
     tipo = node.attrib.get('type')
     if name and url:
+     self.lock.acquire()
      cursor.execute('SELECT id FROM feed WHERE nombre = ?', [name])
      row = cursor.fetchone()
+     self.lock.release()
      if(row is None):
       # Create feed in the DB
       self.lock.acquire()
@@ -3260,23 +3427,29 @@ class Naufrago:
       self.conn.commit()
       self.lock.release()
       # Obtain feed favicon
+      self.lock.acquire()
       row = cursor.execute('SELECT MAX(id) FROM feed')
       id_feed = cursor.fetchone()[0]
+      self.lock.release()
       #self.get_favicon(id_feed, url)
       t = threading.Thread(target=self.get_favicon, args=(id_feed, url, ))
       t.start()
     elif tipo == 'folder' and len(node) is not 0:
      if node[0].attrib.get('type') != 'folder':
+      self.lock.acquire()
       cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [name])
       row = cursor.fetchone()
+      self.lock.release()
       if(row is None):
        # Create category in the DB (if it does not exist already)
        self.lock.acquire()
        cursor.execute('INSERT INTO categoria VALUES(null, ?)', [name])
        self.conn.commit()
        self.lock.release()
+       self.lock.acquire()
        row = cursor.execute('SELECT MAX(id) FROM categoria')
        row = cursor.fetchone()
+       self.lock.release()
       current_category = row[0]
    f.close()
    cursor.close()
@@ -3307,13 +3480,17 @@ class Naufrago:
    f = open(dialog.get_filename()+'.opml', 'w')
    out = '<?xml version="1.0"?>\n<opml version="1.0">\n<head>\n<title>Naufrago! Feed List Export</title>\n</head>\n<body>\n'
    cursor = self.conn.cursor()
+   self.lock.acquire()
    cursor.execute('SELECT id,nombre FROM categoria')
    categorias = cursor.fetchall()
+   self.lock.release()
    cursor.close()
    for row in categorias:
     out += '<outline title="'+row[1]+'" text="'+row[1]+'" description="'+row[1]+'" type="folder">\n'
+    self.lock.acquire()
     cursor.execute('SELECT nombre,url FROM feed WHERE id_categoria = ?', [row[0]])
     feeds = cursor.fetchall()
+    self.lock.release()
     for row2 in feeds:
      nombre = row2[0].replace('&', '%26')
      url = row2[1].replace('&', '%26')
