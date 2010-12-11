@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.0"><head><title>FeedR subscriptions</title></head>
+<body>
+<outline text="Christianity" title="Christianity" type="folder">
+	<outline text="Experimental Theology" title="Experimental Theology" xmlUrl="http://experimentaltheology.blogspot.com/feeds/posts/default"/>
+	<outline text="For the scattered flock" title="For the scattered flock" xmlUrl="http://singlextianman.wordpress.com/feed/"/>
+</outline>
+<outline text="DIY" title="DIY" type="folder">
+	<outline text="Bathtub Brewery" title="Bathtub Brewery" xmlUrl="http://pipes.yahoo.com/pipes/pipe.run?ContextBegin=%3Cspan+class%3D%22body%22%3E&amp;ContextEnd=%3C%2Fspan%3E&amp;RssUrl=http%3A%2F%2Fwww.bathtubbrewery.com%2Ffeed%2F&amp;_id=f9ef30e9f3b6b905777deae6d24727a6&amp;_render=rss"/>
+	<outline text="BikeHacks" title="BikeHacks" xmlUrl="http://feeds.feedburner.com/BikeHacks"/>
+	<outline text="Hack a Day" title="Hack a Day" xmlUrl="http://www.wizardrss.com/feed/hackaday.com/feed/"/>
+	<outline text="Home Brew Beer" title="Home Brew Beer" xmlUrl="http://blog.homebrewbeer.net/feeds/posts/default"/>
+	<outline text="Lifehacker" title="Lifehacker" xmlUrl="http://feeds.gawker.com/lifehacker/vip"/>
+</outline>
+<outline text="Foodie" title="Foodie" type="folder">
+	<outline text="Homemade Lemon Cake" title="Homemade Lemon Cake" xmlUrl="http://homemadelemoncake.blogspot.com/feeds/posts/default?alt=rss"/>
+	<outline text="Springwise" title="Springwise" xmlUrl="http://www.wizardrss.com/feed/feeds.feedburner.com/springwise"/>
+</outline>
+<outline text="Humor" title="Humor" type="folder">
+	<outline text="Hyperbole and a Half" title="Hyperbole and a Half" xmlUrl="http://feeds.feedburner.com/Hyperbole-and-a-half"/>
+	<outline text="The Daily WTF" title="The Daily WTF" xmlUrl="http://syndication.thedailywtf.com/TheDailyWtf"/>
+	<outline text="Tom the Cameraman" title="Tom the Cameraman" xmlUrl="http://tomthecameraman.com/?feed=rss2"/>
+	<outline text="xkcd.com" title="xkcd.com" xmlUrl="http://xkcd.com/atom.xml"/>
+</outline>
+<outline text="Internet" title="Internet" type="folder">
+	<outline text="PostSecret" title="PostSecret" xmlUrl="http://www.postsecret.com/feeds/posts/default"/>
+</outline>
+<outline text="Linux" title="Linux" type="folder">
+	<outline text="Omg! Ubuntu!" title="Omg! Ubuntu!" xmlUrl="http://feeds.feedburner.com/d0od"/>
+	<outline text="Planet Ubuntu" title="Planet Ubuntu" xmlUrl="http://planet.ubuntulinux.org/rss20.xml"/>
+	<outline text="The Linux Critic" title="The Linux Critic" xmlUrl="http://linuxcritic.wordpress.com/feed/"/>
+</outline>
+<outline text="MGTOW" title="MGTOW" type="folder">
+	<outline text="MarkyMark's Thoughts on Various Issues" title="MarkyMark's Thoughts on Various Issues" xmlUrl="http://markymarksthoughts.blogspot.com/feeds/posts/default"/>
+	<outline text="Men's Rights News &amp; Info" title="Men's Rights News &amp; Info" xmlUrl="http://news.mensactivism.org/rss.xml"/>
+	<outline text="Misandry Review" title="Misandry Review" xmlUrl="http://www.misandryreview.com/feed/"/>
+	<outline text="Pro-Male/Anti-Feminist Technology" title="Pro-Male/Anti-Feminist Technology" xmlUrl="http://feeds.feedburner.com/antifeministtech"/>
+	<outline text="The Elusive Wapiti" title="The Elusive Wapiti" xmlUrl="http://feeds2.feedburner.com/TheElusiveWapiti"/>
+	<outline text="The Lost Art of Self-Preservation (for Women)" title="The Lost Art of Self-Preservation (for Women)" xmlUrl="http://feeds.feedburner.com/TheLostArtOfSelf-preservationforWomen"/>
+	<outline text="The Spearhead" title="The Spearhead" xmlUrl="http://www.the-spearhead.com/feed/"/>
+</outline>
+<outline text="News &amp; Politics" title="News &amp; Politics" type="folder">
+	<outline text="1913 Intel" title="1913 Intel" xmlUrl="http://www.1913intel.com/feed/"/>
+	<outline text="Althouse" title="Althouse" xmlUrl="http://feeds.feedburner.com/blogspot/eOqB"/>
+	<outline text="America's Watchtower" title="America's Watchtower" xmlUrl="http://feeds.feedburner.com/wordpress/pUNj"/>
+	<outline text="And Still I Persist" title="And Still I Persist" xmlUrl="http://and-still-i-persist.com/feed/"/>
+	<outline text="Caroline Glick" title="Caroline Glick" xmlUrl="http://www.carolineglick.com/e/atom.xml"/>
+	<outline text="Chicago Breaking News" title="Chicago Breaking News" xmlUrl="http://feeds.chicagotribune.com/ChicagoBreakingNews?format=xml"/>
+	<outline text="Hawaiian libertarian" title="Hawaiian libertarian" xmlUrl="http://hawaiianlibertarian.blogspot.com/feeds/posts/default"/>
+	<outline text="Planck's Constant" title="Planck's Constant" xmlUrl="http://www.wizardrss.com/feed/feeds.feedburner.com/PlanksConstant"/>
+	<outline text="SHTF Plan - When It Hits The Fan, Don't Say We Didn't Warn You" title="SHTF Plan - When It Hits The Fan, Don't Say We Didn't Warn You" xmlUrl="http://feeds.feedburner.com/SHTFplan"/>
+	<outline text="Sultan Knish" title="Sultan Knish" xmlUrl="http://feeds.feedburner.com/FromNyToIsraelSultanRevealsTheStoriesBehindTheNews"/>
+	<outline text="Vox Popoli" title="Vox Popoli" xmlUrl="http://feeds.feedburner.com/blogspot/voxpopoli"/>
+	<outline text="Whiskey's Place" title="Whiskey's Place" xmlUrl="http://whiskeys-place.blogspot.com/feeds/posts/default"/>
+</outline>
+<outline text="Technology" title="Technology" type="folder">
+	<outline text="Boy Genius Reports" title="Boy Genius Reports" xmlUrl="http://feeds.feedburner.com/TheBoyGeniusReport"/>
+	<outline text="Carrypad" title="Carrypad" xmlUrl="http://www.wizardrss.com/feed/feeds.feedburner.com/carrypad"/>
+	<outline text="Engadget" title="Engadget" xmlUrl="http://www.engadget.com/rss.xml"/>
+	<outline text="Joystiq" title="Joystiq" xmlUrl="http://www.joystiq.com/rss.xml"/>
+	<outline text="Liliputing" title="Liliputing" xmlUrl="http://feeds.feedburner.com/Liliputing"/>
+	<outline text="My Tablet Life" title="My Tablet Life" xmlUrl="http://pipes.yahoo.com/pipes/pipe.run?ContextBegin=%3Cspan+class%3D%22body%22%3E&amp;ContextEnd=%3C%2Fspan%3E&amp;RssUrl=http%3A%2F%2Fwww.mytabletlife.com%2Ffeed%2F&amp;_id=f9ef30e9f3b6b905777deae6d24727a6&amp;_render=rss"/>
+	<outline text="Techdirt" title="Techdirt" xmlUrl="http://feeds.techdirt.com/techdirt/feed"/>
+</outline>
+<outline text="Tiny Houses" title="Tiny Houses" type="folder">
+	<outline text="Funny about Money" title="Funny about Money" xmlUrl="http://fivefilters.org/content-only/makefulltextfeed.php?url=http%3A%2F%2Ffeeds2.feedburner.com%2Ffunny-about-money%2Ffunny&amp;key=&amp;max=5&amp;links=preserve&amp;submit=Create+Feed"/>
+	<outline text="I WILL ESCAPE" title="I WILL ESCAPE" xmlUrl="http://iwillescape.typepad.com/i-will-escape/atom.xml"/>
+	<outline text="Living In Small Houses." title="Living In Small Houses." xmlUrl="http://fivefilters.org/content-only/makefulltextfeed.php?url=http%3A%2F%2Ffeeds2.feedburner.com%2Flivinginsmallhouses%2FBoKe&amp;key=&amp;max=4&amp;links=preserve&amp;submit=Create+Feed"/>
+	<outline text="Project Homestead" title="Project Homestead" xmlUrl="http://www.projecthomestead.com/blog/atom.xml"/>
+	<outline text="Project Rolling Freedom!" title="Project Rolling Freedom!" xmlUrl="http://projectrollingfreedom.com/feed"/>
+	<outline text="Tales of a Tiny Homestead" title="Tales of a Tiny Homestead" xmlUrl="http://naturallytiny.blogspot.com/feeds/posts/default"/>
+	<outline text="The Tiny Life" title="The Tiny Life" xmlUrl="http://feeds.feedburner.com/TheTinyLife"/>
+	<outline text="Tiny House Design" title="Tiny House Design" xmlUrl="http://feeds2.feedburner.com/TinyHouseDesign"/>
+</outline>
+<outline text="Travel" title="Travel" type="folder">
+	<outline text="Fragments of Dreams" title="Fragments of Dreams" xmlUrl="http://kojioe2.wordpress.com/feed/"/>
+	<outline text="Gridskipper" title="Gridskipper" xmlUrl="http://www.wizardrss.com/feed/feeds.feedburner.com/gridskipper/full"/>
+	<outline text="Repeating Islands" title="Repeating Islands" xmlUrl="http://pipes.yahoo.com/pipes/pipe.run?ContextBegin=%3Cspan+class%3D%22body%22%3E&amp;ContextEnd=%3C%2Fspan%3E&amp;RssUrl=http%3A%2F%2Frepeatingislands.com%2Ffeed%2F&amp;_id=f9ef30e9f3b6b905777deae6d24727a6&amp;_render=rss"/>
+	<outline text="Roosh V" title="Roosh V" xmlUrl="http://feeds.feedburner.com/dcb"/>
+	<outline text="Scout Magazine" title="Scout Magazine" xmlUrl="http://pipes.yahoo.com/pipes/pipe.run?ContextBegin=%3Cspan+class%3D%22body%22%3E&amp;ContextEnd=%3C%2Fspan%3E&amp;RssUrl=http%3A%2F%2Fscoutmagazine.ca%2Ffeed%2F&amp;_id=f9ef30e9f3b6b905777deae6d24727a6&amp;_render=rss"/>
+	<outline text="Thailand Land of Smiles" title="Thailand Land of Smiles" xmlUrl="http://feeds2.feedburner.com/Thailandlandofsmilescom"/>
+	<outline text="The Expeditioner" title="The Expeditioner" xmlUrl="http://pipes.yahoo.com/pipes/pipe.run?ContextBegin=%3Cspan+class%3D%22body%22%3E&amp;ContextEnd=%3C%2Fspan%3E&amp;RssUrl=http%3A%2F%2Fwww.theexpeditioner.com%2Ffeed%2F&amp;_id=f9ef30e9f3b6b905777deae6d24727a6&amp;_render=rss"/>
+	<outline text="Translating Cuba" title="Translating Cuba" xmlUrl="http://www.wizardrss.com/feed/translatingcuba.com/?feed=rss2"/>
+</outline>
+<outline text="Uncategorized" title="Uncategorized" type="folder">
+</outline>
+<outline text="Weeaboo" title="Weeaboo" type="folder">
+	<outline text="Things Fall Apart" title="Things Fall Apart" xmlUrl="http://elpeevio.blogspot.com/feeds/posts/default"/>
+	<outline text="クロス† チャネル" title="クロス† チャネル" xmlUrl="http://kojioe.wordpress.com/feed/"/>
+</outline>
+</body></opml>

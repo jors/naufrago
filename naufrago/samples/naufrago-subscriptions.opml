@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<opml version="1.0">
+<head>
+<title>Naufrago! Feed List Export</title>
+</head>
+<body>
+<outline title="General (local)" text="General (local)" description="General (local)" type="folder">
+<outline title="django-dynamic-formset project updates - Google Code" text="django-dynamic-formset project updates - Google Code" type="rss" xmlUrl="http://code.google.com/feeds/p/django-dynamic-formset/updates/basic"/>
+<outline title="VOIP-info.org Page Changes" text="VOIP-info.org Page Changes" type="rss" xmlUrl="http://www.voip-info.org/rss_feeds/page_changes.xml"/>
+<outline title="GRUPO DELITOS TELEMÁTICOS" text="GRUPO DELITOS TELEMÁTICOS" type="rss" xmlUrl="https://www.gdt.guardiacivil.es/webgdt/alertas_gdt_rss.xml"/>
+<outline title="Asco de vida" text="Asco de vida" type="rss" xmlUrl="http://feeds2.feedburner.com/AscoDeVida"/>
+<outline title="Visto en FB" text="Visto en FB" type="rss" xmlUrl="http://feeds.feedburner.com/VistoEnFacebook"/>
+</outline><outline title="OSS" text="OSS" description="OSS" type="folder">
+<outline title="Planeta Debian en español" text="Planeta Debian en español" type="rss" xmlUrl="http://planeta.debian.net/rss20.xml"/>
+<outline title="Hispalinux" text="Hispalinux" type="rss" xmlUrl="http://www.hispalinux.es/node/feed"/>
+<outline title="Planet Debian" text="Planet Debian" type="rss" xmlUrl="http://planet.debian.org/rss20.xml"/>
+<outline title="Debian Administration" text="Debian Administration" type="rss" xmlUrl="http://www.debian-administration.org/atom.xml"/>
+<outline title="Gnomefiles" text="Gnomefiles" type="rss" xmlUrl="http://www.gnomefiles.org/files/gnomefiles.rdf"/>
+<outline title="GNOME Footnotes" text="GNOME Footnotes" type="rss" xmlUrl="http://www.gnomedesktop.org/backend.php"/>
+<outline title="mozillaZine" text="mozillaZine" type="rss" xmlUrl="http://www.mozillazine.org/contents.rdf"/>
+<outline title="TuxMobil" text="TuxMobil" type="rss" xmlUrl="http://tuxmobil.org/tuxmobil_rss.rdf"/>
+<outline title="The GNOME Journal - article" text="The GNOME Journal - article" type="rss" xmlUrl="http://www.gnomejournal.org/?rss=1%26section=article"/>
+<outline title="IBM developerWorks : Linux" text="IBM developerWorks : Linux" type="rss" xmlUrl="http://www.ibm.com/developerworks/views/linux/rss/libraryview.jsp"/>
+<outline title="IBM developerWorks : Open source" text="IBM developerWorks : Open source" type="rss" xmlUrl="http://www.ibm.com/developerworks/views/opensource/rss/libraryview.jsp"/>
+<outline title="IBM developerWorks : Web development" text="IBM developerWorks : Web development" type="rss" xmlUrl="http://www.ibm.com/developerworks/views/web/rss/libraryview.jsp"/>
+<outline title="Planet GNOME" text="Planet GNOME" type="rss" xmlUrl="http://planet.gnome.org/atom.xml"/>
+<outline title="Planet BaDoPi" text="Planet BaDoPi" type="rss" xmlUrl="http://badopi.net/rss20.xml"/>
+</outline><outline title="Personal" text="Personal" description="Personal" type="folder">
+<outline title="enchufado.com RSS 2.0 Feed" text="enchufado.com RSS 2.0 Feed" type="rss" xmlUrl="http://enchufado.com/rss2.php"/>
+<outline title="Meloquitandelasmanos!" text="Meloquitandelasmanos!" type="rss" xmlUrl="http://meloquitandelasmanos.es/rss2.php"/>
+<outline title="SourceForge.net - Recent activity for project: naufrago" text="SourceForge.net - Recent activity for project: naufrago" type="rss" xmlUrl="http://sourceforge.net/export/rss2_keepsake.php?group_id=333054"/>
+</outline><outline title="Noticias" text="Noticias" description="Noticias" type="folder">
+<outline title="Menéame: publicadas" text="Menéame: publicadas" type="rss" xmlUrl="http://meneame.net/rss2.php"/>
+<outline title="Barrapunto" text="Barrapunto" type="rss" xmlUrl="http://backends.barrapunto.com/barrapunto.rss"/>
+<outline title="BulmaLUG" text="BulmaLUG" type="rss" xmlUrl="http://bulma.net/xml.php"/>
+<outline title="Engadget en español" text="Engadget en español" type="rss" xmlUrl="http://es.engadget.com/rss.xml"/>
+<outline title="Microsiervos" text="Microsiervos" type="rss" xmlUrl="http://www.microsiervos.com/index.xml"/>
+</outline><outline title="Seguridad (español)" text="Seguridad (español)" description="Seguridad (español)" type="folder">
+<outline title="Pentester.es" text="Pentester.es" type="rss" xmlUrl="http://www.pentester.es/feeds/posts/default"/>
+<outline title="Security By Default" text="Security By Default" type="rss" xmlUrl="http://feeds.feedburner.com/SecurityByDefault"/>
+<outline title="Security Art Work" text="Security Art Work" type="rss" xmlUrl="http://www.securityartwork.es/feed/"/>
+<outline title="Security et alii" text="Security et alii" type="rss" xmlUrl="http://securityetalii.es/feed/"/>
+<outline title="It should work..." text="It should work..." type="rss" xmlUrl="http://vierito.es/wordpress/feed/"/>
+<outline title="Latest news of INTECO" text="Latest news of INTECO" type="rss" xmlUrl="http://www.inteco.es/rss/Press/Latest_news_of_INTECO/?sectionID=6039"/>
+<outline title="conexioninversa" text="conexioninversa" type="rss" xmlUrl="http://conexioninversa.blogspot.com/feeds/posts/default"/>
+<outline title="una-al-dia Hispasec" text="una-al-dia Hispasec" type="rss" xmlUrl="http://www.hispasec.com/rss/unaaldia.xml"/>
+<outline title="Inicio || Diario de un Hacker" text="Inicio || Diario de un Hacker" type="rss" xmlUrl="http://www.diariodeunhacker.com/feed/rss"/>
+<outline title="Un informático en el lado del mal" text="Un informático en el lado del mal" type="rss" xmlUrl="http://elladodelmal.blogspot.com/feeds/posts/default"/>
+<outline title="Sergio Hernando" text="Sergio Hernando" type="rss" xmlUrl="http://www.sahw.com/wp/feed/"/>
+<outline title="48Bits Blog" text="48Bits Blog" type="rss" xmlUrl="http://blog.48bits.com/feed/rss/"/>
+<outline title="Ni ceros ni unos ..." text="Ni ceros ni unos ..." type="rss" xmlUrl="http://nicerosniunos.blogspot.com/feeds/posts/default"/>
+<outline title="Mundo Informático" text="Mundo Informático" type="rss" xmlUrl="http://infow.wordpress.com/feed/"/>
+<outline title="AUDITORÍA DE SEGURIDAD PARA EMPRESAS" text="AUDITORÍA DE SEGURIDAD PARA EMPRESAS" type="rss" xmlUrl="http://hacking-avanzado.blogspot.com/feeds/posts/default"/>
+<outline title="Todo es seguro ~~" text="Todo es seguro ~~" type="rss" xmlUrl="http://todoesseguro.blogspot.com/feeds/posts/default"/>
+<outline title="El diario de Juanito" text="El diario de Juanito" type="rss" xmlUrl="http://windowstips.wordpress.com/feed/"/>
+<outline title="Guru de la  informática" text="Guru de la  informática" type="rss" xmlUrl="http://vtroger.blogspot.com/feeds/posts/default"/>
+<outline title="Blog Laboratorio Hispasec" text="Blog Laboratorio Hispasec" type="rss" xmlUrl="http://blog.hispasec.com/laboratorio/rss20.xml"/>
+<outline title="Apuntes de seguridad de la información" text="Apuntes de seguridad de la información" type="rss" xmlUrl="http://seguridad-de-la-informacion.blogspot.com/feeds/posts/default"/>
+<outline title="S21sec Blog. Seguridad digital." text="S21sec Blog. Seguridad digital." type="rss" xmlUrl="http://blog.s21sec.com/feeds/posts/default"/>
+<outline title="Neo System Forensics" text="Neo System Forensics" type="rss" xmlUrl="http://neosysforensics.blogspot.com/feeds/posts/default"/>
+<outline title="Noticias de elhacker.net" text="Noticias de elhacker.net" type="rss" xmlUrl="http://www.elhacker.net/notis/rss.php?number=10"/>
+<outline title="KungFooSion" text="KungFooSion" type="rss" xmlUrl="http://kungfoosion.blogspot.com/feeds/posts/default"/>
+<outline title="RaDaJo Security Blog" text="RaDaJo Security Blog" type="rss" xmlUrl="http://www.radajo.com/feeds/posts/default"/>
+<outline title="El blog de Thor" text="El blog de Thor" type="rss" xmlUrl="http://el-blog-de-thor.blogspot.com/feeds/posts/default"/>
+<outline title="informaticoysegurata.blogspot.com" text="informaticoysegurata.blogspot.com" type="rss" xmlUrl="http://feeds.feedburner.com/InformaticoYSegurata"/>
+<outline title="Kriptópolis" text="Kriptópolis" type="rss" xmlUrl="http://www.kriptopolis.org/rss"/>
+<outline title="Noticias de Seguridad Informática" text="Noticias de Seguridad Informática" type="rss" xmlUrl="http://feeds2.feedburner.com/NoticiasSeguridadInformatica"/>
+<outline title="mbpfernand0.wordpress.com" text="mbpfernand0.wordpress.com" type="rss" xmlUrl="http://mbpfernand0.wordpress.com/feed/"/>
+<outline title="El Soctano" text="El Soctano" type="rss" xmlUrl="http://soctano.blogspot.com/feeds/posts/default"/>
+<outline title="Noticias SpamLoco.net" text="Noticias SpamLoco.net" type="rss" xmlUrl="http://feedproxy.google.com/Spamloco"/>
+<outline title="hackplayers" text="hackplayers" type="rss" xmlUrl="http://hackplayers.blogspot.com/feeds/posts/default?alt=rss"/>
+<outline title="Seguridad y Redes. Página Personal de Alfon." text="Seguridad y Redes. Página Personal de Alfon." type="rss" xmlUrl="http://seguridadyredes.nireblog.com/rss2/53360/index.xml"/>
+<outline title="www.cyberhades.com" text="www.cyberhades.com" type="rss" xmlUrl="http://www.cyberhades.com/feed/"/>
+<outline title="Taddong" text="Taddong" type="rss" xmlUrl="http://blog.taddong.com/feeds/posts/default"/>
+<outline title="Malware Intelligence Blog" text="Malware Intelligence Blog" type="rss" xmlUrl="http://mipistus.blogspot.com/feeds/posts/default"/>
+<outline title="El rincón de dan1t0" text="El rincón de dan1t0" type="rss" xmlUrl="http://dan1t0.wordpress.com/feed/"/>
+<outline title="La Comunidad DragonJAR" text="La Comunidad DragonJAR" type="rss" xmlUrl="http://feedproxy.google.com/dragonjar/pKru"/>
+</outline><outline title="Seguridad (guiri)" text="Seguridad (guiri)" description="Seguridad (guiri)" type="folder">
+<outline title="Packet Storm Security Headlines" text="Packet Storm Security Headlines" type="rss" xmlUrl="http://packetstormsecurity.org/headlines.xml"/>
+<outline title="Computer Academic Underground" text="Computer Academic Underground" type="rss" xmlUrl="http://caughq.wordpress.com/rss"/>
+<outline title="AppSec Street Fighter - SANS Institute" text="AppSec Street Fighter - SANS Institute" type="rss" xmlUrl="http://blogs.sans.org/appsecstreetfighter/feed/"/>
+<outline title="carnal0wnage" text="carnal0wnage" type="rss" xmlUrl="http://carnal0wnage.attackresearch.com/rss.xml"/>
+<outline title="Darknet - The Darkside" text="Darknet - The Darkside" type="rss" xmlUrl="http://feedproxy.google.com/darknethackers"/>
+<outline title="ha.ckers.org web application security lab" text="ha.ckers.org web application security lab" type="rss" xmlUrl="http://ha.ckers.org/blog/feed/"/>
+<outline title="SANS Internet Storm Center, InfoCON: green" text="SANS Internet Storm Center, InfoCON: green" type="rss" xmlUrl="http://isc.sans.org/rssfeed.xml"/>
+<outline title="Security Circus" text="Security Circus" type="rss" xmlUrl="http://securitycircus.blogspot.com/feeds/posts/default"/>
+</outline><outline title="Diarios" text="Diarios" description="Diarios" type="folder">
+<outline title="LA VANGUARDIA.es - Al Minuto" text="LA VANGUARDIA.es - Al Minuto" type="rss" xmlUrl="http://feeds.feedburner.com/lavanguardia/alminuto"/>
+<outline title="ELPAIS.com - Portada" text="ELPAIS.com - Portada" type="rss" xmlUrl="http://www.elpais.com/rss/feed.html?feedId=1022"/>
+<outline title="Portada // elmundo.es" text="Portada // elmundo.es" type="rss" xmlUrl="http://rss.elmundo.es/rss/descarga.htm?data2=4"/>
+<outline title="www.as.com" text="www.as.com" type="rss" xmlUrl="http://www.as.com/static/estatico/rss/"/>
+<outline title="RSS Agregación ABC" text="RSS Agregación ABC" type="rss" xmlUrl="http://www.abc.es/rss/feeds/abcPortada.xml"/>
+<outline title="ElPeriodico" text="ElPeriodico" type="rss" xmlUrl="http://www.elperiodico.com/es/rss/rss_portada.xml"/>
+</outline><outline title="Web" text="Web" description="Web" type="folder">
+<outline title="LaWebera.es" text="LaWebera.es" type="rss" xmlUrl="http://feeds.feedburner.com/laweberaes"/>
+<outline title="Noticias breves en Desarrolloweb.com" text="Noticias breves en Desarrolloweb.com" type="rss" xmlUrl="http://www.desarrolloweb.com/rss/breves_rss.php"/>
+</outline><outline title="Blogs" text="Blogs" description="Blogs" type="folder">
+<outline title="Rubén Ortiz" text="Rubén Ortiz" type="rss" xmlUrl="http://www.rubenortiz.es/feed/"/>
+<outline title="Comments for Rubén Ortiz" text="Comments for Rubén Ortiz" type="rss" xmlUrl="http://www.rubenortiz.es/comments/feed/"/>
+</outline></body>
+</opml>

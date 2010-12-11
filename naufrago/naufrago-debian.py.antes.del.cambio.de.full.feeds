@@ -3098,29 +3098,28 @@ class Naufrago:
    limit = self.num_entries
 
   # DBG
-  #local_file = ''
-  #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-  # web_file = urllib2.urlopen(url, timeout=10)
-  # local_file = open(nombre_feed + '.xml', 'a')
-  # local_file.write(web_file.read())
-  # local_file.close()
-  # web_file.close()
-#
-  # local_file = open(nombre_feed + '.log', 'a')
-  # local_file.write('[' + nombre_feed + ']\n')
-  # local_file.write('===START_DB_DUMP===\n')
-  # self.lock.acquire()
-  # cursor.execute('SELECT entry_unique_id,titulo FROM articulo WHERE id_feed = ? ORDER BY fecha', [id_feed])
-  # dump = cursor.fetchall()
-  # self.lock.release()
-  # for row in dump:
-  #  local_file.write(row[0] + ' - ' + row[1] + '\n')
-  # local_file.write('===END_DB_DUMP===\n')
-  # local_file.write('===START_ENTRY_RETRIEVE===\n')
+  local_file = ''
+  if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
+   web_file = urllib2.urlopen(url, timeout=10)
+   local_file = open(nombre_feed + '.xml', 'a')
+   local_file.write(web_file.read())
+   local_file.close()
+   web_file.close()
+
+   local_file = open(nombre_feed + '.log', 'a')
+   local_file.write('[' + nombre_feed + ']\n')
+   local_file.write('===START_DB_DUMP===\n')
+   self.lock.acquire()
+   cursor.execute('SELECT entry_unique_id,titulo FROM articulo WHERE id_feed = ? ORDER BY fecha', [id_feed])
+   dump = cursor.fetchall()
+   self.lock.release()
+   for row in dump:
+    local_file.write(row[0] + ' - ' + row[1] + '\n')
+   local_file.write('===END_DB_DUMP===\n')
+   local_file.write('===START_ENTRY_RETRIEVE===\n')
   # DBG
 
   # Check for article existence...
-  ###for i in range(0, count):
   for i in range(0, limit):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    self.lock.acquire()
@@ -3131,16 +3130,16 @@ class Naufrago:
    # Non-existant entry? Insert!
    if(unique is None):
     # DBG
-    #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-    # local_file.write('Recibido: ' + id + ' - '+ title + ' (detectado como UNIQUE!).\n')
-    # self.lock.acquire()
-    # cursor.execute('SELECT id FROM articulo WHERE titulo = ? AND id_feed = ?', [title.decode("utf-8"),id_feed])
-    # is_title = cursor.fetchone()
-    # self.lock.release()
-    # if is_title is not None:
-    #  local_file.write('ATENCIÓN: ¡Ya había una entrada con el mismo título en la BD!\n')
-    # else:
-    #  local_file.write('NO se encontró el título previamente en la BD.\n')
+    if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
+     local_file.write('Recibido: ' + id + ' - '+ title + ' (detectado como UNIQUE!).\n')
+     self.lock.acquire()
+     cursor.execute('SELECT id FROM articulo WHERE titulo = ? AND id_feed = ?', [title.decode("utf-8"),id_feed])
+     is_title = cursor.fetchone()
+     self.lock.release()
+     if is_title is not None:
+      local_file.write('ATENCIÓN: ¡Ya había una entrada con el mismo título en la BD!\n')
+     else:
+      local_file.write('NO se encontró el título previamente en la BD.\n')
     # DBG
     # Check first is the feed is full
     self.lock.acquire()
@@ -3171,10 +3170,7 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
     images = self.find_entry_images(feed_link, description)
-    ###if i >= limit: ghost = 1
-    ###else: ghost = 0
     self.lock.acquire()
-    ###cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8"),ghost])
     cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
     self.conn.commit()
     self.lock.release()
@@ -3183,7 +3179,6 @@ class Naufrago:
     unique = cursor.fetchone()
     self.lock.release()
     # START Offline mode image retrieving
-    ###if ghost == 0:
     if (self.offline_mode == 1) and (images != ''):
      self.lock.acquire()
      cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
@@ -3196,7 +3191,6 @@ class Naufrago:
     num_new_posts_total += 1
    else:
     # START Offline mode image retrieving
-    ###if ghost == 0:
     if (self.offline_mode == 1):
      self.lock.acquire()
      cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
@@ -3212,9 +3206,9 @@ class Naufrago:
     # END Offline mode image retrieving
 
   # DBG
-  #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-  # local_file.write('===END_ENTRY_RETRIEVE===\n\n')
-  # local_file.close()
+  if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
+   local_file.write('===END_ENTRY_RETRIEVE===\n\n')
+   local_file.close()
   # DBG
   gtk.gdk.threads_leave()
 
@@ -3366,7 +3360,6 @@ class Naufrago:
   filter = gtk.FileFilter()
   filter.set_name("opml/xml")
   filter.add_pattern("*.opml")
-  filter.add_pattern("*.xml")
   dialog.add_filter(filter)
 
   filter = gtk.FileFilter()
@@ -3382,12 +3375,13 @@ class Naufrago:
    dialog.hide()
    f = open(filename, 'r')
    tree = ElementTree.parse(f)
-   current_category = 'General'
+   current_category = 0
    cursor = self.conn.cursor()
    for node in tree.getiterator('outline'):
     name = node.attrib.get('text').replace('[','(').replace(']',')')
     url = node.attrib.get('xmlUrl')
-    if url:
+    tipo = node.attrib.get('type')
+    if name and url:
      self.lock.acquire()
      cursor.execute('SELECT id FROM feed WHERE nombre = ?', [name])
      row = cursor.fetchone()
@@ -3406,8 +3400,8 @@ class Naufrago:
       #self.get_favicon(id_feed, url)
       t = threading.Thread(target=self.get_favicon, args=(id_feed, url, ))
       t.start()
-    else:
-     if len(node) is not 0:
+    elif tipo == 'folder' and len(node) is not 0:
+     if node[0].attrib.get('type') != 'folder':
       self.lock.acquire()
       cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [name])
       row = cursor.fetchone()
