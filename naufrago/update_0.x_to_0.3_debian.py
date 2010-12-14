@@ -22,6 +22,7 @@ def 02to03(cursor):
   cursor.execute('ALTER TABLE config ADD driven_mode integer NOT NULL DEFAULT 0')
   cursor.execute('ALTER TABLE config ADD update_freq_timemode integer NOT NULL DEFAULT 0')
   cursor.execute('ALTER TABLE config ADD init_check_app_updates integer NOT NULL DEFAULT 1')
+  cursor.execute('ALTER TABLE articulo ADD ghost integer NOT NULL DEFAULT 0')
  except:
   pass
 
