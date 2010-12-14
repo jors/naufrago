@@ -3040,7 +3040,7 @@ class Naufrago:
   elif hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
    #print d.bozo_exception
    for item in bozo_invalid:
-    if item in (d.bozo_exception):
+    if item in str(d.bozo_exception):
      model.set(dest_iter, 1, 'crossout-image')
      dont_parse = True
      break
@@ -3106,36 +3106,13 @@ class Naufrago:
     model_tmp.set(iter_tmp, 0, title)
 
   limit = count = len(d.entries)
-  print 'count: el feed ofrece ' + `count` + ' entradas.'
   if count > self.num_entries:
    limit = self.num_entries
-  print 'limit: establecida en ' + `limit` + ' entradas.'
+  print 'El feed ofrece ' + `count` + ' entries...'
 
-  # DBG
-  #local_file = ''
-  #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-  # web_file = urllib2.urlopen(url, timeout=10)
-  # local_file = open(nombre_feed + '.xml', 'a')
-  # local_file.write(web_file.read())
-  # local_file.close()
-  # web_file.close()
-#
-  # local_file = open(nombre_feed + '.log', 'a')
-  # local_file.write('[' + nombre_feed + ']\n')
-  # local_file.write('===START_DB_DUMP===\n')
-  # self.lock.acquire()
-  # cursor.execute('SELECT entry_unique_id,titulo FROM articulo WHERE id_feed = ? ORDER BY fecha', [id_feed])
-  # dump = cursor.fetchall()
-  # self.lock.release()
-  # for row in dump:
-  #  local_file.write(row[0] + ' - ' + row[1] + '\n')
-  # local_file.write('===END_DB_DUMP===\n')
-  # local_file.write('===START_ENTRY_RETRIEVE===\n')
-  # DBG
-
+  new_entries = []
   # Check for article existence...
   for i in range(0, count):
-  ###for i in range(0, limit):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
    self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
@@ -3144,77 +3121,42 @@ class Naufrago:
    images = ''
    # Non-existant entry? Insert!
    if(unique is None):
-    print 'Entrada única!!!'
-    # DBG
-    #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-    # local_file.write('Recibido: ' + id + ' - '+ title + ' (detectado como UNIQUE!).\n')
-    # self.lock.acquire()
-    # cursor.execute('SELECT id FROM articulo WHERE titulo = ? AND id_feed = ?', [title.decode("utf-8"),id_feed])
-    # is_title = cursor.fetchone()
-    # self.lock.release()
-    # if is_title is not None:
-    #  local_file.write('ATENCIÓN: ¡Ya había una entrada con el mismo título en la BD!\n')
-    # else:
-    #  local_file.write('NO se encontró el título previamente en la BD.\n')
-    # DBG
-    # Check first is the feed is full
-    #___self.lock.acquire()
-    #___cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
-    #___row2 = cursor.fetchone()
-    #___self.lock.release()
-    #___if((row2 is not None) and (row2[0]>=self.num_entries)): # If so, do some purging first...
-    #___ self.lock.acquire()
-    #___ cursor.execute('SELECT id,fecha FROM articulo WHERE importante = 0 AND id_feed = ? ORDER BY fecha ASC LIMIT 1', [id_feed])
-    #___ id_articulo, fecha = cursor.fetchone()
-    #___ self.lock.release()
-     # Ahora borramos las imagenes del filesystem, si procede
-    #___ self.lock.acquire()
-    #___ cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
-    #___ images = cursor.fetchall()
-    #___ self.lock.release()
-    #___ for i in images:
-    #___  self.lock.acquire()
-    #___  cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
-    #___  row3 = cursor.fetchone()
-    #___  self.lock.release()
-    #___  if (row3 is not None) and (row3[0] <= 1):
-    #___   if os.path.exists(images_path + '/'+ str(i[0])):
-    #___    os.unlink(images_path + '/'+ str(i[0]))
-    #___ self.lock.acquire()
-    #___ cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
-    #___ cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
-    #___ self.conn.commit()
-    #___ self.lock.release()
+    print 'Entrada única!!! (title: '+`title`+'), ',
     images = self.find_entry_images(feed_link, description)
     ghost = 0
-    if i >= limit: ghost = 1
+    if i >= limit:
+     ghost = 1
+     print 'ghost=1'
+    else:
+     print 'ghost=0'
     self.lock.acquire()
     cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8"),ghost])
-    ###cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8")])
     self.conn.commit()
     self.lock.release()
     self.lock.acquire()
     cursor.execute('SELECT MAX(id) FROM articulo')
-    unique = cursor.fetchone()
+    recently_inserted_entry = cursor.fetchone()
     self.lock.release()
+    new_entries.append(recently_inserted_entry[0]) # Lista de control de nuevas entries insertadas
     # START Offline mode image retrieving
-    if i <= limit:
+    if i < limit:
      if (self.offline_mode == 1) and (images != ''):
       self.lock.acquire()
-      cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [unique[0]]) # No dupes
+      cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [recently_inserted_entry[0]]) # No dupes
       images_present = cursor.fetchone()
       self.lock.release()
       if images_present is None:
-       self.retrieve_entry_images(unique[0], images)
+       self.retrieve_entry_images(recently_inserted_entry[0], images)
     # END Offline mode image retrieving
-    if i <= limit:
-     new_posts = True
+    # Accounting...
+    if i < limit:
+    # new_posts = True
      num_new_posts_total += 1
 
    else:
     print 'Entrada existente.'
     # START Offline mode image retrieving
-    if i <= limit:
+    if i < limit:
      if (self.offline_mode == 1):
       self.lock.acquire()
       cursor.execute('SELECT imagenes FROM articulo WHERE id = ?', [unique[0]]) # ¿Hay imagenes?
@@ -3235,12 +3177,6 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
 
-  # DBG
-  #if nombre_feed == 'Asco de vida' or nombre_feed == 'Visto en FB' or nombre_feed == 'ElPeriodico':
-  # local_file.write('===END_ENTRY_RETRIEVE===\n\n')
-  # local_file.close()
-  # DBG
-
   # NEW !!!
   # Check first is the feed is full (to do some cleanup)
   self.lock.acquire()
@@ -3248,17 +3184,22 @@ class Naufrago:
   total = cursor.fetchone()
   self.lock.release()
   if (total is not None):
-   if (total[0]>count) and (total[0]>self.num_entries): # If so, do some purging first...
+   # Si lo que recibimos del feed es menor que self.num_entries,
+   # count pasará a valer lo mismo que self.num_entries.
+   if count < self.num_entries:
+    count = self.num_entries
+   # Si el total (sin importantes) supera lo que recibimos del feed
+   # (o self.num_entries si count es menor), entramos a hacer LIMPIEZA.
+   if (total[0]>count):
     print 'Entramos a hacer LIMPIEZA.'
-    self.lock.acquire()
-    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 1', [id_feed])
-    total_importante = cursor.fetchone()
-    self.lock.release()
-    exceed = total[0] - total_importante[0] - count
+    exceed = total[0] - count
+    print 'En total hay ' + `total[0]` + ' (de '+`count`+' permitidas), y sobran ' + `exceed`
     self.lock.acquire()
     cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante=0 ORDER BY fecha ASC LIMIT ?', [id_feed,exceed])
     row  = cursor.fetchall()
     self.lock.release()
+    print 'Borramos: '
+    print row
     for id_articulo in row:
      # Ahora borramos las imagenes del filesystem, si procede
      self.lock.acquire()
@@ -3275,10 +3216,31 @@ class Naufrago:
         os.unlink(images_path + '/' + `i[0]`)
       self.lock.acquire()
       cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
-      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
       self.conn.commit()
       self.lock.release()
+
+     self.lock.acquire()
+     cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
+     self.conn.commit()
+     self.lock.release()
+     # Accounting...
+     if len(new_entries) > 0:
+      if id_articulo[0] in new_entries:
+       num_new_posts_total -= 1
+       new_entries.remove(id_articulo[0])
+
+    self.lock.acquire()
+    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
+    print 'FIN: quedan ' + `cursor.fetchone()[0]` + ' entradas.'
+    self.lock.release()
   # NEW !!!
+  # NEW2 !!!
+  # Accounting...
+  if len(new_entries) > 0:
+   new_posts = True
+  else:
+   new_posts = False
+  # NEW2 !!!
 
   gtk.gdk.threads_leave()
 

@@ -5,5 +5,6 @@ if 'uno' in L:
  print 'Trobat!'
  L.append('cuatre')
  print L
+ print 'Mide ' + `len(L)`
 else:
  print 'No trobat!'
