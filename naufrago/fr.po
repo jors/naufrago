@@ -18,7 +18,7 @@ msgstr ""
 
 #: naufrago.py:53
 msgid "Error importing modules: "
-msgstr ""
+msgstr "Importation des modules impossible: "
 
 #: naufrago.py:315 naufrago.py:486 naufrago.py:505 naufrago.py:560
 #: naufrago.py:585 naufrago.py:651 naufrago.py:673 naufrago.py:706
@@ -52,23 +52,23 @@ msgstr "Avertissement !"
 
 #: naufrago.py:1084 naufrago.py:1094 naufrago.py:1109
 msgid "Upgrade checker"
-msgstr ""
+msgstr "Vérifier les mises-à-jour"
 
 #: naufrago.py:1087 naufrago.py:1097 naufrago.py:1112
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: naufrago.py:1088
 msgid "No updates available."
-msgstr ""
+msgstr "Aucune mise-à-jour disponible."
 
 #: naufrago.py:1113
 msgid "Coult not contact server. Try again later!"
-msgstr ""
+msgstr "Impossible d'établir le contact avec le serveur. Réessayez plus tard !"
 
 #: naufrago.py:1143
 msgid "Naufrago! is a simple RSS reader"
-msgstr "Naufrago! est un simple lecteur de flux RSS"
+msgstr "Naufrago! est un lecteur simplifié de flux RSS"
 
 #: naufrago.py:1208
 msgid "_Archive"
@@ -180,11 +180,11 @@ msgstr "Actualise tous les flux"
 
 #: naufrago.py:1223 naufrago.py:1652
 msgid "Stop"
-msgstr ""
+msgstr "Interrompre"
 
 #: naufrago.py:1223
 msgid "Stop update"
-msgstr ""
+msgstr "Interrompre l'actualisation"
 
 #: naufrago.py:1224
 msgid "_Help"
@@ -196,7 +196,7 @@ msgstr "FAQ"
 
 #: naufrago.py:1226
 msgid "Check updates"
-msgstr ""
+msgstr "Vérifier les mises-à-jour"
 
 #: naufrago.py:1227
 msgid "_About"
@@ -259,9 +259,8 @@ msgid "Create"
 msgstr "Créer"
 
 #: naufrago.py:1879
-#, fuzzy
 msgid "Category <b>already present</b>!"
-msgstr "Cette catégorie <b>ne peut pas être supprimée</b> !"
+msgstr "Catégorie <b>déjà existante</b> !"
 
 #: naufrago.py:1918
 msgid "Delete the selected <b>category</b>?"
@@ -311,7 +310,7 @@ msgstr "Nom par défaut"
 
 #: naufrago.py:2109
 msgid "Feed <b>already present</b>!"
-msgstr ""
+msgstr "Flux <b>déjà existant</b> !"
 
 #: naufrago.py:2147
 msgid "Delete selected <b>feed</b>?"
@@ -355,7 +354,7 @@ msgstr "Démarrer avec l'arborescence dépliée"
 
 #: naufrago.py:2436
 msgid "Driven mode"
-msgstr ""
+msgstr "Affichage amélioré"
 
 #: naufrago.py:2439
 msgid "Start in Tray Icon"
@@ -367,7 +366,7 @@ msgstr "Actualiser au démarrage"
 
 #: naufrago.py:2451
 msgid "Check application updates on start"
-msgstr ""
+msgstr "Vérifier les mises-à-jour au démarrage"
 
 #: naufrago.py:2456
 msgid "Start"
@@ -378,17 +377,16 @@ msgid "Number of feed entries"
 msgstr "Nombre d'articles par flux"
 
 #: naufrago.py:2473
-#, fuzzy
 msgid "Update every"
-msgstr "Actualiser toutes les (heures)"
+msgstr "Actualiser toutes les"
 
 #: naufrago.py:2484
 msgid "hour/s"
-msgstr ""
+msgstr "heure(s)"
 
 #: naufrago.py:2485
 msgid "minute/s"
-msgstr ""
+msgstr "minutes(s)"
 
 #: naufrago.py:2490
 msgid "Hide read entries"
@@ -399,9 +397,8 @@ msgid "Feeds & articles"
 msgstr "Flux et articles"
 
 #: naufrago.py:2502
-#, fuzzy
 msgid "Hide dates"
-msgstr "Cacher les articles lus"
+msgstr "Cacher les dates"
 
 #: naufrago.py:2508
 msgid "Notification on new entries"
@@ -441,7 +438,7 @@ msgstr "Mode Hors-Ligne (plus lent!)"
 
 #: naufrago.py:2547
 msgid "Modes"
-msgstr ""
+msgstr "Modes"
 
 #: naufrago.py:2716
 msgid "Mark all as read"

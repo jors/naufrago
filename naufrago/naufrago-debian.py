@@ -1339,9 +1339,11 @@ class Naufrago:
   cursor.close()
 
  def purge_entries(self):
-  """Purges excedent entries from each feed. This is called from Preferences
-     dialog if the number of entries per feed is shrunk."""
+  """Adequates excedent entries from each feed. This is called from Preferences
+     dialog if the number of entries per feed has grown/shrunk."""
   updated_feed_ids = []
+  s_valid = ''
+  s_ghost = ''
   cursor = self.conn.cursor()
   self.lock.acquire()
   cursor.execute('SELECT id FROM feed')
@@ -1349,37 +1351,28 @@ class Naufrago:
   self.lock.release()
   for row in feeds:
    self.lock.acquire()
-   cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante = 0 ORDER BY fecha DESC LIMIT ?,1000000', [row[0],self.num_entries])
-   articles = cursor.fetchall()
+   cursor.execute('SELECT id FROM articulo WHERE id_feed=? AND importante=0 ORDER BY fecha DESC LIMIT 0,?', [row[0],self.num_entries])
+   row2 = cursor.fetchall()
    self.lock.release()
-   if articles is not None:
-    id_articulos = ''
-    for art in articles:
-     id_articulos += `art[0]` + ','
-     # Aprovechamos el bucle para borrar las imagenes del filesystem, si procede.
-     # Ojo, porque cabe controlar que esa imagen no sea usada también por otro artículo,
-     # dado que éstas se comparten entre artículos si son la misma.
-     self.lock.acquire()
-     cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [art[0]])
-     images = cursor.fetchall()
-     self.lock.release()
-     for i in images:
-      self.lock.acquire()
-      cursor.execute('SELECT count(nombre) FROM imagen WHERE nombre = ?', [i[0]])
-      row3 = cursor.fetchone()
-      self.lock.release()
-      if (row3 is not None) and (row3[0] <= 1):
-       if os.path.exists(images_path + '/'+ `i[0]`):
-        os.unlink(images_path + '/'+ `i[0]`)
-    id_articulos = id_articulos[0:len(id_articulos)-1]
-
-    self.lock.acquire()
-    cursor.execute('DELETE FROM imagen WHERE id_articulo IN ('+id_articulos+')')
-    cursor.execute('DELETE FROM articulo WHERE id IN ('+id_articulos+')')
-    self.conn.commit()
-    self.lock.release()
-    cursor.close()
+   if row2 is not None:
+    s = ','.join(`n[0]` for n in row2)
+    s_valid = s_valid + s
     updated_feed_ids.append(row[0])
+
+   self.lock.acquire()
+   cursor.execute('SELECT id FROM articulo WHERE id_feed=? AND importante=0 ORDER BY fecha DESC LIMIT ?,1000000', [row[0],self.num_entries])
+   row2 = cursor.fetchall()
+   self.lock.release()
+   if row2 is not None:
+    s = ','.join(`n[0]` for n in row2)
+    s_ghost = s_ghost + s
+    updated_feed_ids.append(row[0])
+
+  self.lock.acquire()
+  cursor.execute('UPDATE articulo SET ghost=0 WHERE id IN ('+s_valid+')')
+  cursor.execute('UPDATE articulo SET ghost=1 WHERE id IN ('+s_ghost+')')
+  self.conn.commit()
+  self.lock.release()
 
   if len(updated_feed_ids)>0:
    self.liststore.clear()
@@ -3108,7 +3101,7 @@ class Naufrago:
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
-  print 'El feed ofrece ' + `count` + ' entries...'
+  print 'El feed ['+nombre_feed+'] ofrece ' + `count` + ' entries...'
 
   new_entries = []
   # Check for article existence...
@@ -3154,7 +3147,7 @@ class Naufrago:
      num_new_posts_total += 1
 
    else:
-    print 'Entrada existente.'
+    print 'Entrada existente (ghost=0).'
     # START Offline mode image retrieving
     if i < limit:
      if (self.offline_mode == 1):
@@ -3171,7 +3164,7 @@ class Naufrago:
         self.retrieve_entry_images(unique[0], imagenes[0])
     # END Offline mode image retrieving
     else:
-     print 'Ponemos ghost=1 a esta entrada (existe y es excedente).'
+     print 'Entrada existente Y excedente (ghost=1).'
      self.lock.acquire()
      cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
      self.conn.commit()
@@ -3231,7 +3224,9 @@ class Naufrago:
 
     self.lock.acquire()
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
-    print 'FIN: quedan ' + `cursor.fetchone()[0]` + ' entradas.'
+    print 'FIN: quedan ' + `cursor.fetchone()[0]` + ' entradas ',
+    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0 AND ghost = 0', [id_feed])
+    print '(' + `cursor.fetchone()[0]` + ' visibles).'
     self.lock.release()
   # NEW !!!
   # NEW2 !!!
