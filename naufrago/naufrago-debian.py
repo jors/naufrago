@@ -2329,25 +2329,41 @@ class Naufrago:
  def driven_mode_action(self):
   """Collapse or expands parent nodes based on unread items within its feeds."""
   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+  useless_iter_parent = model.iter_parent(useless_iter)
+  useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
+
   iter = model.get_iter_root() # Magic
+  id_cat = model.get_value(iter, 2)
   while (iter is not None):
-   if(model.iter_depth(iter) == 0): # Si es padre
+   if(model.iter_depth(iter) == 0) and (id_cat != 9998) and (id_cat != 9999): # Si es padre
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
+     if self.driven_mode == 1:
+      if id_cat == useless_iter_id_cat:
+       q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND articulo.ghost=0 AND categoria.id='+`id_cat`+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
+       print q
+       cursor = self.conn.cursor()
+       self.lock.acquire()
+       cursor.execute(q)
+       row = cursor.fetchone()
+       self.lock.release()
+       cursor.close()
+       if (row is not None) and (row[0] == 0):
+        print 'count: ' + `row[0]`
+        # Esconder la lista de feeds y mostrar en el navegador los datos de la categoría
+        self.liststore.clear() # Limpieza de tabla de entries/articulos
+        self.scrolled_window2.set_size_request(0,0)
+        self.scrolled_window2.hide()
+        self.webview.load_string("<h2>"+_("Category")+": "+model.get_value(useless_iter_parent, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+        self.eb.hide()
+        self.eb_image_zoom.hide()
+
      self.treeview.collapse_row(model.get_path(iter))
-     # Si la categoria actual coincide con el nodo padre del nodo hijo que había seleccionado, magia.
-     if useless_iter is not None and self.driven_mode == 1:
-      # Esconder la lista de feeds y mostrar en el navegador los datos de la categoría
-      self.liststore.clear() # Limpieza de tabla de entries/articulos
-      self.scrolled_window2.set_size_request(0,0)
-      self.scrolled_window2.hide()
-      useless_iter_parent = model.iter_parent(useless_iter)
-      self.webview.load_string("<h2>" + _("Category") + ": "+model.get_value(useless_iter_parent, 0)+"</h2>", "text/html", "utf-8", "valid_link")
-      self.eb.hide()
-      self.eb_image_zoom.hide()
     elif boldornot == 'bold':
      self.treeview.expand_row(model.get_path(iter), open_all=False)
    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre.. 
+   if iter is not None:
+    id_cat = model.get_value(iter, 2)
 
  def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode):
   """Restores the state of the linked checkboxes unfolded_tree and driven_mode."""
