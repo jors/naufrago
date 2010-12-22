@@ -1,4 +1,4 @@
-8/07/2010
+22/12/2010
 
 =========
 Contenido
@@ -34,18 +34,20 @@ Las destacadas serían:
  - Categorización de feeds de un único nivel en árbol.
  - Organización de feeds por categorías mediante drag & drop.
  - Lectura online/offline de feeds (incluyendo imágenes).
+ - Apertura/cierre inteligente de categorias.
  - Modo pantalla completa para la lectura de feeds.
  - Marcación de feeds como importantes/permanentes (grabación).
  - Inclusión de los favicons de los feeds.
  - Iconización de la aplicación en la Tray.
  - Importación/exportación de feeds en formato OPML.
- - Multiidioma (de momento Ingles, Catalan y Castellano).
+ - Carpeta de Importantes y No leídos.
+ - Buscador de términos.
+ - Multiidioma (de momento Inglés, Francés, Polaco, Italiano, Catalán y Castellano).
+ - Autocomprobador de actualizaciones.
 
 Lista de deseos:
- - Carpeta de importantes.
+
  - Traducciones a más idiomas.
- - Más threads.
- - Buscador de términos.
 
 ========================
 3. Requisitos (mínimos)
@@ -133,6 +135,8 @@ especialmente a mi pareja, y además:
   (http://www.openclipart.org/user-detail/GMcGlinn).
 - El necesario svg de RSS de SRD
   (http://www.openclipart.org/user-detail/SRD).
+- El simple pero claro svg del aspa roja de raemi
+  (http://www.openclipart.org/user-detail/raemi).
 - Doug Quale ( quale1 at charter dot net ) & 
   Walter Anger ( WalterAnger at aon dot at ).
   por el excelente material DnD.

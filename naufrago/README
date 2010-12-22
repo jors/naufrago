@@ -34,18 +34,19 @@ The majors ones would be:
  - Feed organization drag & dropping through categories.
  - Online/offline feed reading (including images).
  - Full screen mode for better feed reading.
+ - Smart category folding/unfolding.
  - Important/permanent feed marking (recording).
  - Favicon support.
  - Tray iconization.
  - Feed import/export in OPML format.
- - Multilanguage (currently English, Catalan and Spanish).
+ - Important and Unread folders.
+ - Term searching capabilities.
+ - Multilanguage (currently English, French, Polish, Italian, Catalan and Spanish).
+ - Automatic update checker.
 
 Whishlist:
 
- - "Important" entries folder.
  - More translations.
- - More threads.
- - Term search.
 
 ==========================
 3. Requirements (minimum)

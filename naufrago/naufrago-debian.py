@@ -2344,6 +2344,7 @@ class Naufrago:
     if boldornot == 'normal':
      if self.driven_mode == 1:
       if id_cat == useless_iter_id_cat:
+       q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND articulo.ghost=0 AND categoria.id='+`id_cat`+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
        cursor = self.conn.cursor()
        self.lock.acquire()
        cursor.execute(q)
