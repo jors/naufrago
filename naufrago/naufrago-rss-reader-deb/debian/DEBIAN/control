@@ -7,7 +7,7 @@ Installed-Size: 292
 Depends: python (>= 2.5), python-gtk2, python-feedparser, python-gobject, python-pysqlite2, python-webkit, python-notify
 Section: net
 Priority: optional
-Homepage: http://www.enchufado.com/
+Homepage: http://sourceforge.net/projects/naufrago/
 Description: Simple offline RSS reader
  Náufrago! es un lector simple de RSS que permite ver noticias
  con sus imágenes aún sin mantenerse a flote, o dicho de otro modo,
@@ -18,10 +18,13 @@ Description: Simple offline RSS reader
   - Categorización de feeds de un único nivel en árbol.
   - Organización de feeds por categorías mediante drag & drop.
   - Lectura online/offline de feeds (incluyendo imágenes).
+  - Apertura/cierre inteligente de categorias.
   - Modo pantalla completa para la lectura de feeds.
   - Marcación de feeds como importantes/permanentes (grabación).
   - Inclusión de los favicons de los feeds.
   - Iconización de la aplicación en la Tray.
   - Carpetas de Importantes y No leídos.
   - Buscador de términos.
+  - Multiidioma (de momento Inglés, Polaco, Italiano, Catalán y Castellano).
   - Importación/exportación de feeds en formato OPML.
+  - Autocomprobador de actualizaciones.

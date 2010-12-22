@@ -27,15 +27,17 @@ def 02to03(cursor):
   pass
 
 for user in os.listdir('/home'):
- if os.path.isdir(os.path.join('/home', user)):
-  # Appdir move!
-  homedir = '/home/' + user
-  if os.path.exists(homedir + '/.naufrago/'):
+ homedir = '/home/' + user
+ if os.path.isdir(homedir):
+  if os.path.exists(homedir + '/.naufrago/'): # Are we dealing with 0.1...
    os.rename(homedir + '/.naufrago/', homedir + '/.config/naufrago/')
-  # Database conditioning!
-  if os.path.exists(homedir + '/.config/naufrago/naufrago.db'):
    conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
    cursor = conn.cursor()
    01to02(cursor)
+   02to03(cursor)
+   cursor.close()
+  elif os.path.exists(homedir + '/.config/naufrago/naufrago.db'): # ... or 0.2 version?
+   conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
+   cursor = conn.cursor()
    02to03(cursor)
    cursor.close()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-07 18:12+0100\n"
+"POT-Creation-Date: 2010-12-22 18:15+0100\n"
 "PO-Revision-Date: 2010-07-05 16:57+0200\n"
 "Last-Translator: jors <worbynet@gmail.com>\n"
 "Language-Team: Catalan\n"
@@ -21,485 +21,485 @@ msgstr ""
 msgid "Error importing modules: "
 msgstr "Error important moduls: "
 
-#: naufrago.py:315 naufrago.py:486 naufrago.py:505 naufrago.py:560
-#: naufrago.py:585 naufrago.py:651 naufrago.py:673 naufrago.py:706
-#: naufrago.py:741 naufrago.py:934 naufrago.py:956 naufrago.py:961
-#: naufrago.py:1750 naufrago.py:1752
+#: naufrago.py:316 naufrago.py:485 naufrago.py:504 naufrago.py:559
+#: naufrago.py:584 naufrago.py:650 naufrago.py:672 naufrago.py:705
+#: naufrago.py:740 naufrago.py:931 naufrago.py:953 naufrago.py:958
+#: naufrago.py:1735 naufrago.py:1737
 msgid "Unread"
 msgstr "No llegits"
 
-#: naufrago.py:339 naufrago.py:486 naufrago.py:502 naufrago.py:560
-#: naufrago.py:582 naufrago.py:651 naufrago.py:673 naufrago.py:703
-#: naufrago.py:738 naufrago.py:934 naufrago.py:953 naufrago.py:961
-#: naufrago.py:1742 naufrago.py:1744
+#: naufrago.py:340 naufrago.py:485 naufrago.py:501 naufrago.py:559
+#: naufrago.py:581 naufrago.py:650 naufrago.py:672 naufrago.py:702
+#: naufrago.py:737 naufrago.py:931 naufrago.py:950 naufrago.py:958
+#: naufrago.py:1727 naufrago.py:1729
 msgid "Important"
 msgstr "Importants"
 
-#: naufrago.py:990
+#: naufrago.py:983
 msgid "Special folder"
 msgstr "Carpeta especial"
 
-#: naufrago.py:1003
+#: naufrago.py:996
 msgid "Source"
 msgstr "Font"
 
-#: naufrago.py:1009 naufrago.py:2379
+#: naufrago.py:1002 naufrago.py:2358
 msgid "Category"
 msgstr "Categoria"
 
-#: naufrago.py:1054
+#: naufrago.py:1047
 msgid "Warning!"
 msgstr "Atenció!"
 
-#: naufrago.py:1084 naufrago.py:1094 naufrago.py:1109
+#: naufrago.py:1077 naufrago.py:1087 naufrago.py:1102
 msgid "Upgrade checker"
 msgstr "Comprobador d'actualitzacions"
 
-#: naufrago.py:1087 naufrago.py:1097 naufrago.py:1112
+#: naufrago.py:1080 naufrago.py:1090 naufrago.py:1105
 msgid "Close"
 msgstr "Tancar"
 
-#: naufrago.py:1088
+#: naufrago.py:1081
 msgid "No updates available."
 msgstr "No hi han actualitzacions disponibles."
 
-#: naufrago.py:1113
+#: naufrago.py:1106
 msgid "Coult not contact server. Try again later!"
 msgstr "No s'ha pogut contactar el servidor. Prova de nou més tard!"
 
-#: naufrago.py:1143
+#: naufrago.py:1136
 msgid "Naufrago! is a simple RSS reader"
 msgstr "Naufrago! és un lector simple de RSS"
 
-#: naufrago.py:1208
+#: naufrago.py:1201
 msgid "_Archive"
 msgstr "_Arxiu"
 
-#: naufrago.py:1209
+#: naufrago.py:1202
 msgid "_New feed"
 msgstr "_Nova font"
 
-#: naufrago.py:1209
+#: naufrago.py:1202
 msgid "Adds a feed"
 msgstr "Afegeix una font"
 
-#: naufrago.py:1210
+#: naufrago.py:1203
 msgid "New _category"
 msgstr "Nova _categoria"
 
-#: naufrago.py:1210
+#: naufrago.py:1203
 msgid "Adds a category"
 msgstr "Afegeix una categoria"
 
-#: naufrago.py:1211 naufrago.py:2146
+#: naufrago.py:1204 naufrago.py:2117
 msgid "Delete feed"
 msgstr "Esborrar font"
 
-#: naufrago.py:1211
+#: naufrago.py:1204
 msgid "Deletes a feed"
 msgstr "Esborra una font"
 
-#: naufrago.py:1212 naufrago.py:1917
+#: naufrago.py:1205 naufrago.py:1888
 msgid "Delete category"
 msgstr "Esborra categoria"
 
-#: naufrago.py:1212
+#: naufrago.py:1205
 msgid "Deletes a category"
 msgstr "Esborra una categoria"
 
-#: naufrago.py:1213
+#: naufrago.py:1206
 msgid "Import feeds"
 msgstr "Importar fonts"
 
-#: naufrago.py:1213
+#: naufrago.py:1206
 msgid "Imports a feedlist"
 msgstr "Importa una llista de fonts"
 
-#: naufrago.py:1214
+#: naufrago.py:1207
 msgid "Export feeds"
 msgstr "Exportar fonts"
 
-#: naufrago.py:1214
+#: naufrago.py:1207
 msgid "Exports a feedlist"
 msgstr "Exporta la llista de fonts"
 
-#: naufrago.py:1215
+#: naufrago.py:1208
 msgid "_Quit"
 msgstr "Sortir"
 
-#: naufrago.py:1215
+#: naufrago.py:1208
 msgid "Quits"
 msgstr "Surt de l'aplicació"
 
-#: naufrago.py:1216
+#: naufrago.py:1209
 msgid "E_dit"
 msgstr "E_ditar"
 
-#: naufrago.py:1217
+#: naufrago.py:1210
 msgid "_Edit"
 msgstr "_Edita"
 
-#: naufrago.py:1217
+#: naufrago.py:1210
 msgid "Edits the selected element"
 msgstr "Edita l'element seleccionat"
 
-#: naufrago.py:1218 naufrago.py:2236 naufrago.py:2239
+#: naufrago.py:1211 naufrago.py:2205 naufrago.py:2208
 msgid "Search"
 msgstr "Buscar"
 
-#: naufrago.py:1218
+#: naufrago.py:1211
 msgid "Searchs for a term in the feeds"
 msgstr "Busca per a un terme a les fonts"
 
-#: naufrago.py:1219
+#: naufrago.py:1212
 msgid "_Preferences"
 msgstr "_Preferències"
 
-#: naufrago.py:1219
+#: naufrago.py:1212
 msgid "Shows preferences"
 msgstr "Mostra les preferències"
 
-#: naufrago.py:1220
+#: naufrago.py:1213
 msgid "_Network"
 msgstr "Xarxa"
 
-#: naufrago.py:1221
+#: naufrago.py:1214
 msgid "_Update"
 msgstr "Act_ualitzar"
 
-#: naufrago.py:1221
+#: naufrago.py:1214
 msgid "Updates the selected feed"
 msgstr "Actualitza la font seleccionada"
 
-#: naufrago.py:1222 naufrago.py:1649
+#: naufrago.py:1215 naufrago.py:1634
 msgid "Update all"
 msgstr "Actualitzar tot"
 
-#: naufrago.py:1222
+#: naufrago.py:1215
 msgid "Update all feeds"
 msgstr "Actualitzar totes les fonts"
 
-#: naufrago.py:1223 naufrago.py:1652
+#: naufrago.py:1216 naufrago.py:1637
 msgid "Stop"
 msgstr "Aturar"
 
-#: naufrago.py:1223
+#: naufrago.py:1216
 msgid "Stop update"
 msgstr "Aturar actualització"
 
-#: naufrago.py:1224
+#: naufrago.py:1217
 msgid "_Help"
 msgstr "Ajuda"
 
-#: naufrago.py:1225
+#: naufrago.py:1218
 msgid "FAQ"
 msgstr "PUF"
 
-#: naufrago.py:1226
+#: naufrago.py:1219
 msgid "Check updates"
 msgstr "Comprovar actualitzacions"
 
-#: naufrago.py:1227
+#: naufrago.py:1220
 msgid "_About"
 msgstr "Sobre"
 
-#: naufrago.py:1227
+#: naufrago.py:1220
 msgid "About"
 msgstr "Sobre"
 
-#: naufrago.py:1431
+#: naufrago.py:1416
 msgid "Feeds"
 msgstr "Fonts"
 
-#: naufrago.py:1484
+#: naufrago.py:1469
 msgid "Date"
 msgstr "Data"
 
-#: naufrago.py:1485
+#: naufrago.py:1470
 msgid "Title"
 msgstr "Títol"
 
-#: naufrago.py:1528
+#: naufrago.py:1513
 msgid "Clic to fullscreen"
 msgstr "Fes clic per a pantalla completa"
 
-#: naufrago.py:1535
+#: naufrago.py:1520
 msgid "Clic to open in browser"
 msgstr "Fes clic per a obrir en un navegador"
 
-#: naufrago.py:1655
+#: naufrago.py:1640
 msgid "Quit"
 msgstr "Sortir"
 
-#: naufrago.py:1798
+#: naufrago.py:1769
 msgid "Today"
 msgstr "Avui"
 
-#: naufrago.py:1829
+#: naufrago.py:1800
 msgid "Edit category"
 msgstr "Editar categoria"
 
-#: naufrago.py:1830
+#: naufrago.py:1801
 msgid "Change <b>category</b> name to:"
 msgstr "Canviar el nom de la <b>categoria</b> a:"
 
-#: naufrago.py:1831 naufrago.py:2014 naufrago.py:2726
+#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2709
 msgid "Edit"
 msgstr "Editar"
 
-#: naufrago.py:1833
+#: naufrago.py:1804
 msgid "Add category"
 msgstr "Afegir categoria"
 
-#: naufrago.py:1834
+#: naufrago.py:1805
 msgid "Please, insert the <b>category</b>:"
 msgstr "Si us plau, introdueix la <b>categoria</b>:"
 
-#: naufrago.py:1835
+#: naufrago.py:1806
 msgid "Create"
 msgstr "Crear"
 
-#: naufrago.py:1879
+#: naufrago.py:1850
 msgid "Category <b>already present</b>!"
 msgstr "La categoria <b>ja existeix</b>!"
 
-#: naufrago.py:1918
+#: naufrago.py:1889
 msgid "Delete the selected <b>category</b>?"
 msgstr "Esborrar la <b>categoria</b> seleccionada?"
 
-#: naufrago.py:1919
+#: naufrago.py:1890
 msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
 msgstr "Atenció: tots els RSS que conté s'esborrarán. Prodecir?"
 
-#: naufrago.py:1988
+#: naufrago.py:1959
 msgid "This category <b>cannot be deleted</b>!"
 msgstr "La categoria General <b>no pot ser esborrada</b>!"
 
-#: naufrago.py:1990 naufrago.py:1992
+#: naufrago.py:1961 naufrago.py:1963
 msgid "You <b>must choose a category</b> folder!"
 msgstr "Tens que <b>escollir una categoria</b>!"
 
-#: naufrago.py:1999
+#: naufrago.py:1970
 msgid "Name "
 msgstr "Nom "
 
-#: naufrago.py:2012
+#: naufrago.py:1983
 msgid "Edit feed"
 msgstr "Editar font"
 
-#: naufrago.py:2013
+#: naufrago.py:1984
 msgid "Change <b>feed</b> data:"
 msgstr "Canviar les dades de la <b>font</b>:"
 
-#: naufrago.py:2017
+#: naufrago.py:1988
 msgid "Add feed"
 msgstr "Afegir font"
 
-#: naufrago.py:2018
+#: naufrago.py:1989
 msgid "Please, insert <b>feed</b> address:"
 msgstr "Si us plau, introdueix la direcció de la <b>font</b>:"
 
-#: naufrago.py:2019
+#: naufrago.py:1990
 msgid "Add"
 msgstr "Afegir"
 
-#: naufrago.py:2052
+#: naufrago.py:2023
 msgid "Default name"
 msgstr "Nom per defecte"
 
-#: naufrago.py:2109
+#: naufrago.py:2080
 msgid "Feed <b>already present</b>!"
 msgstr "Font <b>ja existent</b>!"
 
-#: naufrago.py:2147
+#: naufrago.py:2118
 msgid "Delete selected <b>feed</b>?"
 msgstr "Esborrar la <b>font</b> seleccionada?"
 
-#: naufrago.py:2205 naufrago.py:2207
+#: naufrago.py:2174 naufrago.py:2176
 msgid "You <b>must choose a feed</b>!"
 msgstr "Tens que <b>escollir una font</b>!"
 
-#: naufrago.py:2227
+#: naufrago.py:2196
 msgid "This category <b>cannot be edited</b>!"
 msgstr "La categoria General <b>no pot ser editada</b>!"
 
-#: naufrago.py:2231
+#: naufrago.py:2200
 msgid "You <b>must choose a category or a feed</b> to edit!"
 msgstr "Tens que <b>escollir una categoria o una font</b> per a editar!"
 
-#: naufrago.py:2240
+#: naufrago.py:2209
 msgid "Insert the <b>searchterm</b>:"
 msgstr "Introdueix el <b>terme de búsqueda</b>:"
 
-#: naufrago.py:2270
+#: naufrago.py:2239
 msgid "Search results for"
 msgstr "Resultats per a"
 
-#: naufrago.py:2272
+#: naufrago.py:2241
 msgid "No entry found for <b>"
 msgstr "No s'han trobat entrades per a <b>"
 
-#: naufrago.py:2417
+#: naufrago.py:2400
 msgid "Preferences"
 msgstr "Preferències"
 
-#: naufrago.py:2418
+#: naufrago.py:2401
 msgid "Save"
 msgstr "Desar"
 
-#: naufrago.py:2432
+#: naufrago.py:2415
 msgid "Start with unfolded tree"
 msgstr "Iniciar amb arbre desplegat"
 
-#: naufrago.py:2436
+#: naufrago.py:2419
 msgid "Driven mode"
 msgstr "Mode dirigit"
 
-#: naufrago.py:2439
+#: naufrago.py:2422
 msgid "Start in Tray Icon"
 msgstr "Iniciar com a Tray Icon"
 
-#: naufrago.py:2447
+#: naufrago.py:2430
 msgid "Update on start"
 msgstr "Actualitzar a l'inici"
 
-#: naufrago.py:2451
+#: naufrago.py:2434
 msgid "Check application updates on start"
 msgstr "Comprovar actualitzacions a l'inici"
 
-#: naufrago.py:2456
+#: naufrago.py:2439
 msgid "Start"
 msgstr "Inici"
 
-#: naufrago.py:2462
+#: naufrago.py:2445
 msgid "Number of feed entries"
 msgstr "Nombre d'entrades per font"
 
-#: naufrago.py:2473
+#: naufrago.py:2456
 msgid "Update every"
 msgstr "Actualitzar font cada"
 
-#: naufrago.py:2484
+#: naufrago.py:2467
 msgid "hour/s"
 msgstr "hora/es"
 
-#: naufrago.py:2485
+#: naufrago.py:2468
 msgid "minute/s"
 msgstr "minut/s"
 
-#: naufrago.py:2490
+#: naufrago.py:2473
 msgid "Hide read entries"
 msgstr "Amagar entrades llegides"
 
-#: naufrago.py:2497
+#: naufrago.py:2480
 msgid "Feeds & articles"
 msgstr "Fonts i articles"
 
-#: naufrago.py:2502
+#: naufrago.py:2485
 msgid "Hide dates"
 msgstr "Amagar dates"
 
-#: naufrago.py:2508
+#: naufrago.py:2491
 msgid "Notification on new entries"
 msgstr "Notificació de noves entrades"
 
-#: naufrago.py:2512
+#: naufrago.py:2495
 msgid "Show icon in tray"
 msgstr "Mostrar icona a la tray"
 
-#: naufrago.py:2519
+#: naufrago.py:2502
 msgid "Toolbar mode"
 msgstr "Mode toolbar"
 
-#: naufrago.py:2522
+#: naufrago.py:2505
 msgid "Full"
 msgstr "Complerta"
 
-#: naufrago.py:2523
+#: naufrago.py:2506
 msgid "Icons only"
 msgstr "Nomès icones"
 
-#: naufrago.py:2524
+#: naufrago.py:2507
 msgid "Text only"
 msgstr "Nomès text"
 
-#: naufrago.py:2525
+#: naufrago.py:2508
 msgid "Hidden"
 msgstr "Amagada"
 
-#: naufrago.py:2531
+#: naufrago.py:2514
 msgid "Interface"
 msgstr "Interfície"
 
-#: naufrago.py:2536
+#: naufrago.py:2519
 msgid "Offline mode (slower!)"
 msgstr "Mode offline (més lent!)"
 
-#: naufrago.py:2547
+#: naufrago.py:2530
 msgid "Modes"
 msgstr "Modes"
 
-#: naufrago.py:2716
+#: naufrago.py:2699
 msgid "Mark all as read"
 msgstr "Marcar tot com llegit"
 
-#: naufrago.py:2721
+#: naufrago.py:2704
 msgid "Update"
 msgstr "Actualitzar"
 
-#: naufrago.py:2731
+#: naufrago.py:2714
 msgid "Delete"
 msgstr "Esborrar"
 
-#: naufrago.py:2737
+#: naufrago.py:2720
 msgid "New feed"
 msgstr "Nova font"
 
-#: naufrago.py:2740
+#: naufrago.py:2723
 msgid "New category"
 msgstr "Nova categoria"
 
-#: naufrago.py:2786
+#: naufrago.py:2769
 msgid "Open in browser"
 msgstr "Obrir en navegador"
 
-#: naufrago.py:2787
+#: naufrago.py:2770
 msgid "Copy URL to clipboard"
 msgstr "Copiar URL al portapapers"
 
-#: naufrago.py:2790
+#: naufrago.py:2773
 msgid "Toggle read/non-read"
 msgstr "Alternar entre llegit/no-llegit"
 
-#: naufrago.py:2793
+#: naufrago.py:2776
 msgid "Toggle all read/non-read"
 msgstr "Alternar tot entre llegit/no-llegit"
 
-#: naufrago.py:2913 naufrago.py:2914
+#: naufrago.py:2896 naufrago.py:2897
 msgid "Without title"
 msgstr "Sense títol"
 
-#: naufrago.py:2923 naufrago.py:2924
+#: naufrago.py:2906 naufrago.py:2907
 msgid "Without link"
 msgstr "Sense enllaç"
 
-#: naufrago.py:2971
+#: naufrago.py:2954
 msgid "Obtaining image "
 msgstr "Obtenint imatge "
 
-#: naufrago.py:3079
+#: naufrago.py:3062
 msgid "Obtaining feed "
 msgstr "Obtenint font "
 
-#: naufrago.py:3370 naufrago.py:3448
+#: naufrago.py:3342 naufrago.py:3420
 msgid "Open.."
 msgstr "Obrir.."
 
-#: naufrago.py:3384
+#: naufrago.py:3357
 msgid "All files"
 msgstr "Tots els arxius"
 
-#: naufrago.py:3452
+#: naufrago.py:3424
 msgid "_Save"
 msgstr "De_sar"
 

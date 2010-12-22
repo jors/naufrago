@@ -88,10 +88,13 @@ if distro_package == True: # We're running on 'Distro-mode' (intended for distri
   puf_path = app_path + 'content/puf_ca.html'
  elif "pl" in locale:
   index_path = app_path + 'content/index_pl.html'
-  puf_path = app_path + 'content/puf_pl.html'
+  puf_path = app_path + 'content/puf.html'
  elif "it" in locale:
   index_path = app_path + 'content/index_it.html'
   puf_path = app_path + 'content/puf.html'
+ elif "fr" in locale:
+  index_path = app_path + 'content/index_fr.html'
+  puf_path = app_path + 'content/puf_fr.html'
  else:
   index_path = app_path + 'content/index.html'
   puf_path = app_path + 'content/puf.html'
@@ -1238,7 +1241,7 @@ class Naufrago:
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1760,7 +1763,7 @@ class Naufrago:
   p = re.compile(r'<[^<]*?/?>') # Removes HTML tags
   p2 = re.compile('\s{2,}') # Translate 2 o + joined whitespaces to only one
   for row in rows:
-   if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0): # NEW
+   if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0):
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     fecha = datetime.datetime.fromtimestamp(row[2]).strftime("%Y-%m-%d")
     if now == fecha: fecha = _('Today')
@@ -2329,8 +2332,9 @@ class Naufrago:
  def driven_mode_action(self):
   """Collapse or expands parent nodes based on unread items within its feeds."""
   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
-  useless_iter_parent = model.iter_parent(useless_iter)
-  useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
+  if type(useless_iter) is gtk.TreeIter:
+   useless_iter_parent = model.iter_parent(useless_iter)
+   useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
 
   iter = model.get_iter_root() # Magic
   id_cat = model.get_value(iter, 2)
@@ -2340,8 +2344,6 @@ class Naufrago:
     if boldornot == 'normal':
      if self.driven_mode == 1:
       if id_cat == useless_iter_id_cat:
-       q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND articulo.ghost=0 AND categoria.id='+`id_cat`+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
-       print q
        cursor = self.conn.cursor()
        self.lock.acquire()
        cursor.execute(q)
@@ -2349,7 +2351,6 @@ class Naufrago:
        self.lock.release()
        cursor.close()
        if (row is not None) and (row[0] == 0):
-        print 'count: ' + `row[0]`
         # Esconder la lista de feeds y mostrar en el navegador los datos de la categoría
         self.liststore.clear() # Limpieza de tabla de entries/articulos
         self.scrolled_window2.set_size_request(0,0)
@@ -3158,8 +3159,7 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
 
-  # NEW !!!
-  # Check first is the feed is full (to do some cleanup)
+  # CLEANUP: Check first is the feed is full (to do some cleanup)
   self.lock.acquire()
   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
   total = cursor.fetchone()
@@ -3216,14 +3216,11 @@ class Naufrago:
     cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0 AND ghost = 0', [id_feed])
     print '(' + `cursor.fetchone()[0]` + ' visibles).'
     self.lock.release()
-  # NEW !!!
-  # NEW2 !!!
   # Accounting...
   if len(new_entries) > 0:
    new_posts = True
   else:
    new_posts = False
-  # NEW2 !!!
 
   gtk.gdk.threads_leave()
 
