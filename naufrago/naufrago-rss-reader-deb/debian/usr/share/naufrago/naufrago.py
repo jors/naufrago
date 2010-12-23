@@ -2344,6 +2344,7 @@ class Naufrago:
     if boldornot == 'normal':
      if self.driven_mode == 1:
       if id_cat == useless_iter_id_cat:
+       q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND articulo.ghost=0 AND categoria.id='+`id_cat`+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
        cursor = self.conn.cursor()
        self.lock.acquire()
        cursor.execute(q)
@@ -3166,6 +3167,10 @@ class Naufrago:
    # (o self.num_entries si count es menor), entramos a hacer LIMPIEZA.
    if (total[0]>count):
     exceed = total[0] - count
+    self.lock.acquire()
+    cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante=0 ORDER BY fecha ASC LIMIT ?', [id_feed,exceed])
+    row  = cursor.fetchall()
+    self.lock.release()
     for id_articulo in row:
      # Ahora borramos las imagenes del filesystem, si procede
      self.lock.acquire()

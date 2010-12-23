@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-22 18:15+0100\n"
+"POT-Creation-Date: 2010-12-23 20:02+0100\n"
 "PO-Revision-Date: 2010-12-17 11:47+0100\n"
 "Last-Translator: Michał Ćwikliński <michal@cwiklinski.it>\n"
 "Language-Team: Polish <mcwiklinski@gmail.com>\n"
@@ -46,7 +46,7 @@ msgstr "Katalog specjalny"
 msgid "Source"
 msgstr "Źródło"
 
-#: naufrago.py:1002 naufrago.py:2358
+#: naufrago.py:1002 naufrago.py:2359
 msgid "Category"
 msgstr "Kategoria"
 
@@ -246,7 +246,7 @@ msgstr "Edytuj kategorię"
 msgid "Change <b>category</b> name to:"
 msgstr "Zmień nazwę <b>kategorii</b> na:"
 
-#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2709
+#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2710
 msgid "Edit"
 msgstr "Edytuj"
 
@@ -343,167 +343,167 @@ msgstr "Wyniki wyszukiwania dla"
 msgid "No entry found for <b>"
 msgstr "Brak wpisów dla <b>"
 
-#: naufrago.py:2400
+#: naufrago.py:2401
 msgid "Preferences"
 msgstr "Preferencje"
 
-#: naufrago.py:2401
+#: naufrago.py:2402
 msgid "Save"
 msgstr "Zapisz"
 
-#: naufrago.py:2415
+#: naufrago.py:2416
 msgid "Start with unfolded tree"
 msgstr "Uruchamiaj ze zwiniętym drzewem"
 
-#: naufrago.py:2419
+#: naufrago.py:2420
 msgid "Driven mode"
 msgstr "Tryb sterowany"
 
-#: naufrago.py:2422
+#: naufrago.py:2423
 msgid "Start in Tray Icon"
 msgstr "Uruchom jako ikona w pasku"
 
-#: naufrago.py:2430
+#: naufrago.py:2431
 msgid "Update on start"
 msgstr "Aktualizacja przy starcie"
 
-#: naufrago.py:2434
+#: naufrago.py:2435
 msgid "Check application updates on start"
 msgstr "Sprawdzaj aktualizacje przy starcie"
 
-#: naufrago.py:2439
+#: naufrago.py:2440
 msgid "Start"
 msgstr "Start"
 
-#: naufrago.py:2445
+#: naufrago.py:2446
 msgid "Number of feed entries"
 msgstr "Ilość wpisów w kanale"
 
-#: naufrago.py:2456
+#: naufrago.py:2457
 msgid "Update every"
 msgstr "Okres aktualizacji"
 
-#: naufrago.py:2467
+#: naufrago.py:2468
 msgid "hour/s"
 msgstr "godzin"
 
-#: naufrago.py:2468
+#: naufrago.py:2469
 msgid "minute/s"
 msgstr "minut"
 
-#: naufrago.py:2473
+#: naufrago.py:2474
 msgid "Hide read entries"
 msgstr "Ukryj przeczytane pozycje"
 
-#: naufrago.py:2480
+#: naufrago.py:2481
 msgid "Feeds & articles"
 msgstr "Kanały i artykuły"
 
-#: naufrago.py:2485
+#: naufrago.py:2486
 msgid "Hide dates"
 msgstr "Ukryj daty"
 
-#: naufrago.py:2491
+#: naufrago.py:2492
 msgid "Notification on new entries"
 msgstr "Pokaż powiadomienia o nowych pozycjach"
 
-#: naufrago.py:2495
+#: naufrago.py:2496
 msgid "Show icon in tray"
 msgstr "Pokaż ikonę w zasobniku"
 
-#: naufrago.py:2502
+#: naufrago.py:2503
 msgid "Toolbar mode"
 msgstr "Tryb paska narzędzi"
 
-#: naufrago.py:2505
+#: naufrago.py:2506
 msgid "Full"
 msgstr "Pełny"
 
-#: naufrago.py:2506
+#: naufrago.py:2507
 msgid "Icons only"
 msgstr "Tylko ikony"
 
-#: naufrago.py:2507
+#: naufrago.py:2508
 msgid "Text only"
 msgstr "Tylko tekst"
 
-#: naufrago.py:2508
+#: naufrago.py:2509
 msgid "Hidden"
 msgstr "Ukryty"
 
-#: naufrago.py:2514
+#: naufrago.py:2515
 msgid "Interface"
 msgstr "Interfejs"
 
-#: naufrago.py:2519
+#: naufrago.py:2520
 msgid "Offline mode (slower!)"
 msgstr "Tryb offline (wolny!)"
 
-#: naufrago.py:2530
+#: naufrago.py:2531
 msgid "Modes"
 msgstr "Tryby"
 
-#: naufrago.py:2699
+#: naufrago.py:2700
 msgid "Mark all as read"
 msgstr "Zaznacz wszystko jako przeczytane"
 
-#: naufrago.py:2704
+#: naufrago.py:2705
 msgid "Update"
 msgstr "Aktualizuj"
 
-#: naufrago.py:2714
+#: naufrago.py:2715
 msgid "Delete"
 msgstr "Usuń"
 
-#: naufrago.py:2720
+#: naufrago.py:2721
 msgid "New feed"
 msgstr "Nowy kanał"
 
-#: naufrago.py:2723
+#: naufrago.py:2724
 msgid "New category"
 msgstr "Nowa kategoria"
 
-#: naufrago.py:2769
+#: naufrago.py:2770
 msgid "Open in browser"
 msgstr "Otwórz w przeglądarce"
 
-#: naufrago.py:2770
+#: naufrago.py:2771
 msgid "Copy URL to clipboard"
 msgstr "Skopiuj URL do schowka"
 
-#: naufrago.py:2773
+#: naufrago.py:2774
 msgid "Toggle read/non-read"
 msgstr "Przełącz przeczytane/nieprzeczytane"
 
-#: naufrago.py:2776
+#: naufrago.py:2777
 msgid "Toggle all read/non-read"
 msgstr "Przełącz wszystkie przeczytane/nieprzeczytane"
 
-#: naufrago.py:2896 naufrago.py:2897
+#: naufrago.py:2897 naufrago.py:2898
 msgid "Without title"
 msgstr "Bez tytułu"
 
-#: naufrago.py:2906 naufrago.py:2907
+#: naufrago.py:2907 naufrago.py:2908
 msgid "Without link"
 msgstr "Bez adresu"
 
-#: naufrago.py:2954
+#: naufrago.py:2955
 msgid "Obtaining image "
 msgstr "Pobieranie obrazka"
 
-#: naufrago.py:3062
+#: naufrago.py:3063
 msgid "Obtaining feed "
 msgstr "Pobieranie kanału "
 
-#: naufrago.py:3342 naufrago.py:3420
+#: naufrago.py:3347 naufrago.py:3425
 msgid "Open.."
 msgstr "Otwórz.."
 
-#: naufrago.py:3357
+#: naufrago.py:3362
 msgid "All files"
 msgstr "Wszystkie pliki"
 
-#: naufrago.py:3424
+#: naufrago.py:3429
 msgid "_Save"
 msgstr "Zapi_sz"
 

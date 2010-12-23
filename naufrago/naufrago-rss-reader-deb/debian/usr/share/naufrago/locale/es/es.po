@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-22 18:15+0100\n"
+"POT-Creation-Date: 2010-12-23 20:02+0100\n"
 "PO-Revision-Date: 2010-07-06 18:28+0200\n"
 "Last-Translator: jors <worbynet@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -44,7 +44,7 @@ msgstr "Carpeta especial"
 msgid "Source"
 msgstr "Fuente"
 
-#: naufrago.py:1002 naufrago.py:2358
+#: naufrago.py:1002 naufrago.py:2359
 msgid "Category"
 msgstr "Categoría"
 
@@ -244,7 +244,7 @@ msgstr "Editar categoría"
 msgid "Change <b>category</b> name to:"
 msgstr "Cambiar el nombre de la <b>categoría</b> a:"
 
-#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2709
+#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2710
 msgid "Edit"
 msgstr "Editar"
 
@@ -341,167 +341,167 @@ msgstr "Resultados de la búsqueda para"
 msgid "No entry found for <b>"
 msgstr "No se encontró ninguna entrada para <b>"
 
-#: naufrago.py:2400
+#: naufrago.py:2401
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: naufrago.py:2401
+#: naufrago.py:2402
 msgid "Save"
 msgstr "Guardar"
 
-#: naufrago.py:2415
+#: naufrago.py:2416
 msgid "Start with unfolded tree"
 msgstr "Iniciar con árbol desplegado"
 
-#: naufrago.py:2419
+#: naufrago.py:2420
 msgid "Driven mode"
 msgstr "Modo dirigido"
 
-#: naufrago.py:2422
+#: naufrago.py:2423
 msgid "Start in Tray Icon"
 msgstr "Iniciar como Tray Icon"
 
-#: naufrago.py:2430
+#: naufrago.py:2431
 msgid "Update on start"
 msgstr "Actualizar al inicio"
 
-#: naufrago.py:2434
+#: naufrago.py:2435
 msgid "Check application updates on start"
 msgstr "Comprobar actualizaciones al inicio"
 
-#: naufrago.py:2439
+#: naufrago.py:2440
 msgid "Start"
 msgstr "Inicio"
 
-#: naufrago.py:2445
+#: naufrago.py:2446
 msgid "Number of feed entries"
 msgstr "Número de entradas"
 
-#: naufrago.py:2456
+#: naufrago.py:2457
 msgid "Update every"
 msgstr "Actualizar cada"
 
-#: naufrago.py:2467
+#: naufrago.py:2468
 msgid "hour/s"
 msgstr "hora/s"
 
-#: naufrago.py:2468
+#: naufrago.py:2469
 msgid "minute/s"
 msgstr "minuto/s"
 
-#: naufrago.py:2473
+#: naufrago.py:2474
 msgid "Hide read entries"
 msgstr "Esconder entradas leidas"
 
-#: naufrago.py:2480
+#: naufrago.py:2481
 msgid "Feeds & articles"
 msgstr "Fuentes y artículos"
 
-#: naufrago.py:2485
+#: naufrago.py:2486
 msgid "Hide dates"
 msgstr "Esconder fechas"
 
-#: naufrago.py:2491
+#: naufrago.py:2492
 msgid "Notification on new entries"
 msgstr "Notificar nuevas entradas"
 
-#: naufrago.py:2495
+#: naufrago.py:2496
 msgid "Show icon in tray"
 msgstr "Mostrar icono en la tray"
 
-#: naufrago.py:2502
+#: naufrago.py:2503
 msgid "Toolbar mode"
 msgstr "Modo toolbar"
 
-#: naufrago.py:2505
+#: naufrago.py:2506
 msgid "Full"
 msgstr "Completa"
 
-#: naufrago.py:2506
+#: naufrago.py:2507
 msgid "Icons only"
 msgstr "Sólo iconos"
 
-#: naufrago.py:2507
+#: naufrago.py:2508
 msgid "Text only"
 msgstr "Sólo texto"
 
-#: naufrago.py:2508
+#: naufrago.py:2509
 msgid "Hidden"
 msgstr "Escondida"
 
-#: naufrago.py:2514
+#: naufrago.py:2515
 msgid "Interface"
 msgstr "Interfaz"
 
-#: naufrago.py:2519
+#: naufrago.py:2520
 msgid "Offline mode (slower!)"
 msgstr "Modo offline (¡más lento!)"
 
-#: naufrago.py:2530
+#: naufrago.py:2531
 msgid "Modes"
 msgstr "Modos"
 
-#: naufrago.py:2699
+#: naufrago.py:2700
 msgid "Mark all as read"
 msgstr "Marcar todo como leído"
 
-#: naufrago.py:2704
+#: naufrago.py:2705
 msgid "Update"
 msgstr "Actualizar"
 
-#: naufrago.py:2714
+#: naufrago.py:2715
 msgid "Delete"
 msgstr "Borrar"
 
-#: naufrago.py:2720
+#: naufrago.py:2721
 msgid "New feed"
 msgstr "Nueva entrada"
 
-#: naufrago.py:2723
+#: naufrago.py:2724
 msgid "New category"
 msgstr "Nueva categoría"
 
-#: naufrago.py:2769
+#: naufrago.py:2770
 msgid "Open in browser"
 msgstr "Abrir en un navegador"
 
-#: naufrago.py:2770
+#: naufrago.py:2771
 msgid "Copy URL to clipboard"
 msgstr "Copiar URL al portapapeles"
 
-#: naufrago.py:2773
+#: naufrago.py:2774
 msgid "Toggle read/non-read"
 msgstr "Alternar leído/no-leído"
 
-#: naufrago.py:2776
+#: naufrago.py:2777
 msgid "Toggle all read/non-read"
 msgstr "Alternar todos leído/no-leído"
 
-#: naufrago.py:2896 naufrago.py:2897
+#: naufrago.py:2897 naufrago.py:2898
 msgid "Without title"
 msgstr "Sin título"
 
-#: naufrago.py:2906 naufrago.py:2907
+#: naufrago.py:2907 naufrago.py:2908
 msgid "Without link"
 msgstr "Sin enlace"
 
-#: naufrago.py:2954
+#: naufrago.py:2955
 msgid "Obtaining image "
 msgstr "Obteniendo imagen "
 
-#: naufrago.py:3062
+#: naufrago.py:3063
 msgid "Obtaining feed "
 msgstr "Obteniendo feed "
 
-#: naufrago.py:3342 naufrago.py:3420
+#: naufrago.py:3347 naufrago.py:3425
 msgid "Open.."
 msgstr "Abrir.."
 
-#: naufrago.py:3357
+#: naufrago.py:3362
 msgid "All files"
 msgstr "Todos los ficheros"
 
-#: naufrago.py:3424
+#: naufrago.py:3429
 msgid "_Save"
 msgstr "Guardar"
 
