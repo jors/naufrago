@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-python -W ignore /usr/share/naufrago/update_0.x_to_0.3.py >/dev/null
+python -W ignore /usr/share/naufrago/update_0.x_to_0.3_debian.py >/dev/null
 exit 0
