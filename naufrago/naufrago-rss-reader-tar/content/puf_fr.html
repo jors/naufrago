@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Questions Fr&eacute;quemment Pos&eacute;es</title>
+ </head>
+ <body>
+ <center><h1>Questions Fr&eacute;quemment Pos&eacute;es</h1></center>
+ <ol> 
+  <li><h2>Introduction</h2></li>
+   <ul>
+    <li><a href="#1">Qu'est-ce que Naufrago ?</a></li>
+    <li><a href="#2">Quelles sont ses fonctionalit&eacute;s ?</a></li>
+    <li><a href="#3">Quelles sont les d&eacute;pendances requises ?</a></li>
+    <li><a href="#4">Pourquoi r&eacute;inventer la roue?</a></li>
+    <li><a href="#5"><i>Page d'Acceuil</i> ou r&eacute;seaux de distribution</a></li>
+   </ul>
+  <li><h2>Fonctionnement</h2></li>
+   <ul>
+    <li><a href="#6">Comment fonctionne le <i>mode Hors-Ligne</i> ?</a></li>
+    <li><a href="#7">Comment fonctionne le mode <i>Affichage amélioré </i>?</a></li>
+    <li><a href="#8">Je veux enregistrer des articles importants !</a></li>
+    <li><a href="#9">Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</a></li>
+    <li><a href="#10">Je ne peux pas supprimer les articles d'un flux donn&eacute;</a></li>
+   </ul>
+  <li><h2>Probl&egrave;mes</h2></li>
+   <ul>
+    <li><a href="#11">L'interruption de l'actualisation du flux prend trop de temps</a></li>
+    <li><a href="#12">Le classement par dates de certains flux est incorrect</a></li>
+    <li><a href="#13">Les entrées de certains flux n'affichent aucun contenu (sauf les titres)</a></li>
+    <li><a href="#14">L'application s'est ferm&eacute;e brusquement !</a></li>
+    <li><a href="#15">Je veux faire un rapport d'erreurs ou réparer ces erreurs !</a></li>
+   </ul>
+  <li><h2>Autre</h2></li>
+   <ul>
+    <li><a href="#16">Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</a></li>
+    <li><a href="#17">Sous quelle licence cette application est-elle distribu&eacute;e ?</a></li>
+    <li><a href="#18">J'aimerais que l'application soit pourvue de ...</a></li>
+    <li><a href="#19">Remerciements de l'auteur</a></li>
+    <li><a href="#20">Aimez-vous Naufrago ?</a></li>
+   </ul>
+  </ol>
+  <hr>
+
+  <h1>Introduction</h1>
+  <h3 id="1"><u>Qu'est-ce que Naufrago ?</u></h3>
+  <p>Naufrago! est un simple lecteur RSS qui vous permet de voir les flux avec leurs images, sans forc&eacute;ment &ecirc;tre connect&eacute; &agrave; Internet. Ceci est d&ucirc; au fait que certaines personnes, y compris l'auteur, n'ont pas toujours une connection &agrave; Internet &agrave; port&eacute;e de main, mais qui souhaitent n&eacute;anmoins lire les nouvelles/articles avec les images qui les accompagnent. C'est vraiment le <i>leitmotiv</i> de cette application.</p>
+  <h3 id="2"><u>Quelles sont ses fonctionalit&eacute;s ?</u></h3>
+  <p>Les fonctionnalit&eacute;s principales sont:
+  <ul>
+   <li><b>Cat&eacute;gorisation</b> des flux dans une <b>arborescence </b>(un seul niveau)<b>.</b></li>
+   <li>Organisation des flux par <b>Gliss&eacute;-D&eacute;pos&eacute;</b>.</li>
+   <li><b>Lecture En-Ligne ou Hors-Ligne </b>(images incluses).</li>
+   <li><b>Affichage intelligent des catégories et entrées</b>.</li>
+   <li><b>Mode Plein-&eacute;cran</b>&nbsp;pour la lecture des flux.</li>
+   <li><b>Marquer les flux </b>comme&nbsp;<b>importants</b>/<b>permanents</b> (enregistrement).</li>
+   <li>Existence de&nbsp;<b>favicons</b>&nbsp;pour les flux.</li>
+   <li>Possibilit&eacute; de r&eacute;duire l'application dans la <b>zone de notification</b>.</li>
+   <li><b>Importer/exporter&nbsp;</b>les flux au format<b>&nbsp;OPML</b>.</li>
+   <li>R&eacute;pertoires<b> Important</b> et <b>Non Lus</b>.</li>
+   <li>Possibilit&eacute; de <b>recherches</b> avanc&eacute;es.</li>
+   <li><b>Multilingue</b> (actuellement Anglais, Fran&ccedil;ais, Polonais, Italien, Catalan et Espagnol).</li>
+   <li><b>Vérificateur de mises-à-jour</b> automatique.</li>
+  </ul>
+  </p>
+  <h3 id="3"><u>Quelles sont les d&eacute;pendances requises ?</u></h3>
+  <p>Si vous lisez cette partie de la documentation, vous avez certainement rencontr&eacute; une erreur li&eacute;e &agrave; des paquets dont d&eacute;pend Naufrago, ou bien votre configuration mat&eacute;rielle n'est pas suffisante.</p>
+  <p>En ce qui concerne ces paquets, vous devez avoir install&eacute;:</p>
+  <ul>
+   <li>Syst&egrave;me d'exploitation GNU/Linux (&eacute;tant donn&eacute; que certaines librairies ne sont pas disponibles pour d'autres syst&egrave;mes)</li>
+   <li>Python</li>
+   <li>python-gtk2 (gtk2 bindings)</li>
+   <li>python-gobject (GObject bindings)</li>
+   <li>python-pysqlite2 (sqlite3 bindings)</li>
+   <li>python-feedparser (feedparser bindings)</li>
+   <li>python-webkit (webkit bindings)</li>
+  </ul>
+  Au niveau du mat&eacute;riel, rien n'est particuli&egrave;rement recommand&eacute;. Si vous voulez vous faire une id&eacute;e, l'auteur a d&eacute;velopp&eacute; Naufragosur un Netbook avec Intel Atom 1.6 Ghz with 1GB of RAM.</p>
+  <h3 id="4"><u>Pourquoi r&eacute;inventer la roue ?</u></h3>
+  <p>Si Naufrago est si proche de Liferea (au moins dans son interface), alors pourquoi r&eacute;inventer la roue ? Pour plusieurs raisons. Principalement parce que l'auteur ne trouvait pas de lecteur RSS pouvant fonctionner sans &ecirc;tre connect&eacute; en ligne (en incluant les images). La deuxi&egrave;me raison est que les d&eacute;veloppeurs de Liferea n'acceptent aucune soumission d'id&eacute;es de la part des utilisateurs (ce qui est respectable). R&eacute;inventer la roue signifie aussi apprendre, se perfectionner, et trouver de nouvelles mani&egrave;res de faire les choses.</p>
+  <h3 id="5"><u>Page d'Acceuil ou r&eacute;seaux de distribution</u></h3>
+  <p>Le projet est accessible sur le&nbsp;<a href="http://enchufado.com/">blog de l'auteur</a>&nbsp;et sur la&nbsp;<a href="http://sourceforge.net/projects/naufrago">page sourceforge du projet</a>.</p>
+  <hr>
+
+  <h1>Fonctionnement</h1>
+  <h3 id="6"><u>Comment fonctionne le mode Hors-Ligne ?</u></h3>
+  <p>Ce mode de fonctionnement assure l'importation et la conservation des articles/flux avec leurs images associ&eacute;es, sans avoir besoin d'une connexion &agrave; Internet. Cela implique que vous pouvez tr&egrave;s bien laisser ce mode activ&eacute; par d&eacute;faut, peu importe que vous ayez ou non une connection &agrave; Internet, et l'application essaiera quand m&ecirc;me de r&eacute;cup&eacute;rer les articles/flux/images li&eacute;es. Le seul d&eacute;savantage de ce mode est qu'en le laissant actif par d&eacute;faut, Naufrago consommera davantage de bande passante, et mettra plus de temps &agrave; actualiser son contenu (&eacute;tant donn&eacute; que les images seront aussi r&eacute;cup&eacute;r&eacute;es).&nbsp;</p>
+  <p><b>NOTE: </b>Pour que le mode Hors-Ligne fonctionne pleinement, apr&egrave;s l'avoir activ&eacute; dans la fen&ecirc;tre des Pr&eacute;f&eacute;rences, vous devrez actualiser tous les flux pour lesquels vous d&eacute;sirez voir les images hors-ligne.</p>
+  <h3 id="7"><u>Comment fonctionne le mode <i>Affichage amélioré</i> ?</u></h3>
+  <p>Ce mode permet de déplier/plier les catégories contenant des flux possédant des entrées non-lues/lues. Cela facilite grandement la visualisation de ce qui a déjà été lu, ou au contraire de ce qu'il reste à lire. Cela évite aussi des clics superflus à la souris.</p>
+  <h3 id="8"><u>Je veux enregistrer des articles importants !</u></h3>
+  <p>Pour cela vous devez cocher chaque article d&eacute;sir&eacute; (avant la date et titre de chaque article). Cela aura pour effet de ranger l'article ainsi coch&eacute; dans la cat&eacute;gorie <i>Important.</i></p>
+  <h3 id="9"><u>Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</u></h3>
+  <p>Comme mentionn&eacute; dans <a href="#2">la section sur les fonctionnalit&eacute;s</a>, the categorization allows only one level of categories.</p>
+  <h3 id="10"><u>Je ne peux pas supprimer les articles d'un flux donn&eacute;</u></h3>
+  <p>C'est exact, ils ne peuvent &ecirc;tre supprim&eacute;s. Il a &eacute;t&eacute; d&eacute;cid&eacute; que l'application s'occupe automatiquement de la suppression d'articles via un nombre d'articles pr&eacute;alablement configur&eacute; dans les Pr&eacute;f&eacute;rences de Naufrago. Alors ne vous en fa&agrave;tes pas, l'application se chargera du nettoyage pour vous..</p>
+  <hr>
+ 
+  <h1>Probl&egrave;mes</h1>
+  <h3 id="11"><u>L'interruption de l'actualisation d'un flux prend trop de temps</u></h3>
+  <p>À vrai dire, cela est directement en rapport avec la façon dont l'actualisation fonctionne. Pour conserver une éthique de simplicité d'utilisation, nous avons défini cette procédure d'actualisation comme une opération atomique, en dehors de laquelle vous pouvez annuler/interrompre. Par conséquent, durant l'actualisation, quand le bouton annuler/interrompre est pressé, l'opération liée sera efficace au moment où le système actualisera le dernier flux (au moment où vous appuierez sur Interrompre).</p>
+  <h3 id="12"><u>Le classement par dates de certains flux est incorrect</u></h3>
+  <p>Comment afficher les flux par ordre croissant selon leurs dates ? <i>Par défaut</i> et parce que l'analyseur de flux n'est pas infaillible en ce qui concerne les différents formats de dates possibles sur Internet, <i>in nous avons décidé dans cette version (0.3) de ranger les flux selon leur date d'entrée dans Naufrago</i>.</p>
+  <h3 id="13"><u>Les entrées de certains flux n'affichent aucun contenu (sauf les titres)</u></h3>
+  <p>Certains flux ne publient pas les dates de leurs entrées, d'autres ne renseignent même pas leur contenu (uniquement les titres). La seule manière d'y remédier est de visiter directement le site fournisseur de ces flux.</p>
+  <h3 id="14"><u>L'application s'est fermée brusquement !</u></h3>
+  <p>Malheureusement, cela arrive parfois, sans raisons clairement identifiées. Afin de vous aider à comprendre le type d'erreur liée à l'arrêt brutal de l'application, un fichier journal (log) a été activé par défaut. Ce fichier se trouve dans <i>/usr/share/naufrago/naufrago.log</i> pour le paquet Debian, et dans le dossier décompressé pour l'archive source. TOUTE AIDE EST LA BIENVENUE si vous désirez nous aider en ce qui concerne ces erreurs.</p>
+  <h3 id="15"><u>Je veux faire un rapport d'erreurs ou réparer ces erreurs !</u></h3>
+  <p>Bien que l'application soit à présent plus stable qu'auparavant, de nombreux problèmes existent toujours. Ce point nécessite des recherches plus poussées, et c'est bien là que <i>j'apprécierai votre aide</i>. Oui, je possède un <a href="http://fr.wikipedia.org/wiki/Revision_Control_System">Système de gestion des versions</a> et vous êtes les bienvenue; envoyez-moi un courrier électronique (en anglais), nous pourrons en discuter. Vous pouvez envoyer des rapports de bogues sur <a href="http://sourceforge.net/tracker/?group_id=333054&amp;atid=1396393">la partie dédiée dans notre espace sourceforge</a> ou bien directement à mon compte de messagerie (<b>worbynet@gmail.com</b>).</p>
+  <hr>
+ 
+  <h1>Autre</h1>
+  <h3 id="16"><u>Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</u></h3>
+  <p>Dans la pratique, les entr&eacute;es RSS ne sont pas toujours des extraits, ou des r&eacute;sum&eacute;s. M&ecirc;me s'il &eacute;tait vrai que les flux RSS &eacute;taient fournis comme des r&eacute;sum&eacute;s, beaucoup d'entre eux contiennent des images &agrave; but informatif ou du contenu additionnel.</p>
+  <h3 id="17"><u>Sous quelle licence cette application est-elle distribu&eacute;e ?</u></h3>
+  <p>Sous licence GPLv3.</p>
+  <h3 id="18"><u>J'aimerais que l'application soit pourvue de ...</u></h3>
+  <p>Tout comme Liferea, en principe je n'accepte pas de demande d'am&eacute;lioration ou d'id&eacute;es, mais vous pouvez toujours essayer, vous n'avez rien &agrave; perdre apr&egrave;s tout. Vos suggestions pourraient &ecirc;tre int&eacute;ressantes, sait-on jamais. Mais vous pouvez toujours m'aider directement au d&eacute;veloppement, ou bien am&eacute;liorer l'application, que sais-je encore...</p>
+  <h3 id="19"><u>Remerciements de l'auteur</u></h3>
+  <p>L'auteur remercie tous ceux qui l'ont soutenu durant le développement de l'application ainsi que tous ceux qui lui ont donné un coup de main. De la même manière, il apprécie toute contribution au projet, notamment en ce qui concerne la recherche des bogues et/ou leur résolution.</p>
+  <h3 id="20"><u>Aimez-vous Naufrago ?</u></h3>
+  <p>Le meilleur cadeau que vous puissiez faire &agrave; l'auteur d'une application n'est pas tant de l'utiliser mais bien de lui faire un rapport sur votre utilisation personnelle de ladite application ou votre reconnaissance. Un simple "Merci" suffira dans la plupart des cas :)</p>
+  <p>Bien s&ucirc;r, vous pouvez aussi am&eacute;liorer le projet, en cr&eacute;ant des correctifs,&nbsp;en impl&eacute;mentant de nouvelles fonctionnalit&eacute;s, en traduisant dans d'autres langues, en cr&eacute;ant des paquets pour diff&eacute;rents distributions... La liste n'est pas exhaustive! Bien &eacute;videmment, vous pouvez critiquer l'application. Quoi qu'il en soit, vous pouvez me contacter &agrave; &nbsp;<b>worbynet</b>_arobase_<b>gmail</b>_point_<b>com</b>&nbsp;et je serai heureux de communiquer avec vous.</p>
+ </body>
+</html>
