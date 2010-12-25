@@ -1,3 +1,40 @@
+naufrago (0.3-1) testing unstable; urgency=low
+
+  * Third Release.
+  * FIXED: Show/hide read entries on realtime.
+  * FIXED: Hanging/freezing problem with pynotify.
+  * FIXED: Some htmlentities are shown uncorrectly on entry
+    titles.
+  * FIXED: Number of unread entries on 'Unread' special
+    folder.
+  * IMPROVED: App stabilization (by thread blocking) by
+    avoiding sqlite race conditions.
+  * IMPROVED: Open entry in browser on double click.
+  * IMPROVED: Open entry in browser on pressing return.
+  * IMPROVED: Reorder treeview on new category.
+  * IMPROVED: No horizontal scrollbar for feed list.
+  * IMPROVED: 'Hide read entries' hides entries when there's
+    a feed selected and marking all as read is triggered.
+  * IMPROVED: launching script logs errors.
+  * IMPROVED: warning dialogs when adding existent
+    feed/category.
+  * IMPROVED: Importing feedlist (tested: FeedR, Liferea &
+    Naufrago!).
+  * IMPROVED: Important rework in the way feeds are stored
+    to avoid repeated entries (happens with some feeds with
+    bad date field or bad date parsing).
+  * NEW: Important column is now sortable.
+  * NEW: Added option to hide date column.
+  * NEW: Bold/unbold folders with unread/read articles.
+  * NEW: Module import error warning.
+  * NEW: Added "driven mode" (unfolds categories on new
+    entries, folds when all are read).
+  * NEW: Added option to cancel feed updates (present on
+    toolbar and statusbar).
+  * NEW: App online version checker.
+
+ -- Jordi Oliveras <worbynet@gmail.com>  Wed, 22 Dec 2010 18:26:37 +0200
+
 naufrago (0.2-1) testing unstable; urgency=low
 
   * Second Release.
@@ -8,14 +45,6 @@ naufrago (0.2-1) testing unstable; urgency=low
   * FIXED: Strings converted to utf8 to avoid some PangoWarnings.
   * FIXED: Some bugs when importing/exporting feeds.
   * FIXED: Many bugfixes during new version development.
-  * NEW: Added option to show a notification on new entries.
-  * NEW: Feed update status indicator through favicon change.
-  * NEW: Added option to show/hide Tray Icon.
-  * NEW: Added option to show/hide Toolbar & to modify its style.
-  * NEW: Added option to show/hide read entries.
-  * NEW: Added special folders 'Important' & 'Unread'.
-  * NEW: More threads added to avoid GUI freezing.
-  * NEW: Translations to Polish and Italian.
   * IMPROVED: Preferencess dialog reworked & reorganized.
   * IMPROVED: Paths changed to freedesktop.org "XDG Base Directory
     Specification".
@@ -27,6 +56,14 @@ naufrago (0.2-1) testing unstable; urgency=low
   * IMPROVED: Moving entry list to the top when selecting a feed.
   * IMPROVED: Feed list window saves its width.
   * IMPROVED: Key accelerators.
+  * NEW: Added option to show a notification on new entries.
+  * NEW: Feed update status indicator through favicon change.
+  * NEW: Added option to show/hide Tray Icon.
+  * NEW: Added option to show/hide Toolbar & to modify its style.
+  * NEW: Added option to show/hide read entries.
+  * NEW: Added special folders 'Important' & 'Unread'.
+  * NEW: More threads added to avoid GUI freezing.
+  * NEW: Translations to Polish and Italian.
 
  -- Jordi Oliveras <worbynet@gmail.com>  Fri, 16 Sep 2010 11:08:21 +0200
 

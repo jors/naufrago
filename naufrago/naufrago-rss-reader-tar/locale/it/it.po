@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-21 16:29+0200\n"
+"POT-Creation-Date: 2010-12-23 20:02+0100\n"
 "PO-Revision-Date: 2010-07-06 18:28+0200\n"
 "Last-Translator: kir <kir@sdf-eu.org>\n"
 "Language-Team: Spanish\n"
@@ -18,426 +18,490 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: naufrago.py:246 naufrago.py:381 naufrago.py:398 naufrago.py:449
-#: naufrago.py:472 naufrago.py:534 naufrago.py:554 naufrago.py:583
-#: naufrago.py:614 naufrago.py:775 naufrago.py:795 naufrago.py:800
-#: naufrago.py:1457 naufrago.py:1459
+#: naufrago.py:53
+msgid "Error importing modules: "
+msgstr "Errore durante límportazione dei moduli"
+
+#: naufrago.py:316 naufrago.py:485 naufrago.py:504 naufrago.py:559
+#: naufrago.py:584 naufrago.py:650 naufrago.py:672 naufrago.py:705
+#: naufrago.py:740 naufrago.py:931 naufrago.py:953 naufrago.py:958
+#: naufrago.py:1735 naufrago.py:1737
 msgid "Unread"
 msgstr "Non letto"
 
-#: naufrago.py:264 naufrago.py:381 naufrago.py:395 naufrago.py:449
-#: naufrago.py:469 naufrago.py:534 naufrago.py:554 naufrago.py:580
-#: naufrago.py:611 naufrago.py:775 naufrago.py:792 naufrago.py:800
-#: naufrago.py:1451 naufrago.py:1453
+#: naufrago.py:340 naufrago.py:485 naufrago.py:501 naufrago.py:559
+#: naufrago.py:581 naufrago.py:650 naufrago.py:672 naufrago.py:702
+#: naufrago.py:737 naufrago.py:931 naufrago.py:950 naufrago.py:958
+#: naufrago.py:1727 naufrago.py:1729
 msgid "Important"
 msgstr "Importante"
 
-#: naufrago.py:821
+#: naufrago.py:983
 msgid "Special folder"
 msgstr "Cartella speciale"
 
-#: naufrago.py:832
+#: naufrago.py:996
 msgid "Source"
 msgstr "Sorgenti"
 
-#: naufrago.py:838
+#: naufrago.py:1002 naufrago.py:2359
 msgid "Category"
 msgstr "Categoria"
 
-#: naufrago.py:883
+#: naufrago.py:1047
 msgid "Warning!"
 msgstr "Avviso!"
 
-#: naufrago.py:918
+#: naufrago.py:1077 naufrago.py:1087 naufrago.py:1102
+msgid "Upgrade checker"
+msgstr "Controllo d'aggiornamenti"
+
+#: naufrago.py:1080 naufrago.py:1090 naufrago.py:1105
+msgid "Close"
+msgstr "Chiudi"
+
+#: naufrago.py:1081
+msgid "No updates available."
+msgstr "Nessun aggiornamento disponibile"
+
+#: naufrago.py:1106
+msgid "Coult not contact server. Try again later!"
+msgstr "Non si può contattare il server. Riprovi più tardi"
+
+#: naufrago.py:1136
 msgid "Naufrago! is a simple RSS reader"
 msgstr "Naufrago! è un semplice lettore RSS"
 
-#: naufrago.py:981
+#: naufrago.py:1201
 msgid "_Archive"
 msgstr "_Archivio"
 
-#: naufrago.py:982
+#: naufrago.py:1202
 msgid "_New feed"
 msgstr "_Nuovo feed"
 
-#: naufrago.py:982
+#: naufrago.py:1202
 msgid "Adds a feed"
 msgstr "Aggiungi un feed"
 
-#: naufrago.py:983
+#: naufrago.py:1203
 msgid "New _category"
 msgstr "Nuova _categoria"
 
-#: naufrago.py:983
+#: naufrago.py:1203
 msgid "Adds a category"
 msgstr "Aggiungi una categoria"
 
-#: naufrago.py:984 naufrago.py:1765
+#: naufrago.py:1204 naufrago.py:2117
 msgid "Delete feed"
 msgstr "Cancellare feed"
 
-#: naufrago.py:984
+#: naufrago.py:1204
 msgid "Deletes a feed"
 msgstr "Cancella un feed"
 
-#: naufrago.py:985 naufrago.py:1565
+#: naufrago.py:1205 naufrago.py:1888
 msgid "Delete category"
 msgstr "Cancellare categoria"
 
-#: naufrago.py:985
+#: naufrago.py:1205
 msgid "Deletes a category"
 msgstr "Cancella una categoria"
 
-#: naufrago.py:986
+#: naufrago.py:1206
 msgid "Import feeds"
 msgstr "Importare i feeds"
 
-#: naufrago.py:986
+#: naufrago.py:1206
 msgid "Imports a feedlist"
 msgstr "Importa un feedlist"
 
-#: naufrago.py:987
+#: naufrago.py:1207
 msgid "Export feeds"
 msgstr "Esportare feeds"
 
-#: naufrago.py:987
+#: naufrago.py:1207
 msgid "Exports a feedlist"
 msgstr "Esporta un feddlist"
 
-#: naufrago.py:988
+#: naufrago.py:1208
 msgid "_Quit"
 msgstr "Esci"
 
-#: naufrago.py:988
+#: naufrago.py:1208
 msgid "Quits"
 msgstr "Esce dell'applicazione"
 
-#: naufrago.py:989
+#: naufrago.py:1209
 msgid "E_dit"
 msgstr "Mo_dificare"
 
-#: naufrago.py:990
+#: naufrago.py:1210
 msgid "_Edit"
 msgstr "Modifica"
 
-#: naufrago.py:990
+#: naufrago.py:1210
 msgid "Edits the selected element"
 msgstr "Modifica la voce selezionata"
 
-#: naufrago.py:991 naufrago.py:1839 naufrago.py:1842
+#: naufrago.py:1211 naufrago.py:2205 naufrago.py:2208
 msgid "Search"
 msgstr "Cerca"
 
-#: naufrago.py:991
+#: naufrago.py:1211
 msgid "Searchs for a term in the feeds"
-msgstr "Ricerches per un periodo nei feed"
+msgstr "Cerca una parola nei feed"
 
-#: naufrago.py:992
+#: naufrago.py:1212
 msgid "_Preferences"
 msgstr "_Preferenze"
 
-#: naufrago.py:992
+#: naufrago.py:1212
 msgid "Shows preferences"
 msgstr "Mostra le preferenze"
 
-#: naufrago.py:993
+#: naufrago.py:1213
 msgid "_Network"
 msgstr "Rete"
 
-#: naufrago.py:994
+#: naufrago.py:1214
 msgid "_Update"
 msgstr "Aggiornare"
 
-#: naufrago.py:994
+#: naufrago.py:1214
 msgid "Updates the selected feed"
 msgstr "Aggiorna elfeed selezionato"
 
-#: naufrago.py:995 naufrago.py:1390
+#: naufrago.py:1215 naufrago.py:1634
 msgid "Update all"
 msgstr "Aggiornare tutto"
 
-#: naufrago.py:995
+#: naufrago.py:1215
 msgid "Update all feeds"
 msgstr "Aggiorna tutti i feeds"
 
-#: naufrago.py:996
+#: naufrago.py:1216 naufrago.py:1637
+msgid "Stop"
+msgstr "Stop"
+
+#: naufrago.py:1216
+msgid "Stop update"
+msgstr "Interrompere l'aggiornamento"
+
+#: naufrago.py:1217
 msgid "_Help"
 msgstr "Aiuto"
 
-#: naufrago.py:997
+#: naufrago.py:1218
 msgid "FAQ"
 msgstr "FAQ"
 
-#: naufrago.py:998
+#: naufrago.py:1219
+msgid "Check updates"
+msgstr "Controllo d'aggiornamenti"
+
+#: naufrago.py:1220
 msgid "_About"
 msgstr "_Intorno a"
 
-#: naufrago.py:998
+#: naufrago.py:1220
 msgid "About"
 msgstr "Intorno a"
 
-#: naufrago.py:1175
+#: naufrago.py:1416
 msgid "Feeds"
 msgstr "Feeds"
 
-#: naufrago.py:1229
+#: naufrago.py:1469
 msgid "Date"
 msgstr "Data"
 
-#: naufrago.py:1230
+#: naufrago.py:1470
 msgid "Title"
 msgstr "Titolo"
 
-#: naufrago.py:1272
+#: naufrago.py:1513
 msgid "Clic to fullscreen"
 msgstr "Fare clic per schermo pieno"
 
-#: naufrago.py:1279
+#: naufrago.py:1520
 msgid "Clic to open in browser"
 msgstr "Fare clic per aprire nel browser"
 
-#: naufrago.py:1393
+#: naufrago.py:1640
 msgid "Quit"
 msgstr "Uscire"
 
-#: naufrago.py:1488
+#: naufrago.py:1769
 msgid "Today"
 msgstr "Oggi"
 
-#: naufrago.py:1517
+#: naufrago.py:1800
 msgid "Edit category"
 msgstr "Modificare categoria"
 
-#: naufrago.py:1518
+#: naufrago.py:1801
 msgid "Change <b>category</b> name to:"
 msgstr "Cambiare il nome della <b>categoria</b> a:"
 
-#: naufrago.py:1519 naufrago.py:1649 naufrago.py:2201
+#: naufrago.py:1802 naufrago.py:1985 naufrago.py:2710
 msgid "Edit"
 msgstr "Modifica"
 
-#: naufrago.py:1521
+#: naufrago.py:1804
 msgid "Add category"
 msgstr "Aggiungere categoria"
 
-#: naufrago.py:1522
+#: naufrago.py:1805
 msgid "Please, insert the <b>category</b>:"
 msgstr "Per favore, inserire la <b>categoria</b>:"
 
-#: naufrago.py:1523
+#: naufrago.py:1806
 msgid "Create"
 msgstr "Creare"
 
-#: naufrago.py:1566
+#: naufrago.py:1850
+msgid "Category <b>already present</b>!"
+msgstr "Categoria <b>già presente</b>!"
+
+#: naufrago.py:1889
 msgid "Delete the selected <b>category</b>?"
 msgstr "Cancellare la <b>categoria</b> selezionata?"
 
-#: naufrago.py:1567
+#: naufrago.py:1890
 msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
 msgstr ""
 "<b>Attenzione:</b> tutti i feed contenuti saranno anche eliminati. Procedere?"
 
-#: naufrago.py:1625
+#: naufrago.py:1959
 msgid "This category <b>cannot be deleted</b>!"
-msgstr "La categoria Generale <b>non può essere soppresso</b>!"
+msgstr "Questa categoria <b>non può essere cancellata</b>!"
 
-#: naufrago.py:1627 naufrago.py:1629
+#: naufrago.py:1961 naufrago.py:1963
 msgid "You <b>must choose a category</b> folder!"
 msgstr "È necessario <b>scegliere una cartella di categoria</b>!"
 
-#: naufrago.py:1636
+#: naufrago.py:1970
 msgid "Name "
 msgstr "Nome "
 
-#: naufrago.py:1647
+#: naufrago.py:1983
 msgid "Edit feed"
 msgstr "Modificare feed"
 
-#: naufrago.py:1648
+#: naufrago.py:1984
 msgid "Change <b>feed</b> data:"
 msgstr "Modificare dati del <b>feed</b>:"
 
-#: naufrago.py:1652
+#: naufrago.py:1988
 msgid "Add feed"
 msgstr "Aggiungere feed"
 
-#: naufrago.py:1653
+#: naufrago.py:1989
 msgid "Please, insert <b>feed</b> address:"
-msgstr "Per favore, inserire i indirizzo del <b>feed</b>:"
+msgstr "Per favore, inserire lo indirizzo del <b>feed</b>:"
 
-#: naufrago.py:1654
+#: naufrago.py:1990
 msgid "Add"
 msgstr "Aggiungere"
 
-#: naufrago.py:1687
+#: naufrago.py:2023
 msgid "Default name"
 msgstr "Nome di default"
 
-#: naufrago.py:1766
+#: naufrago.py:2080
+msgid "Feed <b>already present</b>!"
+msgstr "Feed già presente"
+
+#: naufrago.py:2118
 msgid "Delete selected <b>feed</b>?"
 msgstr "Eliminare il <b>feed</b> selezionato?"
 
-#: naufrago.py:1808 naufrago.py:1810
+#: naufrago.py:2174 naufrago.py:2176
 msgid "You <b>must choose a feed</b>!"
 msgstr "Devi <b>scegliere un feed</b>!"
 
-#: naufrago.py:1830
+#: naufrago.py:2196
 msgid "This category <b>cannot be edited</b>!"
-msgstr "La categoria Generale <b>non può essere modificati</b>!"
+msgstr "Questa categoria <b>non può essere modificata</b>!"
 
-#: naufrago.py:1834
+#: naufrago.py:2200
 msgid "You <b>must choose a category or a feed</b> to edit!"
 msgstr "Devi <b>scegliere una categoria o un feed</b> per modificare!"
 
-#: naufrago.py:1843
+#: naufrago.py:2209
 msgid "Insert the <b>searchterm</b>:"
 msgstr "Inserire la <b>ricerca sterna</b>:"
 
-#: naufrago.py:1871
+#: naufrago.py:2239
 msgid "Search results for"
 msgstr "Risultati della ricerca per"
 
-#: naufrago.py:1873
+#: naufrago.py:2241
 msgid "No entry found for <b>"
 msgstr "Nessun risultato trovato per <b>"
 
-#: naufrago.py:1930
+#: naufrago.py:2401
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: naufrago.py:1931
+#: naufrago.py:2402
 msgid "Save"
 msgstr "Salvare"
 
-#: naufrago.py:1945
+#: naufrago.py:2416
 msgid "Start with unfolded tree"
 msgstr "Avviare con albero spiegato"
 
-#: naufrago.py:1949
-msgid "Start in Tray Icon"
-msgstr "Avvio Tray Icon"
+#: naufrago.py:2420
+msgid "Driven mode"
+msgstr "Modo guidato"
 
-#: naufrago.py:1957
+#: naufrago.py:2423
+msgid "Start in Tray Icon"
+msgstr "Avvio in Tray Icon"
+
+#: naufrago.py:2431
 msgid "Update on start"
 msgstr "Aggiornamento all'avvio"
 
-#: naufrago.py:1962
+#: naufrago.py:2435
+msgid "Check application updates on start"
+msgstr "Controlla aggiornamenti delle applicazioni all'avvio"
+
+#: naufrago.py:2440
 msgid "Start"
 msgstr "Avvio"
 
-#: naufrago.py:1968
+#: naufrago.py:2446
 msgid "Number of feed entries"
 msgstr "Numero dei commenti"
 
-#: naufrago.py:1980
-msgid "Update every (hours)"
-msgstr "Aggiornamento ogni (ore)"
+#: naufrago.py:2457
+msgid "Update every"
+msgstr "Aggiornamento ogni"
 
-#: naufrago.py:1991
-msgid "Offline mode (slower!)"
-msgstr "Offline mode (più lenta!)"
+#: naufrago.py:2468
+msgid "hour/s"
+msgstr "ora/e"
 
-#: naufrago.py:1996
+#: naufrago.py:2469
+msgid "minute/s"
+msgstr "minuto/i"
+
+#: naufrago.py:2474
 msgid "Hide read entries"
 msgstr "Nascondi le nuove voci"
 
-#: naufrago.py:2004
+#: naufrago.py:2481
 msgid "Feeds & articles"
-msgstr "Feed e gli articoli"
+msgstr "Feed e articoli"
 
-#: naufrago.py:2010
+#: naufrago.py:2486
+msgid "Hide dates"
+msgstr "Nascondi le date"
+
+#: naufrago.py:2492
 msgid "Notification on new entries"
 msgstr "Notifica di nuove voci"
 
-#: naufrago.py:2014
+#: naufrago.py:2496
 msgid "Show icon in tray"
-msgstr "Mostra icona nel vassoio di"
+msgstr "Mostra icona nel tray"
 
-#: naufrago.py:2021
+#: naufrago.py:2503
 msgid "Toolbar mode"
 msgstr "Toolbar modalità"
 
-#: naufrago.py:2024
+#: naufrago.py:2506
 msgid "Full"
 msgstr "Completo"
 
-#: naufrago.py:2025
+#: naufrago.py:2507
 msgid "Icons only"
 msgstr "Solo le icone"
 
-#: naufrago.py:2026
+#: naufrago.py:2508
 msgid "Text only"
 msgstr "Solo testo"
 
-#: naufrago.py:2027
+#: naufrago.py:2509
 msgid "Hidden"
 msgstr "Nascosto"
 
-#: naufrago.py:2033
+#: naufrago.py:2515
 msgid "Interface"
 msgstr "Interfaccia"
 
-#: naufrago.py:2191
+#: naufrago.py:2520
+msgid "Offline mode (slower!)"
+msgstr "Modo offline (più lento!)"
+
+#: naufrago.py:2531
+msgid "Modes"
+msgstr "Modi"
+
+#: naufrago.py:2700
 msgid "Mark all as read"
 msgstr "Segna tutto como letto"
 
-#: naufrago.py:2196
+#: naufrago.py:2705
 msgid "Update"
 msgstr "Aggiorna"
 
-#: naufrago.py:2206
+#: naufrago.py:2715
 msgid "Delete"
 msgstr "Cancella"
 
-#: naufrago.py:2212
+#: naufrago.py:2721
 msgid "New feed"
 msgstr "Nuovo feed"
 
-#: naufrago.py:2215
+#: naufrago.py:2724
 msgid "New category"
 msgstr "Nuova categoria"
 
-#: naufrago.py:2259
+#: naufrago.py:2770
 msgid "Open in browser"
 msgstr "Aprire nel browser"
 
-#: naufrago.py:2260
+#: naufrago.py:2771
 msgid "Copy URL to clipboard"
 msgstr "Copia URL nello clipboard"
 
-#: naufrago.py:2263
+#: naufrago.py:2774
 msgid "Toggle read/non-read"
 msgstr "Toggle letto/non-letto"
 
-#: naufrago.py:2266
+#: naufrago.py:2777
 msgid "Toggle all read/non-read"
 msgstr "Toggle tutti letto/non-letto"
 
-#: naufrago.py:2374
+#: naufrago.py:2897 naufrago.py:2898
 msgid "Without title"
 msgstr "Senza titolo"
 
-#: naufrago.py:2378
+#: naufrago.py:2907 naufrago.py:2908
 msgid "Without link"
 msgstr "Senza link"
 
-#: naufrago.py:2416
+#: naufrago.py:2955
 msgid "Obtaining image "
 msgstr "Ottenendo immagine "
 
-#: naufrago.py:2522 naufrago.py:2659
+#: naufrago.py:3063
 msgid "Obtaining feed "
 msgstr "Ottenendo feed "
 
-#: naufrago.py:2805 naufrago.py:2870
+#: naufrago.py:3347 naufrago.py:3425
 msgid "Open.."
 msgstr "Aprire.."
 
-#: naufrago.py:2819
+#: naufrago.py:3362
 msgid "All files"
 msgstr "Tutti i file"
 
-#: naufrago.py:2874
+#: naufrago.py:3429
 msgid "_Save"
 msgstr "_Salvare"
 

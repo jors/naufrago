@@ -2,30 +2,30 @@
  IMPORTANT LLEGEIX-ME!!!
 ------------------------
 
-Si actualment tens Naufrago! 0.1 instal-lat, si us plau,
+Si actualment tens Naufrago! 0.1 ó 0.2 instal-lat, si us plau,
 segueix els següents passos abans d'executar l'aplicació
-per tal d'actualitzar a la versió 0.2:
+per tal d'actualitzar a la versió 0.3:
 
-1. DESCOMPRIMEX 'naufrago-0.2.tar.bz2'. Si estàs llegint
+1. DESCOMPRIMEX 'naufrago-0.3.tar.bz2'. Si estàs llegint
    això, probablement ho has fet ja.
 
-2. COPIA els següents directoris i arxius de la versió 0.1
-   de Naufrago! a l'arrel del directori descomprimit al pas
+2. COPIA els següents directoris i arxius de la versió 0.1 ó
+   0.2 de Naufrago! a l'arrel del directori descomprimit al pas
    anterior:
 
    - favicons
    - imagenes
    - naufrago.db
 
-3. EXECUTA l'script de nom "update_0.1_to_0.2.py" proporcionat
+3. EXECUTA l'script de nom "update_0.x_to_0.3.py" proporcionat
    pel tarball. Pots fer-ho a través d'una de les opcions següents
    (amb l'usuari amb el que normalment executes Naufrago!):
 
    OPCIÓ 1:
-   chmod +x update_0.1_to_0.2.py && ./update_0.1_to_0.2.py
+   chmod +x update_0.x_to_0.3.py && ./update_0.x_to_0.3.py
 
    OPCIÓ 2:
-   python update_0.1_to_0.2.py
+   python update_0.x_to_0.3.py
 
 4. Si no hi ha hagut errors, ja està tot fet! Llança aquesta nova
    versió de Naufrago! i diverteix-te!
@@ -34,23 +34,23 @@ per tal d'actualitzar a la versió 0.2:
  PROBLEMES
 ----------
 
-P. He executat la versió 0.2 aplicació abans de fer
+P. He executat la versió 0.3 aplicació abans de fer
 l'actualització i ara l'aplicació no funciona bé! Ajuda!
 
-A. Si executes la versió 0.2 de l'aplicació abans de fer
+A. Si executes la versió 0.3 de l'aplicació abans de fer
 l'actualització, si us plau, elimina els directoris 'favicons'
 i 'imatges' i l'arxiu 'naufrago.db' i procedeix amb els passos
-d'actualització esmentats en aquest document.
+d'actualització esmentats anteriorment en aquest document.
 
 P. Al pas 3, quan executo l'script,  diu que no pot trobar l'arxiu
 de base de dades.
 
-A. Assegurat de que has copiat la base de dades de la versió 0.1
-sobre el mateix directori on es troba l'script. També assegurat que
+A. Assegurat de que has copiat la base de dades de la versió 0.1 ó
+0.2 sobre el mateix directori on es troba l'script. També assegurat que
 tinguis permisos d'escriptura al mateix.
 
-P: Jo no he utilitzat mai la versió 0.1, què he de fer?
+P: Jo no he utilitzat mai la versió 0.1 ó 0.2, què he de fer?
 
 R.: Simplement ignora aquest document i llança feliçment l'aplicació
-0.2 :)
+0.3 :)
 

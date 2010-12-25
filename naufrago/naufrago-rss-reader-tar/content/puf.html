@@ -16,24 +16,26 @@
    <li><h2>Operation</h2></li>
     <ul>
      <li><a href="#6">How does <i>offline mode</i> works?</a></li>
-     <li><a href="#7">I want to save important articles/entries/posts!</a></li>
-     <li><a href="#8">I can not create subcategories</a></li>
-     <li><a href="#9">I can not delete articles / entries / posts from feeds</a></li>
+     <li><a href="#7">How does <i>driven mode</i> works?</a></li>
+     <li><a href="#8">I want to save important articles/entries/posts!</a></li>
+     <li><a href="#9">I can not create subcategories</a></li>
+     <li><a href="#10">I can not delete articles / entries / posts from feeds</a></li>
     </ul>
    <li><h2>Problems</h2></li>
     <ul>
-     <li><a href="#10">The entries of one or more feeds are chronologically ordered wrong</a></li>
-     <li><a href="#11">The entries of one or more feeds have not content, just titles</a></li>
-     <li><a href="#12">Feed import is so slow and seems to hang the app</a></li>
-     <li><a href="#13">The application was closed unexpectedly!</a></li>
+     <li><a href="#11">The feed update stopping takes too long</a></li>
+     <li><a href="#12">The date sorting of some feeds is incorrect</a></li>
+     <li><a href="#13">The entries of some feeds don't show any content but titles (or even any title)</a></li>
+     <li><a href="#14">The application was closed unexpectedly!</a></li>
+     <li><a href="#15">I want to report/fix issues!</a></li>
     </ul>
    <li><h2>Other</h2></li>
     <ul>
-     <li><a href="#14">If RSS feeds are summaries, are necessary images offline?</a></li>
-     <li><a href="#15">Under what license is it distributed?</a></li>
-     <li><a href="#16">I would like the application made / had ...</a></li>
-     <li><a href="#17">Author's Acknowledgments</a></li>
-     <li><a href="#18">Do you like Naufrago!?</a></li>
+     <li><a href="#16">If RSS feeds are summaries, are necessary images offline?</a></li>
+     <li><a href="#17">Under what license is it distributed?</a></li>
+     <li><a href="#18">I would like the application made / had ...</a></li>
+     <li><a href="#19">Author's Acknowledgments</a></li>
+     <li><a href="#20">Do you like Naufrago!?</a></li>
     </ul>
   </ol>
   <hr>
@@ -47,6 +49,7 @@
    <li>Feed <b>categorization</b> on a single category <b>level tree</b>.</li>
    <li>Feed organization by <b>drag &amp; drop</b>.</li>
    <li><b>Online/offline reading</b> (including images).</li>
+   <li><b>Smart category folding/unfolding</b>.</li>
    <li><b>Fullscreen mode</b> for feed reading.</li>
    <li><b>Marking feeds</b> as <b>important</b>/<b>permanent</b> (recording).</li>
    <li>Inclusion of <b>favicons</b> for feeds.</li>
@@ -54,7 +57,8 @@
    <li><b>Import/export</b> feeds <b>in OPML</b> format.</li>
    <li><b>Important</b> and <b>Unread folders</b>.</li>
    <li>Term <b>searching capabilities</b>.</li>
-   <li><b>Multi language</b> (currently English, Polish, Italian, Catalan and Spanish).</li>
+   <li><b>Multi language</b> (currently English, French, Polish, Italian, Catalan and Spanish).</li>
+   <li>Automatic <b>update checker</b></b>.</li>
   </ul>
   </p>
   <h3 id="3"><u>Which are the minimum requirements?</u></h3>
@@ -78,35 +82,39 @@
   <h1>Operation</h1>
   <h3 id="6"><u>How does <i>offline mode</i> works?</u></h3>
   <p>This mode ensures that you have access to the articles/entries/posts with its images even without an Internet conection, without interfering with other aspects in the functioning of the application. This means you can always leave it enabled, no matter you have or have not Internet access, and the application will still keep on getting new articles / entries / posts if it can. The only drawback is that leaving this mode always activated, it will consume more bandwidth and will take longer to get the updates, since the images will also be retrieved. <b>NOTE: </b>For the offline mode to work correctly, after you enable it on the preferences dialog, you must update all feeds whose images you want to view offline.</p>
-  <h3 id="7"><u>I want to save important articles/entries/posts!</u></h3>
+  <h3 id="7"><u>How does <i>driven mode</i> works?</u></h3>
+  <p>This mode works by unfolding/folding these categories containing feeds with unread/read entries, respectively, making easy for the user the task of visual identification of what's left for reading. This also avoids unnecessary <i>clics</i> to the user.</p>
+  <h3 id="8"><u>I want to save important articles/entries/posts!</u></h3>
   <p>You can do this by checking the checkbox located at the beginning of the title of each article / entry / post.</p>
-  <h3 id="8"><u>I can not create subcategories</u></h3>
+  <h3 id="9"><u>I can not create subcategories</u></h3>
   <p>As mentioned in the <a href="#2">features section of the application</a>, the categorization allows only one level of categories.</p>
-  <h3 id="9"><u>I can not delete articles / entries / posts from feeds</u></h3>
+  <h3 id="10"><u>I can not delete articles / entries / posts from feeds</u></h3>
   <p>It is true, they can not be erased. Instead, it was decided that the application manages its deletion automatically based on the number of articles / entries / posts configured in the preferences. So don't worry, the application will perform the cleaning for you.</p>
   <hr>
 
   <h1>Problems</h1>
-  <h3 id="10"><u>The entries of one or more feeds are ordered wrong chronologically</u></h3>
-  <p>There are feeds that do not publish any date for their entries. While the application concerns about generating one, if there isn't, the retrieved articles / entries / posts recovered initially do not preserve order. But from this point, the following articles / entries / posts that are recovered will start to get sorted. <b>Update:</b> Still there's another problem with feedparser while parsing some feeds that produces weird date parsing (in instance, incorrect dates, future dates included).</p>
-  <h3 id="11"><u>The entries of one or more feeds have not content, just titles</u></h3>
-  <p>The same way there are feeds that do not publish any date for their entries, some do not provide content either, but only the title. If you want to read the articles / entries / posts from that site, you will have to visit their website.</p>
-  <h3 id="12"><u>Feed import is so slow and seems to hang the app</u></h3>
-  <p>That happened in 0.1 version, but should now be solved as long as it has been reworked as a threaded background task.</p>
-  <h3 id="13"><u>The application was closed unexpectedly!</u></h3>
-  <p>Unfortunately, this happened sometimes and is an unidentified error (sometimes as a segfault, somestimes as an X error), so WE WELCOME all those who wish to make contributions in this regard. Help is needed!</p>
+  <h3 id="11"><u>The feed update stopping takes too long</u></h3>
+  <p>Actually, this is inherent in how the cancel/stop feed updating works. For simplicity, we have defined an entire feed update as atomic operation, out of which you can proceed with the cancel/stop. Thus, during an update, when the cancel/stop is triggered, it will be effective when done with the last feed being updated at that time.</p>
+  <h3 id="12"><u>The date sorting of some feeds is incorrect</u></h3>
+  <p>How this could be given that they usually are shown in order? <i>By default</i> and because feedparser is not foolproof at guessing all Internet RSS date formats, <i>in this version (0.3) we have chose to sort feed entries on a first-come basis</i>. So the sorting by the date column may have therefore the above problem.</p>
+  <h3 id="13"><u>The entries of some feeds don't show any content but titles (or even any title)</u></h3>
+  <p>Just the same way there are feeds that does not publish dates for their entries, some others does not even provide content, but only the title (and sometimes even this is missing). Here the only way to go is to visit the site.</p>
+  <h3 id="14"><u>The application was closed unexpectedly!</u></h3>
+  <p>Unfortunatelly, this happens sometimes and are unidenfied errors (abortions, segfaults, conection errors against X...). In order to assist you in the work of identifying potential errors, a log file has been enabled to help in this cases. The log is located at <i>/usr/share/naufrago/naufrago.log</i> for the Debian package and in the directory of decompression for the tarball. ANY HELP IS WELCOME if you want to contribute in this regard.</p>
+  <h3 id="15"><u>I want to report/fix issues!</u></h3>
+  <p>While the application is more stable that it was, it still has problems. This point needs further research and is where <i>I really would appreciate help</i>. Yes, I have a <a href="http://en.wikipedia.org/wiki/Revision_Control_System">Revision Control System</a> and you are welcome; send me an email and we will talk about that. You can send bugreports to <a href="http://sourceforge.net/tracker/?group_id=333054&atid=1396393">the sourceforge tracker</a> or to me personally at my mail account (<b>worbynet@gmail.com</b>).</p>
   <hr>
 
   <h1>Other</h1>
-  <h3 id="14"><u>If RSS feeds are summaries, are necessary images offline?</u></h3>
+  <h3 id="16"><u>If RSS feeds are summaries, are necessary images offline?</u></h3>
   <p>In practice, RSS entries are not always abstracts (but the full entry), and it is unclear where this topic will evolve, particularly in the Internet. And even if it was true that RSS feeds were provided as summaries, many of them also include informative images / additional content.</p>
-  <h3 id="15"><u>Under what license is it distributed?</u></h3>
+  <h3 id="17"><u>Under what license is it distributed?</u></h3>
   <p>Under the GPLv3.</p>
-  <h3 id="16"><u>I would like the application made / had ...</u></h3>
+  <h3 id="18"><u>I would like the application made / had ...</u></h3>
   <p>The same way Liferea do, in principle I do not accept <i>feature requests</i>, but as more was lost in Cuba (that's a spanish expression), you do not lose anything by trying. If I find it interesting, who knows :) But, you can always give me a hand with it, do it yourself, ask someone, etc...</p>
-  <h3 id="17"><u>Author's Acknowledgments</u></h3>
-  <p>The author thanks all those who have endured during development (especially to my girlfriend:) and to all of those who did give a hand. Likewise, he appreciates any contribution you want to do to the project, especially bug hunting and resolving them.</p>
-  <h3 id="18"><u>Do you like Naufrago!?</u></h3>
+  <h3 id="19"><u>Author's Acknowledgments</u></h3>
+  <p>The author thanks all those who have endured during development (especially to my girlfriend:) and to all of those who did give a hand (cheers to jcasas &amp; mito). Likewise, he appreciates any contribution you want to do to the project, especially hunting/working out bugs.</p>
+  <h3 id="20"><u>Do you like Naufrago!?</u></h3>
   <p>The best gift for a writer of software is not the application usage, but the user's usage and appreciation report. A "thanks mate" will suffice in most of the cases :)</p><p>But you can also help improving the project, doing <i>bug fixes</i>, implementating new features, translating to new languages, packaging for different distros... The list is endless! Similarly, although not so nice, you can also criticize it. In any case, you can write to <b>worbynet</b>_at_<b>gmail</b>_dot_<b>com</b> and I'll be happy to hear from you.</p>
  </body>
 </html>

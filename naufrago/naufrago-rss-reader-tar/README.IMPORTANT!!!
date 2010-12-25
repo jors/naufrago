@@ -3,31 +3,31 @@
 ¡¡¡README IMPORTANT !!!
 -----------------------
 
-If you currently have Naufrago! 0.1 installed, please, 
-follow this steps BEFORE RUNNING THE APP in order to
-upgrade to 0.2 version:
+If you currently have Naufrago! 0.1 or 0.2 installed,
+please, follow the following steps BEFORE RUNNING THE
+APP in order to upgrade to 0.3 version:
 
-1. UNCOMPRESS 'naufrago-0.2.tar.bz2'. If you are reading
+1. UNCOMPRESS 'naufrago-0.3.tar.bz2'. If you are reading
    this, you probably did it already.
 
 2. COPY the following directories and files from Naufrago!
-   version 0.1 to the root of the previously uncompressed
+   version 0.1 or 0.2 to the root of the previously uncompressed
    directory:
 
    - favicons
    - imagenes
    - naufrago.db
 
-3. RUN the script named 'update_0.1_to_0.2.py' provided
+3. RUN the script named 'update_0.x_to_0.3.py' provided
    within this tarball. You can do it through one of the
    following options (with the user which you usually run
    Naufrago!):
 
    OPTION 1:
-   chmod +x update_0.1_to_0.2.py && ./update_0.1_to_0.2.py
+   chmod +x update_0.x_to_0.3.py && ./update_0.x_to_0.3.py
 
    OPTION 2:
-   python update_0.1_to_0.2.py
+   python update_0.x_to_0.3.py
 
 4. If there were no errors, you're done! Launch this new
    version of Naufrago! and enjoy!
@@ -36,20 +36,20 @@ upgrade to 0.2 version:
  PROBLEMS
 ----------
 
-Q. I ran the 0.2 app version before doing the upgrade
+Q. I ran the 0.3 app version before doing the upgrade
 steps and now the app does not work well! Help!
 
-A. If you run the 0.2 app version before doing previous upgrade
+A. If you run the 0.3 app version before doing previous upgrade
 steps, please, delete the 'favicons' and 'imagenes' directories and
-the 'naufrago.db' file and proceed with the steps.
+the 'naufrago.db' file and proceed with the above mentioned steps.
 
 Q. At step 3, when I run the script, it says it cannot find the
 database file.
 
-A. Make sure you copied the 0.1 database on the same path where
-the script is. Also make sure you have write permission on it.
+A. Make sure you copied the 0.1 or 0.2 database on the same path
+where the script is. Also make sure you have write permission on it.
 
-Q. I did not used 0.1 version, what should I do?
+Q. I did not used 0.1 or 0.2 version previously, what should I do?
 
-A. Just ignore this whole file and run the 0.2 app happily :)
+A. Just ignore this whole file and run the 0.3 app happily :)
 
