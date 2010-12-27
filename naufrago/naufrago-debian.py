@@ -386,6 +386,7 @@ class Naufrago:
       self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
 
+     # NEW: Limpieza de la GUI
      if self.hide_readentries:
       self.liststore.clear() # Limpieza de tabla de entries/articulos
       self.scrolled_window2.set_size_request(0,0)
@@ -795,6 +796,21 @@ class Naufrago:
          i += 1
      # END NAME PARSING (nodo destino) #
      cursor.close()
+
+     # NEW: Limpieza de la GUI
+     if liststore_font_style == 'bold':
+      if self.hide_readentries:
+       self.liststore.clear() # Limpieza de tabla de entries/articulos
+       self.scrolled_window2.set_size_request(0,0)
+       self.scrolled_window2.hide()
+       (model_tmp, iter_tmp) = self.treeselection.get_selected()
+       if type(iter_tmp) is gtk.TreeIter:
+        if(model_tmp.iter_depth(iter_tmp) == 1): # Si es hoja
+         self.webview.load_string("<h2>"+_("Feed")+": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
+        elif(model.iter_depth(iter) == 0): # Si es padre
+         self.webview.load_string("<h2>"+_("Category")+": "+model_tmp.get_value(iter_tmp, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+       self.eb.hide()
+       self.eb_image_zoom.hide()
 
     # Unbold categories (if needed).
     self.toggle_category_bold_all()

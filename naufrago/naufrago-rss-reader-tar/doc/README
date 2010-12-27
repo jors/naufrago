@@ -34,13 +34,15 @@ The majors ones would be:
  - Feed organization drag & dropping through categories.
  - Online/offline feed reading (including images).
  - Full screen mode for better feed reading.
+ - Smart category folding/unfolding.
  - Important/permanent feed marking (recording).
  - Favicon support.
  - Tray iconization.
  - Feed import/export in OPML format.
  - Important and Unread folders.
- - Term search engine.
- - Multilanguage (currently English, Catalan and Spanish).
+ - Term searching capabilities.
+ - Multilanguage (currently English, French, Polish, Italian, Catalan and Spanish).
+ - Automatic update checker.
 
 Whishlist:
 
@@ -131,7 +133,7 @@ my girl, and also:
   (http://www.openclipart.org/user-detail/GMcGlinn).
 - The also great RSS svg by SRD
   (http://www.openclipart.org/user-detail/SRD).
-- The simple but clear red crossout by raemi
+- Almost the same goes to raemi
   (http://www.openclipart.org/user-detail/raemi).
 - Doug Quale ( quale1 at charter dot net ) & 
   Walter Anger ( WalterAnger at aon dot at ).

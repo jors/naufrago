@@ -386,8 +386,19 @@ class Naufrago:
       self.update_special_folder(9998)
      # END NAME PARSING (nodo destino) #
 
+     # NEW: Limpieza de la GUI
      if self.hide_readentries:
-      self.liststore.clear()
+      self.liststore.clear() # Limpieza de tabla de entries/articulos
+      self.scrolled_window2.set_size_request(0,0)
+      self.scrolled_window2.hide()
+      (model_tmp, iter_tmp) = self.treeselection.get_selected()
+      if type(iter_tmp) is gtk.TreeIter:
+       if(model_tmp.iter_depth(iter_tmp) == 1): # Si es hoja
+        self.webview.load_string("<h2>"+_("Feed")+": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
+       elif(model.iter_depth(iter) == 0): # Si es padre
+        self.webview.load_string("<h2>"+_("Category")+": "+model_tmp.get_value(iter_tmp, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+      self.eb.hide()
+      self.eb_image_zoom.hide()
 
     elif(model.iter_depth(iter) == 0): # Si es PADRE...
 
@@ -650,7 +661,12 @@ class Naufrago:
        if nombre_feed == _("Important") or nombre_feed == _("Unread"):
         q = 'SELECT count(id) FROM articulo WHERE leido=0 AND ghost=0'
        else:
-        q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id = '+`id_articulo`+') AND ghost=0'
+        # START NEW
+        if self.hide_readentries:
+         q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id='+`id_articulo`+') AND ghost=0 AND leido=0'
+        # END NEW
+        else:
+         q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id='+`id_articulo`+') AND ghost=0'
        self.lock.acquire()
        cursor.execute(q)
        count = cursor.fetchone()
@@ -780,6 +796,21 @@ class Naufrago:
          i += 1
      # END NAME PARSING (nodo destino) #
      cursor.close()
+
+     # NEW: Limpieza de la GUI
+     if liststore_font_style == 'bold':
+      if self.hide_readentries:
+       self.liststore.clear() # Limpieza de tabla de entries/articulos
+       self.scrolled_window2.set_size_request(0,0)
+       self.scrolled_window2.hide()
+       (model_tmp, iter_tmp) = self.treeselection.get_selected()
+       if type(iter_tmp) is gtk.TreeIter:
+        if(model_tmp.iter_depth(iter_tmp) == 1): # Si es hoja
+         self.webview.load_string("<h2>"+_("Feed")+": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
+        elif(model.iter_depth(iter) == 0): # Si es padre
+         self.webview.load_string("<h2>"+_("Category")+": "+model_tmp.get_value(iter_tmp, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+       self.eb.hide()
+       self.eb_image_zoom.hide()
 
     # Unbold categories (if needed).
     self.toggle_category_bold_all()
@@ -1746,13 +1777,13 @@ class Naufrago:
   any_row_to_show=False
   self.liststore.clear()
   cursor = self.conn.cursor()
-  if id_feed == 9998:
+  if id_feed == 9998: # Important
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE importante=1 ORDER BY fecha DESC'
-  elif id_feed == 9999:
+  elif id_feed == 9999: # Unread
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE leido=0 AND ghost=0 ORDER BY fecha DESC'
-  elif search_request_entry_ids is not None:
+  elif search_request_entry_ids is not None: # Search
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id IN ('+search_request_entry_ids+') AND ghost=0 ORDER BY fecha DESC'
-  else:
+  else: # Standard population
    q = 'SELECT id,titulo,fecha,leido,importante FROM articulo WHERE id_feed = '+`id_feed`+' AND ghost=0 ORDER BY fecha DESC'
   self.lock.acquire()
   cursor.execute(q)
@@ -1763,7 +1794,7 @@ class Naufrago:
   p = re.compile(r'<[^<]*?/?>') # Removes HTML tags
   p2 = re.compile('\s{2,}') # Translate 2 o + joined whitespaces to only one
   for row in rows:
-   if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0):
+   if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0) or (search_request_entry_ids is not None) or id_feed == 9998:
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     fecha = datetime.datetime.fromtimestamp(row[2]).strftime("%Y-%m-%d")
     if now == fecha: fecha = _('Today')
@@ -2334,7 +2365,12 @@ class Naufrago:
   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
   if type(useless_iter) is gtk.TreeIter:
    useless_iter_parent = model.iter_parent(useless_iter)
-   useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
+   if type(useless_iter_parent) is gtk.TreeIter:
+    useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
+   else:
+    useless_iter_id_cat = None
+  else:
+   useless_iter_parent = None
 
   iter = model.get_iter_root() # Magic
   id_cat = model.get_value(iter, 2)

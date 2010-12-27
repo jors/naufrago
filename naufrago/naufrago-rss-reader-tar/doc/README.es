@@ -1,4 +1,4 @@
-8/07/2010
+22/12/2010
 
 =========
 Contenido
@@ -34,6 +34,7 @@ Las destacadas serían:
  - Categorización de feeds de un único nivel en árbol.
  - Organización de feeds por categorías mediante drag & drop.
  - Lectura online/offline de feeds (incluyendo imágenes).
+ - Apertura/cierre inteligente de categorias.
  - Modo pantalla completa para la lectura de feeds.
  - Marcación de feeds como importantes/permanentes (grabación).
  - Inclusión de los favicons de los feeds.
@@ -41,7 +42,8 @@ Las destacadas serían:
  - Importación/exportación de feeds en formato OPML.
  - Carpeta de Importantes y No leídos.
  - Buscador de términos.
- - Multiidioma (de momento Ingles, Catalan y Castellano).
+ - Multiidioma (de momento Inglés, Francés, Polaco, Italiano, Catalán y Castellano).
+ - Autocomprobador de actualizaciones.
 
 Lista de deseos:
 
