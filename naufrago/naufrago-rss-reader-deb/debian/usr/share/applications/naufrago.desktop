@@ -1,10 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Naufrago!
-Comment=Lee tus entradas RSS offline
-Icon=/usr/share/naufrago/media/Viking_Longship.svg
-Exec=/usr/bin/naufrago
+Icon=/usr/share/naufrago/Viking_Longship.svg
+Exec=/usr/bin/pngcrushgtk
 Terminal=false
 Type=Application
-Categories=Application;Network;
+Categories=GNOME;GTK;Utility;
 StartupNotify=False

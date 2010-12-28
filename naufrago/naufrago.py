@@ -1272,7 +1272,7 @@ class Naufrago:
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
