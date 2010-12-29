@@ -21,6 +21,7 @@ cp -a $svn_path/README* $svn_path/naufrago-rss-reader-deb/debian/usr/share/doc/n
 for i in README README.es README.ca; do
  gzip -f -9 $svn_path/naufrago-rss-reader-deb/debian/usr/share/doc/naufrago/${i}
 done
+rm -rf $desktop_path
 svn export $svn_path/naufrago-rss-reader-deb $desktop_path
 #cd $desktop_path/debian
 #find . ! -type d -print0 | xargs -0 md5sum | grep -v DEBIAN > $desktop_path/debian/DEBIAN/md5sum

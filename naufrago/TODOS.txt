@@ -205,6 +205,7 @@ BUGS DEL CASI y otros PENDING (addendums):
   * 'alternar todos como leído/no leído' provoca un recuento erróneo en el feed. DONE
   * la opción 'search' las tiene en cuenta? (debería!) DONE
   * en 'Importantes' no debería ser de aplicación. DONE
+  * continuar con la ejecución si no se detecta ninguna locale soportada (fallback a ingles). DONE
 
 - DISCARDED: User-definable feed timeout.
 - DISCARDED: Sort by article reading state (otra columna?).

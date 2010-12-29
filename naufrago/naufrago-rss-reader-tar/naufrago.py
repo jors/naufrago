@@ -56,7 +56,7 @@ except ImportError:
 APP_VERSION = '0.3'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
-distro_package = True
+distro_package = False
 window_visible = True
 
 # Global socket timeout stuff
@@ -68,11 +68,15 @@ APP = 'naufrago'
 if distro_package == True: DIR = '/usr/share/naufrago/locale'
 else: DIR = os.getcwd() + '/locale'
 
-locale.setlocale(locale.LC_ALL, '')
-locale = locale.getdefaultlocale()[0]
-gettext.bindtextdomain(APP, DIR)
-gettext.textdomain(APP)
-_ = gettext.gettext
+try:
+ locale.setlocale(locale.LC_ALL, '')
+ locale = locale.getdefaultlocale()[0]
+ gettext.bindtextdomain(APP, DIR)
+ gettext.textdomain(APP)
+ _ = gettext.gettext
+except:
+ locale = ['en']
+ _ = gettext.gettext
 
 if distro_package == True: # We're running on 'Distro-mode' (intended for distribution packages)
  app_path = '/usr/share/naufrago/'
@@ -92,6 +96,9 @@ if distro_package == True: # We're running on 'Distro-mode' (intended for distri
  elif "it" in locale:
   index_path = app_path + 'content/index_it.html'
   puf_path = app_path + 'content/puf.html'
+ elif "fr" in locale:
+  index_path = app_path + 'content/index_fr.html'
+  puf_path = app_path + 'content/puf_fr.html'
  else:
   index_path = app_path + 'content/index.html'
   puf_path = app_path + 'content/puf.html'
@@ -115,8 +122,8 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
   index_path = current_path + '/content/index_it.html'
   puf_path = current_path + '/content/puf.html'
  elif "fr" in locale:
-  index_path = app_path + 'content/index_fr.html'
-  puf_path = app_path + 'content/puf_fr.html'
+  index_path = current_path + '/content/index_fr.html'
+  puf_path = current_path + '/content/puf_fr.html'
  else:
   index_path = current_path + '/content/index.html'
   puf_path = current_path + '/content/puf.html'
@@ -1106,7 +1113,7 @@ class Naufrago:
    if APP_VERSION == read:
     if type(action) is gtk.Action:
      dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
-     dialog.set_size_request(300,75)
+     dialog.set_size_request(350,75)
      dialog.set_has_separator(False)
      dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
      label = gtk.Label(_("No updates available."))
@@ -1116,7 +1123,7 @@ class Naufrago:
      dialog.destroy()
    else:
     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
-    dialog.set_size_request(300,100)
+    dialog.set_size_request(350,100)
     dialog.set_has_separator(False)
     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
     label = gtk.Label("")
@@ -1131,7 +1138,7 @@ class Naufrago:
   except:
    if type(action) is gtk.Action:
     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
-    dialog.set_size_request(300,75)
+    dialog.set_size_request(350,75)
     dialog.set_has_separator(False)
     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
     label = gtk.Label(_("Coult not contact server. Try again later!"))
@@ -1272,7 +1279,7 @@ class Naufrago:
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -2363,14 +2370,12 @@ class Naufrago:
  def driven_mode_action(self):
   """Collapse or expands parent nodes based on unread items within its feeds."""
   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+  useless_iter_parent = None
+  useless_iter_id_cat = None
   if type(useless_iter) is gtk.TreeIter:
    useless_iter_parent = model.iter_parent(useless_iter)
    if type(useless_iter_parent) is gtk.TreeIter:
     useless_iter_id_cat = model.get_value(useless_iter_parent, 2)
-   else:
-    useless_iter_id_cat = None
-  else:
-   useless_iter_parent = None
 
   iter = model.get_iter_root() # Magic
   id_cat = model.get_value(iter, 2)
@@ -2378,7 +2383,7 @@ class Naufrago:
    if(model.iter_depth(iter) == 0) and (id_cat != 9998) and (id_cat != 9999): # Si es padre
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
-     if self.driven_mode == 1:
+     if (self.driven_mode == 1) and (useless_iter_id_cat is not None):
       if id_cat == useless_iter_id_cat:
        q = 'SELECT count(articulo.id) FROM articulo, feed, categoria WHERE articulo.leido=0 AND articulo.ghost=0 AND categoria.id='+`id_cat`+' AND articulo.id_feed=feed.id AND feed.id_categoria=categoria.id'
        cursor = self.conn.cursor()
