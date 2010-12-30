@@ -13,7 +13,9 @@ def v01to02(cursor):
   cursor.execute('ALTER TABLE config ADD hide_readentries integer NOT NULL DEFAULT 0')
   cursor.execute('UPDATE categoria SET nombre = \'General\' WHERE id = 1')
   conn.commit()
+  print 'Naufrago! 0.1 database format found, changes correctly applied :)'
  except:
+    print 'Naufrago! 0.1 database format not found, skipping...'
     pass
 
 def v02to03(cursor):
@@ -24,30 +26,23 @@ def v02to03(cursor):
   cursor.execute('ALTER TABLE config ADD init_check_app_updates integer NOT NULL DEFAULT 1')
   cursor.execute('ALTER TABLE articulo ADD ghost integer NOT NULL DEFAULT 0')
   cursor.execute('UPDATE config SET init_unfolded_tree = 0')
+  conn.commit()
+  print 'Naufrago! 0.2 database format found, changes correctly applied :)'
  except:
+  print 'Naufrago! 0.2 database format not found, skipping...'
   pass
 
 app_path = os.getcwd()
 db_path = app_path + '/naufrago.db'
-homedir = os.getenv('HOME')
 
-if os.path.exists(homedir + '/.naufrago/'): # Are we dealing with 0.1...
- os.rename(homedir + '/.naufrago/', homedir + '/.config/naufrago/')
+if os.path.exists(db_path):
  try:
-  conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
+  conn = sqlite3.connect(db_path)
+  cursor = conn.cursor()
+  v01to02(cursor)
+  v02to03(cursor)
+  conn.commit()
+  cursor.close()
+  print 'All done!'
  except:
-  print "Could not find database... Did you forget to move it to the current directory?"
- cursor = conn.cursor()
- v01to02(cursor)
- v02to03(cursor)
- conn.commit()
- cursor.close()
-elif os.path.exists(homedir + '/.config/naufrago/'): # ... or 0.2 version?
- try:
-  conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
- except:
-  print "Could not find database... Did you forget to move it to the current directory?"
- cursor = conn.cursor()
- v02to03(cursor)
- conn.commit()
- cursor.close()
+  print 'Could not find database... Did you forget to move it to the current directory?'

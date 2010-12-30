@@ -13,6 +13,7 @@ def v01to02(cursor):
   cursor.execute('ALTER TABLE config ADD hide_readentries integer NOT NULL DEFAULT 0')
   cursor.execute('UPDATE categoria SET nombre = \'General\' WHERE id = 1')
   conn.commit()
+  print 'Naufrago! 0.1 database found, changes correctly applied :)'
  except:
     pass
 
@@ -24,6 +25,8 @@ def v02to03(cursor):
   cursor.execute('ALTER TABLE config ADD init_check_app_updates integer NOT NULL DEFAULT 1')
   cursor.execute('ALTER TABLE articulo ADD ghost integer NOT NULL DEFAULT 0')
   cursor.execute('UPDATE config SET init_unfolded_tree = 0')
+  conn.commit()
+  print 'Naufrago! 0.2 database found, changes correctly applied :)'
  except:
   pass
 

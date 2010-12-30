@@ -36,7 +36,7 @@ case $1 in
   # TAR: ¡OJO, el tar depende de haber generado ya el deb correctamente!
   cp -a $svn_path/content/*.html $svn_path/naufrago-tar/content/
   cp -a $svn_path/media/*.png $svn_path/media/*.gif $svn_path/media/*.svg $svn_path/naufrago-tar/media/
-  cp -a $svn_path/naufrago.py $svn_path/naufrago-tar/
+  ###cp -a $svn_path/naufrago.py $svn_path/naufrago-tar/
   for i in ca es it fr pl; do
    cp -a $svn_path/locale/${i}/${i}.po $svn_path/naufrago-tar/locale/${i}/
    cp -a $svn_path/locale/${i}/LC_MESSAGES/naufrago.mo $svn_path/naufrago-tar/locale/${i}/LC_MESSAGES/
@@ -50,6 +50,7 @@ case $1 in
   svn export $svn_path/naufrago-tar $desktop_tar_path
   cd $desktop_tar_path
   chown -R root.root *
+  chmod o+rwx ../naufrago-tar
   # Y el tar a manija, que es tiene que cambiar:
   # - el valor del package = False!
   # - el script de update de la bd.

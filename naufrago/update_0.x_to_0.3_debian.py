@@ -5,7 +5,7 @@
 import os
 import sqlite3
 
-def 01to02(cursor):
+def v01to02(cursor):
  try:
   cursor.execute('ALTER TABLE config ADD show_trayicon integer NOT NULL DEFAULT 0')
   cursor.execute('ALTER TABLE config ADD toolbar_mode integer NOT NULL DEFAULT 0')
@@ -13,16 +13,20 @@ def 01to02(cursor):
   cursor.execute('ALTER TABLE config ADD hide_readentries integer NOT NULL DEFAULT 0')
   cursor.execute('UPDATE categoria SET nombre = \'General\' WHERE id = 1')
   conn.commit()
+  print 'Naufrago! 0.1 database found, changes correctly applied :)'
  except:
     pass
 
-def 02to03(cursor):
+def v02to03(cursor):
  try:
   cursor.execute('ALTER TABLE config ADD hide_dates integer NOT NULL DEFAULT 0')
   cursor.execute('ALTER TABLE config ADD driven_mode integer NOT NULL DEFAULT 1')
   cursor.execute('ALTER TABLE config ADD update_freq_timemode integer NOT NULL DEFAULT 0')
   cursor.execute('ALTER TABLE config ADD init_check_app_updates integer NOT NULL DEFAULT 1')
   cursor.execute('ALTER TABLE articulo ADD ghost integer NOT NULL DEFAULT 0')
+  cursor.execute('UPDATE config SET init_unfolded_tree = 0')
+  conn.commit()
+  print 'Naufrago! 0.2 database found, changes correctly applied :)'
  except:
   pass
 
@@ -33,11 +37,13 @@ for user in os.listdir('/home'):
    os.rename(homedir + '/.naufrago/', homedir + '/.config/naufrago/')
    conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
    cursor = conn.cursor()
-   01to02(cursor)
-   02to03(cursor)
+   v01to02(cursor)
+   v02to03(cursor)
+   conn.commit()
    cursor.close()
   elif os.path.exists(homedir + '/.config/naufrago/naufrago.db'): # ... or 0.2 version?
    conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
    cursor = conn.cursor()
-   02to03(cursor)
+   v02to03(cursor)
+   conn.commit()
    cursor.close()
