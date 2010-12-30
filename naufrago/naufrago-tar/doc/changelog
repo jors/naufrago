@@ -23,6 +23,8 @@ naufrago (0.3-1) testing unstable; urgency=low
   * IMPROVED: Important rework in the way feeds are stored
     to avoid repeated entries (happens with some feeds with
     bad date field or bad date parsing).
+  * IMPROVED: Locale english fallback when no supported locale
+    is found.
   * NEW: Important column is now sortable.
   * NEW: Added option to hide date column.
   * NEW: Bold/unbold folders with unread/read articles.
@@ -33,7 +35,7 @@ naufrago (0.3-1) testing unstable; urgency=low
     toolbar and statusbar).
   * NEW: App online version checker.
 
- -- Jordi Oliveras <worbynet@gmail.com>  Wed, 22 Dec 2010 18:26:37 +0200
+ -- Jordi Oliveras <worbynet@gmail.com>  Wed, 29 Dec 2010 18:26:37 +0200
 
 naufrago (0.2-1) testing unstable; urgency=low
 

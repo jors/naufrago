@@ -56,7 +56,7 @@ except ImportError:
 APP_VERSION = '0.3'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
-distro_package = False
+distro_package = True
 window_visible = True
 
 # Global socket timeout stuff

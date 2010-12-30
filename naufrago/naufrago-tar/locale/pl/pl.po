@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-27 18:01+0100\n"
+"POT-Creation-Date: 2010-12-28 19:54+0100\n"
 "PO-Revision-Date: 2010-12-17 11:47+0100\n"
 "Last-Translator: Michał Ćwikliński <michal@cwiklinski.it>\n"
 "Language-Team: Polish <mcwiklinski@gmail.com>\n"
@@ -20,495 +20,536 @@ msgstr ""
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: POLAND\n"
 
-#: naufrago.py:53
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:53
 msgid "Error importing modules: "
 msgstr "Błąd importu modułów:"
 
-#: naufrago.py:316 naufrago.py:496 naufrago.py:515 naufrago.py:570
-#: naufrago.py:595 naufrago.py:661 naufrago.py:688 naufrago.py:721
-#: naufrago.py:756 naufrago.py:962 naufrago.py:984 naufrago.py:989
-#: naufrago.py:1766 naufrago.py:1768
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:323
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:503
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:522
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:577
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:602
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:668
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:695
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:728
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:763
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:969
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:991
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:996
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1773
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1775
 msgid "Unread"
 msgstr "Nieprzeczytane"
 
-#: naufrago.py:340 naufrago.py:496 naufrago.py:512 naufrago.py:570
-#: naufrago.py:592 naufrago.py:661 naufrago.py:688 naufrago.py:718
-#: naufrago.py:753 naufrago.py:962 naufrago.py:981 naufrago.py:989
-#: naufrago.py:1758 naufrago.py:1760
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:347
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:503
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:519
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:577
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:599
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:668
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:695
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:725
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:760
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:969
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:988
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:996
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1765
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1767
 msgid "Important"
 msgstr "Ważne"
 
-#: naufrago.py:397 naufrago.py:809
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:404
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:816
 #, fuzzy
 msgid "Feed"
 msgstr "Kanały"
 
-#: naufrago.py:399 naufrago.py:811 naufrago.py:1033 naufrago.py:2395
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:406
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:818
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1040
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2400
 msgid "Category"
 msgstr "Kategoria"
 
-#: naufrago.py:1014
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1021
 msgid "Special folder"
 msgstr "Katalog specjalny"
 
-#: naufrago.py:1027
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1034
 msgid "Source"
 msgstr "Źródło"
 
-#: naufrago.py:1078
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1085
 msgid "Warning!"
 msgstr "Uwaga!"
 
-#: naufrago.py:1108 naufrago.py:1118 naufrago.py:1133
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1115
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1125
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1140
 msgid "Upgrade checker"
 msgstr "Sprawdzanie aktualizacji programu"
 
-#: naufrago.py:1111 naufrago.py:1121 naufrago.py:1136
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1118
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1128
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1143
 msgid "Close"
 msgstr "Zamknij"
 
-#: naufrago.py:1112
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1119
 msgid "No updates available."
 msgstr "Brak aktualizacji."
 
-#: naufrago.py:1137
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1144
 msgid "Coult not contact server. Try again later!"
 msgstr "Nie można połączyć się z serwerem. Spróbuj ponownie później!"
 
-#: naufrago.py:1167
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1174
 msgid "Naufrago! is a simple RSS reader"
 msgstr "Naufrago! jest prostym czytnikiem RSS"
 
-#: naufrago.py:1232
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1239
 msgid "_Archive"
 msgstr "_Archiwum"
 
-#: naufrago.py:1233
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1240
 msgid "_New feed"
 msgstr "_Nowy kanał"
 
-#: naufrago.py:1233
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1240
 msgid "Adds a feed"
 msgstr "Dodanie kanału"
 
-#: naufrago.py:1234
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1241
 msgid "New _category"
 msgstr "Nowa kategoria"
 
-#: naufrago.py:1234
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1241
 msgid "Adds a category"
 msgstr "Dodanie kategorii"
 
-#: naufrago.py:1235 naufrago.py:2148
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1242
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2155
 msgid "Delete feed"
 msgstr "Usuń kanał"
 
-#: naufrago.py:1235
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1242
 msgid "Deletes a feed"
 msgstr "Usunięcie kanału"
 
-#: naufrago.py:1236 naufrago.py:1919
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1243
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1926
 msgid "Delete category"
 msgstr "Usuń kategorię"
 
-#: naufrago.py:1236
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1243
 msgid "Deletes a category"
 msgstr "Usunięcie kategorii"
 
-#: naufrago.py:1237
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1244
 msgid "Import feeds"
 msgstr "Import kanałów"
 
-#: naufrago.py:1237
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1244
 msgid "Imports a feedlist"
 msgstr "Import listy kanałów"
 
-#: naufrago.py:1238
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1245
 msgid "Export feeds"
 msgstr "Eksport kanałów"
 
-#: naufrago.py:1238
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1245
 msgid "Exports a feedlist"
 msgstr "Eksport listy kanałów"
 
-#: naufrago.py:1239
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1246
 msgid "_Quit"
 msgstr "Wyjście"
 
-#: naufrago.py:1239
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1246
 msgid "Quits"
 msgstr "Wyjście"
 
-#: naufrago.py:1240
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1247
 msgid "E_dit"
 msgstr "E_dycja"
 
-#: naufrago.py:1241
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1248
 msgid "_Edit"
 msgstr "_Edycja"
 
-#: naufrago.py:1241
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1248
 msgid "Edits the selected element"
 msgstr "Edycja zaznaczonego elementu"
 
-#: naufrago.py:1242 naufrago.py:2236 naufrago.py:2239
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1249
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2243
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2246
 msgid "Search"
 msgstr "Szukaj"
 
-#: naufrago.py:1242
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1249
 msgid "Searchs for a term in the feeds"
 msgstr "Szukaj wyrażenia w kanałach"
 
-#: naufrago.py:1243
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1250
 msgid "_Preferences"
 msgstr "_Preferencje"
 
-#: naufrago.py:1243
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1250
 msgid "Shows preferences"
 msgstr "Preferencje"
 
-#: naufrago.py:1244
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1251
 msgid "_Network"
 msgstr "Sieć"
 
-#: naufrago.py:1245
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1252
 msgid "_Update"
 msgstr "Akt_ualizacja"
 
-#: naufrago.py:1245
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1252
 msgid "Updates the selected feed"
 msgstr "Aktualizacja wybranych kanałów"
 
-#: naufrago.py:1246 naufrago.py:1665
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1253
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1672
 msgid "Update all"
 msgstr "Aktualizuj wszystko"
 
-#: naufrago.py:1246
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1253
 msgid "Update all feeds"
 msgstr "Aktualizacja wszystkich kanałów"
 
-#: naufrago.py:1247 naufrago.py:1668
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1254
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1675
 msgid "Stop"
 msgstr "Zatrzymaj"
 
-#: naufrago.py:1247
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1254
 msgid "Stop update"
 msgstr "Zatrzymaj aktualizacje"
 
-#: naufrago.py:1248
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1255
 msgid "_Help"
 msgstr "Pomoc"
 
-#: naufrago.py:1249
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1256
 msgid "FAQ"
 msgstr "FAQ"
 
-#: naufrago.py:1250
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1257
 msgid "Check updates"
 msgstr "Sprawdź aktualizacje"
 
-#: naufrago.py:1251
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1258
 msgid "_About"
 msgstr "O progr_amie"
 
-#: naufrago.py:1251
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1258
 msgid "About"
 msgstr "O programie"
 
-#: naufrago.py:1447
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1454
 msgid "Feeds"
 msgstr "Kanały"
 
-#: naufrago.py:1500
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1507
 msgid "Date"
 msgstr "Data"
 
-#: naufrago.py:1501
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1508
 msgid "Title"
 msgstr "Tytuł"
 
-#: naufrago.py:1544
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1551
 msgid "Clic to fullscreen"
 msgstr "Pełny ekran"
 
-#: naufrago.py:1551
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1558
 msgid "Clic to open in browser"
 msgstr "Otwórz w przeglądarce"
 
-#: naufrago.py:1671
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1678
 msgid "Quit"
 msgstr "Wyjdź"
 
-#: naufrago.py:1800
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1807
 msgid "Today"
 msgstr "Dzisiaj"
 
-#: naufrago.py:1831
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1838
 msgid "Edit category"
 msgstr "Edytuj kategorię"
 
-#: naufrago.py:1832
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1839
 msgid "Change <b>category</b> name to:"
 msgstr "Zmień nazwę <b>kategorii</b> na:"
 
-#: naufrago.py:1833 naufrago.py:2016 naufrago.py:2746
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1840
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2023
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2751
 msgid "Edit"
 msgstr "Edytuj"
 
-#: naufrago.py:1835
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1842
 msgid "Add category"
 msgstr "Dodaj kategorię"
 
-#: naufrago.py:1836
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1843
 msgid "Please, insert the <b>category</b>:"
 msgstr "Proszę podaj <b>kategorię</b>:"
 
-#: naufrago.py:1837
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1844
 msgid "Create"
 msgstr "Utwórz"
 
-#: naufrago.py:1881
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1888
 msgid "Category <b>already present</b>!"
 msgstr "Kategoria już <b>istnieje</b>!"
 
-#: naufrago.py:1920
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1927
 msgid "Delete the selected <b>category</b>?"
 msgstr "Usunąć wybraną <b>kategorię</b>?"
 
-#: naufrago.py:1921
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1928
 msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
 msgstr ""
 "<b>Uwaga:</b> wszystkie kanały w kategorii zostaną usunięte. Kontynuować?"
 
-#: naufrago.py:1990
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1997
 msgid "This category <b>cannot be deleted</b>!"
 msgstr "Nie można usunąć <b>tej kategorii</b>!"
 
-#: naufrago.py:1992 naufrago.py:1994
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:1999
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2001
 msgid "You <b>must choose a category</b> folder!"
 msgstr "<b>Musisz wybrać</b> katalog kategorii!"
 
-#: naufrago.py:2001
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2008
 msgid "Name "
 msgstr "Nazwa "
 
-#: naufrago.py:2014
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2021
 msgid "Edit feed"
 msgstr "Edytuj kanał"
 
-#: naufrago.py:2015
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2022
 msgid "Change <b>feed</b> data:"
 msgstr "Zmień dane <b>kanału</b>:"
 
-#: naufrago.py:2019
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2026
 msgid "Add feed"
 msgstr "Dodaj kanał"
 
-#: naufrago.py:2020
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2027
 msgid "Please, insert <b>feed</b> address:"
 msgstr "Proszę, podaj adres <b>kanału</b>:"
 
-#: naufrago.py:2021
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2028
 msgid "Add"
 msgstr "Dodaj"
 
-#: naufrago.py:2054
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2061
 msgid "Default name"
 msgstr "Domyślna nazwa"
 
-#: naufrago.py:2111
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2118
 msgid "Feed <b>already present</b>!"
 msgstr "Kanał <b>jest już dodany</b>!"
 
-#: naufrago.py:2149
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2156
 msgid "Delete selected <b>feed</b>?"
 msgstr "Usunąć zaznaczony <b>kanał</b>?"
 
-#: naufrago.py:2205 naufrago.py:2207
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2212
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2214
 msgid "You <b>must choose a feed</b>!"
 msgstr "<b>Musisz wybrać</b> kanał!"
 
-#: naufrago.py:2227
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2234
 msgid "This category <b>cannot be edited</b>!"
 msgstr "<b>Nie można edytować<b> tej kategorii!"
 
-#: naufrago.py:2231
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2238
 msgid "You <b>must choose a category or a feed</b> to edit!"
 msgstr "Musisz wybrać kategorię lub kanał do edycji!"
 
-#: naufrago.py:2240
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2247
 msgid "Insert the <b>searchterm</b>:"
 msgstr "Proszę podaj <b>frazę do wyszukiwania</b>:"
 
-#: naufrago.py:2270
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2277
 msgid "Search results for"
 msgstr "Wyniki wyszukiwania dla"
 
-#: naufrago.py:2272
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2279
 msgid "No entry found for <b>"
 msgstr "Brak wpisów dla <b>"
 
-#: naufrago.py:2437
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2442
 msgid "Preferences"
 msgstr "Preferencje"
 
-#: naufrago.py:2438
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2443
 msgid "Save"
 msgstr "Zapisz"
 
-#: naufrago.py:2452
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2457
 msgid "Start with unfolded tree"
 msgstr "Uruchamiaj ze zwiniętym drzewem"
 
-#: naufrago.py:2456
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2461
 msgid "Driven mode"
 msgstr "Tryb sterowany"
 
-#: naufrago.py:2459
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2464
 msgid "Start in Tray Icon"
 msgstr "Uruchom jako ikona w pasku"
 
-#: naufrago.py:2467
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2472
 msgid "Update on start"
 msgstr "Aktualizacja przy starcie"
 
-#: naufrago.py:2471
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2476
 msgid "Check application updates on start"
 msgstr "Sprawdzaj aktualizacje przy starcie"
 
-#: naufrago.py:2476
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2481
 msgid "Start"
 msgstr "Start"
 
-#: naufrago.py:2482
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2487
 msgid "Number of feed entries"
 msgstr "Ilość wpisów w kanale"
 
-#: naufrago.py:2493
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2498
 msgid "Update every"
 msgstr "Okres aktualizacji"
 
-#: naufrago.py:2504
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2509
 msgid "hour/s"
 msgstr "godzin"
 
-#: naufrago.py:2505
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2510
 msgid "minute/s"
 msgstr "minut"
 
-#: naufrago.py:2510
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2515
 msgid "Hide read entries"
 msgstr "Ukryj przeczytane pozycje"
 
-#: naufrago.py:2517
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2522
 msgid "Feeds & articles"
 msgstr "Kanały i artykuły"
 
-#: naufrago.py:2522
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2527
 msgid "Hide dates"
 msgstr "Ukryj daty"
 
-#: naufrago.py:2528
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2533
 msgid "Notification on new entries"
 msgstr "Pokaż powiadomienia o nowych pozycjach"
 
-#: naufrago.py:2532
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2537
 msgid "Show icon in tray"
 msgstr "Pokaż ikonę w zasobniku"
 
-#: naufrago.py:2539
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2544
 msgid "Toolbar mode"
 msgstr "Tryb paska narzędzi"
 
-#: naufrago.py:2542
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2547
 msgid "Full"
 msgstr "Pełny"
 
-#: naufrago.py:2543
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2548
 msgid "Icons only"
 msgstr "Tylko ikony"
 
-#: naufrago.py:2544
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2549
 msgid "Text only"
 msgstr "Tylko tekst"
 
-#: naufrago.py:2545
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2550
 msgid "Hidden"
 msgstr "Ukryty"
 
-#: naufrago.py:2551
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2556
 msgid "Interface"
 msgstr "Interfejs"
 
-#: naufrago.py:2556
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2561
 msgid "Offline mode (slower!)"
 msgstr "Tryb offline (wolny!)"
 
-#: naufrago.py:2567
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2572
 msgid "Modes"
 msgstr "Tryby"
 
-#: naufrago.py:2736
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2741
 msgid "Mark all as read"
 msgstr "Zaznacz wszystko jako przeczytane"
 
-#: naufrago.py:2741
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2746
 msgid "Update"
 msgstr "Aktualizuj"
 
-#: naufrago.py:2751
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2756
 msgid "Delete"
 msgstr "Usuń"
 
-#: naufrago.py:2757
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2762
 msgid "New feed"
 msgstr "Nowy kanał"
 
-#: naufrago.py:2760
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2765
 msgid "New category"
 msgstr "Nowa kategoria"
 
-#: naufrago.py:2806
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2811
 msgid "Open in browser"
 msgstr "Otwórz w przeglądarce"
 
-#: naufrago.py:2807
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2812
 msgid "Copy URL to clipboard"
 msgstr "Skopiuj URL do schowka"
 
-#: naufrago.py:2810
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2815
 msgid "Toggle read/non-read"
 msgstr "Przełącz przeczytane/nieprzeczytane"
 
-#: naufrago.py:2813
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2818
 msgid "Toggle all read/non-read"
 msgstr "Przełącz wszystkie przeczytane/nieprzeczytane"
 
-#: naufrago.py:2933 naufrago.py:2934
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2938
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2939
 msgid "Without title"
 msgstr "Bez tytułu"
 
-#: naufrago.py:2943 naufrago.py:2944
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2948
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2949
 msgid "Without link"
 msgstr "Bez adresu"
 
-#: naufrago.py:2991
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:2996
 msgid "Obtaining image "
 msgstr "Pobieranie obrazka"
 
-#: naufrago.py:3099
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:3104
 msgid "Obtaining feed "
 msgstr "Pobieranie kanału "
 
-#: naufrago.py:3383 naufrago.py:3461
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:3388
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:3466
 msgid "Open.."
 msgstr "Otwórz.."
 
-#: naufrago.py:3398
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:3403
 msgid "All files"
 msgstr "Wszystkie pliki"
 
-#: naufrago.py:3465
+#: /home/jors/sources/proyectos/naufrago/naufrago.py:3470
 msgid "_Save"
 msgstr "Zapi_sz"
 

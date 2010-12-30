@@ -4,6 +4,7 @@
 
 svn_path='/home/jors/sources/proyectos/naufrago'
 desktop_deb_path='/home/jors/Desktop/naufrago-deb'
+desktop_tar_path='/home/jors/Desktop/naufrago-tar'
 
 case $1 in
  deb)
@@ -32,7 +33,7 @@ case $1 in
  ;;
 
  tar)
-  # TAR: ¡OJO, porque el tar depende de haber generado ya el deb correctamente!
+  # TAR: ¡OJO, el tar depende de haber generado ya el deb correctamente!
   cp -a $svn_path/content/*.html $svn_path/naufrago-tar/content/
   cp -a $svn_path/media/*.png $svn_path/media/*.gif $svn_path/media/*.svg $svn_path/naufrago-tar/media/
   cp -a $svn_path/naufrago.py $svn_path/naufrago-tar/
@@ -42,6 +43,9 @@ case $1 in
   done
   cp -a $svn_path/naufrago.desktop $svn_path/naufrago-tar/
   cp -a $svn_path/README* $svn_path/naufrago-tar/doc/
+  cp -a $svn_path/naufrago-deb/debian/usr/share/doc/naufrago/changelog.Debian.gz $svn_path/naufrago-tar/doc/
+  gzip -d $svn_path/naufrago-tar/doc/changelog.Debian.gz
+  mv $svn_path/naufrago-tar/doc/changelog.Debian $svn_path/naufrago-tar/doc/changelog
   rm -rf $desktop_tar_path
   svn export $svn_path/naufrago-tar $desktop_tar_path
   cd $desktop_tar_path
