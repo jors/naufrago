@@ -212,6 +212,16 @@ BUGS DEL CASI y otros PENDING (addendums):
 - DISCARDED: Fecha más larga (con hora).
 - DISCARDED: Open links in inline browser.
 - DISCARDED: Custom new entries notification formats (title of the update).
-- Permitir guardar la ordenación de categorías y/o feeds?
+- DISCARDED: Permitir guardar la ordenación de categorías y/o feeds?
 - Migración a pygi?
+
+*****************************************************************************************
+
+ROADMAP 0.4:
+- IMPROVED: User-Agent identifier set to app name + version. DONE
+- FIX: Lazy bug that imported feeds the bad way. DONE
+- IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). PENDING
+- FIX: the pynotify message was not gettexted.
+- NEW: toolbar button to 'Mark EVERYTHING as read'.
+- NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode')
 

@@ -65,7 +65,7 @@ if hasattr(socket, 'setdefaulttimeout'):
 
 # Locale stuff
 APP = 'naufrago'
-if distro_package == True: DIR = '/usr/share/naufrago/locale'
+if distro_package: DIR = '/usr/share/naufrago/locale'
 else: DIR = os.getcwd() + '/locale'
 
 try:
@@ -78,7 +78,7 @@ except:
  locale = ['en']
  _ = gettext.gettext
 
-if distro_package == True: # We're running on 'Distro-mode' (intended for distribution packages)
+if distro_package: # We're running on 'Distro-mode' (intended for distribution packages)
  app_path = '/usr/share/naufrago/'
  media_path = app_path + 'media/'
  db_path = os.getenv("HOME") + '/.config/naufrago/naufrago.db'
@@ -133,7 +133,7 @@ class Naufrago:
  def delete_event(self, event=None, data=None):
   """Closes the app through window manager signal"""
   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
-  if self.on_a_feed_update == True:
+  if self.on_a_feed_update:
    self.stop_feed_update()
    self.t.join()
   # Finalmente, salida efectiva
@@ -147,7 +147,6 @@ class Naufrago:
   if(key == 'Delete'): # ARBOL DE FEEDS
    (model, iter) = self.treeselection.get_selected()
    if(iter is not None): # Si hay algún nodo seleccionado...
-    text = self.treestore.get_value(iter, 0)
     if(model.iter_depth(iter) == 0): # Si es un nodo padre...
      self.delete_category()
     elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
@@ -174,7 +173,7 @@ class Naufrago:
   font_style = 'bold'
 
   model[path][1] = not model[path][1]
-  if model[path][1] == True:
+  if model[path][1]:
    self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("pink")) # Entry title bg glow
    if model[path][3] == 'bold':
     if no_leidos is not None:
@@ -458,7 +457,6 @@ class Naufrago:
   else: # La petición de toggle proviene de la LISTA DE ENTRIES DE UN FEED
    (model, iter) = self.treeselection2.get_selected()
    if(iter is not None): # Hay alguna fila de la lista seleccionada
-    flag_importante = self.liststore.get_value(iter, 1)
     id_articulo = self.liststore.get_value(iter, 4)
     liststore_font_style = font_style = model.get(iter, 3)[0]
 
@@ -1002,7 +1000,7 @@ class Naufrago:
      # Destino: No leídos
      self.update_special_folder(9999)
      # Destino: Importantes
-     if flag_importante == True:
+     if flag_importante:
       self.update_special_folder(9998)
     # END NAME PARSING (nodo destino) #
     # Unbold category if needed.
@@ -1119,7 +1117,7 @@ class Naufrago:
      label = gtk.Label(_("No updates available."))
      dialog.vbox.pack_start(label)
      dialog.show_all()
-     response = dialog.run()
+     dialog.run()
      dialog.destroy()
    else:
     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
@@ -1133,7 +1131,7 @@ class Naufrago:
     dialog.vbox.pack_start(label)
     dialog.vbox.pack_start(url_button)
     dialog.show_all()
-    response = dialog.run()
+    dialog.run()
     dialog.destroy()
   except:
    if type(action) is gtk.Action:
@@ -1144,7 +1142,7 @@ class Naufrago:
     label = gtk.Label(_("Coult not contact server. Try again later!"))
     dialog.vbox.pack_start(label)
     dialog.show_all()
-    response = dialog.run()
+    dialog.run()
     dialog.destroy()
     pass
 
@@ -1267,7 +1265,7 @@ class Naufrago:
  def create_base(self):
   """Creates the base app structure on the user home dir"""
   if not os.path.exists(db_path):
-   if distro_package == True:
+   if distro_package:
     os.makedirs(os.getenv("HOME") + '/.config/naufrago/')
 
    self.conn = sqlite3.connect(db_path, check_same_thread=False)
@@ -1536,7 +1534,7 @@ class Naufrago:
   self.webview.connect_after("populate-popup", self.create_webview_popup)
   # Open in new browser handler (this intercepts all requests)
   self.valid_links = ['valid_link', 'file://'+index_path, 'file://'+puf_path] # Valid links to browse
-  for i in range(1,19):
+  for i in range(1,21):
    self.valid_links.append('file://'+puf_path+'#'+`i`)
   self.webview.connect("navigation-policy-decision-requested", self.navigation_requested)
   self.webview.connect("hovering-over-link", self.hover_link)
@@ -1687,7 +1685,7 @@ class Naufrago:
   self.stop_item.connect("activate", self.stop_feed_update)
   self.quit_item.connect("activate", self.delete_event)
   # Should we enable stop function when showing popup menu? It depends...
-  if self.stop_feed_update_lock == True:
+  if self.stop_feed_update_lock:
    self.stop_item.set_sensitive(True)
   else:
    self.stop_item.set_sensitive(False)
@@ -1814,7 +1812,7 @@ class Naufrago:
     any_row_to_show=True
 
   # Si no hay entries, no queremos su panel!
-  if (rows is None) or (any_row_to_show == False):
+  if (rows is None) or (not any_row_to_show):
    self.scrolled_window2.set_size_request(0,0)
    self.scrolled_window2.hide()
   else:
@@ -1877,7 +1875,6 @@ class Naufrago:
      cursor.execute('SELECT MAX(id) FROM categoria')
      row = cursor.fetchone()
      self.lock.release()
-     ###dad = self.treestore.append(None, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
      self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
@@ -1942,7 +1939,7 @@ class Naufrago:
         no_leidos += int(no_leidos_temp)
 
       # De cara al model, esto es suficiente :-o
-      result = self.treestore.remove(iter)
+      self.treestore.remove(iter)
       del self.treeindex_cat[id_categoria] # Update category dict
       cursor = self.conn.cursor()
       self.lock.acquire()
@@ -2043,7 +2040,7 @@ class Naufrago:
   entryURL.set_activates_default(True) # Activates default response for this entry
   dialog.show_all()
 
-  if new_feed == True:
+  if new_feed:
    labelName.hide()
    entryName.hide()
 
@@ -2159,7 +2156,6 @@ class Naufrago:
     dialog.destroy()
 
     if(response == gtk.RESPONSE_OK):
-     nombre_feed = self.treestore.get_value(iter, 0)
      id_feed = self.treestore.get_value(iter, 2)
 
      cursor = self.conn.cursor()
@@ -2196,7 +2192,7 @@ class Naufrago:
      # Unbold category if needed.
      self.toggle_category_bold()
 
-     result = self.treestore.remove(iter)
+     self.treestore.remove(iter)
      del self.treeindex[id_feed] # Update feeds dict
      self.liststore.clear() # Limpieza de tabla de entries/articulos
 
@@ -2422,19 +2418,19 @@ class Naufrago:
   if checkboxparent.get_active():
    checkboxchild.set_active(False)
    if caller_id == 1:
-    self.init_unfolded_tree == 1
-    self.driven_mode == 0
+    self.init_unfolded_tree = 1
+    self.driven_mode = 0
     self.treeview.expand_all()
    else:
-    self.init_unfolded_tree == 0
-    self.driven_mode == 1
+    self.init_unfolded_tree = 0
+    self.driven_mode = 1
     self.driven_mode_action()
   else:
    if caller_id == 1:
-    self.init_unfolded_tree == 0
+    self.init_unfolded_tree = 0
     self.treeview.collapse_all()
    elif caller_id == 2:
-    self.driven_mode == 0
+    self.driven_mode = 0
     self.treeview.collapse_all()
 
  def preferences(self, data=None):
@@ -2726,7 +2722,6 @@ class Naufrago:
   if event.button == 3:
    x = int(event.x)
    y = int(event.y)
-   time = event.time
    pthinfo = treeview.get_path_at_pos(x, y)
    if pthinfo is not None:
     path, col, cellx, celly = pthinfo
@@ -2746,17 +2741,17 @@ class Naufrago:
      update_item = gtk.ImageMenuItem(_("Update"))
      icon = update_item.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
      update_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.ui_lock == True: update_item.set_sensitive(False)
+     if self.ui_lock: update_item.set_sensitive(False)
 
      edit_item = gtk.ImageMenuItem(_("Edit"))
      icon = edit_item.render_icon(gtk.STOCK_EDIT, gtk.ICON_SIZE_BUTTON)
      edit_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.ui_lock == True: edit_item.set_sensitive(False)
+     if self.ui_lock: edit_item.set_sensitive(False)
 
      delete_item = gtk.ImageMenuItem(_("Delete"))
      icon = delete_item.render_icon(gtk.STOCK_CLOSE, gtk.ICON_SIZE_BUTTON)
      delete_item.set_image(gtk.image_new_from_pixbuf(icon))
-     if self.ui_lock == True: delete_item.set_sensitive(False)
+     if self.ui_lock: delete_item.set_sensitive(False)
 
      separator = gtk.SeparatorMenuItem()
      new_feed_item = gtk.ImageMenuItem(_("New feed"))
@@ -2799,7 +2794,6 @@ class Naufrago:
   elif event.button == 3:
    x = int(event.x)
    y = int(event.y)
-   time = event.time
    pthinfo = treeview.get_path_at_pos(x, y)
    if pthinfo is not None:
     path, col, cellx, celly = pthinfo
@@ -2898,14 +2892,14 @@ class Naufrago:
   """Updates all feeds (no complications!)."""
   # Old way: self.get_feed()
   # New way:
-  if self.ui_lock == False: # This prevents autoupdate from launching if an update is alredy in progress...
+  if self.ui_lock is False: # This prevents autoupdate from launching if an update is alredy in progress...
    self.t = threading.Thread(target=self.get_feed, args=())
    self.t.start()
   return True
 
  def stop_feed_update(self, data=None):
   """Stop feeds update."""
-  if self.stop_feed_update_lock == False:
+  if self.stop_feed_update_lock is False:
    self.stop_feed_update_lock = True
    widget = self.ui.get_widget("/Toolbar/Stop update")
    widget.set_sensitive(False)
@@ -3082,7 +3076,7 @@ class Naufrago:
    else: 
     model.set(dest_iter, 1, `id_feed`)
 
-  if dont_parse == True:
+  if dont_parse:
    return True
   else:
    return False
@@ -3090,6 +3084,8 @@ class Naufrago:
  def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
      category or feed."""
+
+  global APP_VERSION
 
   # START NAME PARSING #
   nombre_feed = model.get_value(child, 0)
@@ -3104,7 +3100,7 @@ class Naufrago:
   self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
   gtk.gdk.threads_enter()
-  d = feedparser.parse(url)
+  d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+' +http://sourceforge.net/projects/naufrago/')
 
   dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
   if dont_parse:
@@ -3116,7 +3112,7 @@ class Naufrago:
   if(hasattr(d.feed,'link')): feed_link = d.feed.link.encode('utf-8')
 
   # Si se trata de un feed nuevo, necesitamos el título antes de nada
-  if(new_feed == True):
+  if new_feed:
    if(hasattr(d.feed,'title')):
     nombre_feed = title = d.feed.title.encode('utf-8')
     # Update db...
@@ -3258,7 +3254,7 @@ class Naufrago:
       self.populate_entries(id_feed)
 
   # Luego el recuento del feed
-  if new_posts == True:
+  if new_posts:
    self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feed` + ' AND leido=0 AND ghost=0')
    row = cursor.fetchone()
@@ -3302,7 +3298,7 @@ class Naufrago:
   # START NEW: Driven mode, parte 1
   # Cualquier feed con nuevas entradas expanderá la categoria.
   if (self.driven_mode == 1):
-   if new_posts == True:
+   if new_posts:
     self.treeview.expand_row(model.get_path(iter), open_all=False)
   # END NEW: Driven mode, parte 1
 
@@ -3370,13 +3366,15 @@ class Naufrago:
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
    if num_new_posts_total > 0:
-    n = pynotify.Notification("Nueva/s entrada/s", "Se añadieron " + `num_new_posts_total` + " entrada/s", self.imageURI)
+    new_entries_txt = _('New entry/s')
+    were_added_txt = _(' entry/s were added')
+    n = pynotify.Notification(new_entries_txt, `num_new_posts_total` + were_added_txt, self.imageURI)
     #n.attach_to_status_icon(self.statusicon) # <-- This fucks up the whole thing!!!
     n.show()
 
   self.statusbar.set_text('')
   # Fires tray icon blinking
-  if((num_new_posts_total > 0) and (window_visible == False) and (self.show_trayicon == 1)):
+  if((num_new_posts_total > 0) and (window_visible is False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
   self.throbber.hide()
   self.toggle_menuitems_sensitiveness(enable=True)
@@ -3412,7 +3410,7 @@ class Naufrago:
    dialog.hide()
    f = open(filename, 'r')
    tree = ElementTree.parse(f)
-   current_category = 'General'
+   current_category = 1 # General
    cursor = self.conn.cursor()
    for node in tree.getiterator('outline'):
     name = node.attrib.get('text').replace('[','(').replace(']',')')
@@ -3427,17 +3425,15 @@ class Naufrago:
       self.lock.acquire()
       cursor.execute('INSERT INTO feed VALUES(null, ?, ?, ?)', [name,url,current_category])
       self.conn.commit()
-      self.lock.release()
-      # Obtain feed favicon
-      self.lock.acquire()
       row = cursor.execute('SELECT MAX(id) FROM feed')
       id_feed = cursor.fetchone()[0]
       self.lock.release()
+      # Obtain feed favicon
       #self.get_favicon(id_feed, url)
       t = threading.Thread(target=self.get_favicon, args=(id_feed, url, ))
       t.start()
     else:
-     if len(node) is not 0:
+     if len(node) != 0:
       self.lock.acquire()
       cursor.execute('SELECT id FROM categoria WHERE nombre = ?', [name])
       row = cursor.fetchone()
@@ -3447,8 +3443,6 @@ class Naufrago:
        self.lock.acquire()
        cursor.execute('INSERT INTO categoria VALUES(null, ?)', [name])
        self.conn.commit()
-       self.lock.release()
-       self.lock.acquire()
        row = cursor.execute('SELECT MAX(id) FROM categoria')
        row = cursor.fetchone()
        self.lock.release()
@@ -3531,7 +3525,7 @@ class Naufrago:
     factory = gtk.IconFactory()
     pixbuf = gtk.gdk.pixbuf_new_from_file(media_path + 'SRD_RSS_Logo_mini.png')
     iconset = gtk.IconSet(pixbuf)
-    factory.add(str(d_feed), iconset)
+    factory.add(str(id_feed), iconset)
     factory.add_default()
     pass
 
@@ -3567,7 +3561,6 @@ class Naufrago:
  ########
 
  def __init__(self):
-  ###self.lock = threading.RLock()
   self.lock = threading.Lock()
   # Crea la base para la aplicación (directorio + feed de regalo!), si no la hubiere
   self.create_base()
@@ -3581,7 +3574,7 @@ def main():
  # Start timer (1h = 60min = 3600secs = 3600*1000ms)
  if naufrago.update_freq_timemode == 0: mult = 3600
  elif naufrago.update_freq_timemode == 1: mult = 60
- timer_id = gobject.timeout_add(naufrago.update_freq*mult*1000, naufrago.update_all_feeds)
+ gobject.timeout_add(naufrago.update_freq*mult*1000, naufrago.update_all_feeds)
  gtk.main()
  
 if __name__ == "__main__":
