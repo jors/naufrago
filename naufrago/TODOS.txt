@@ -220,8 +220,8 @@ BUGS DEL CASI y otros PENDING (addendums):
 ROADMAP 0.4:
 - IMPROVED: User-Agent identifier set to app name + version. DONE
 - FIX: Lazy bug that imported feeds the bad way. DONE
-- IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). PENDING
-- FIX: the pynotify message was not gettexted.
+- FIX: the pynotify message was not gettexted. DONE
+- IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). DONE
 - NEW: toolbar button to 'Mark EVERYTHING as read'.
 - NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode')
 

@@ -1271,12 +1271,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1319,7 +1319,6 @@ class Naufrago:
   self.driven_mode = int(row[15])
   self.update_freq_timemode = int(row[16])
   self.init_check_app_updates = int(row[17])
-  self.clear_mode = int(row[18])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1355,7 +1354,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -1700,12 +1699,13 @@ class Naufrago:
   """StatusIcon popup menu launcher."""
   self.statusicon_menu.popup(None, None, None, button, time, self)
 
- def create_full_tree(self):
-  """Creates the full feed tree strucure, including categories & feeds."""
+ def populate_feeds(self):
+  """Obtains the user feed tree structure"""
+  self.populate_favicons() # Populate all favicons we have prior to use them
+  
   if (self.init_unfolded_tree == 1): category_icon = gtk.STOCK_OPEN
   else: category_icon = gtk.STOCK_DIRECTORY
 
-  self.treestore.clear()
   self.treeindex = {} # A dictionary of feed iters stored by their id
   self.treeindex_cat = {} # A dictionary of category iters stored by their id
   cursor = self.conn.cursor()
@@ -1773,39 +1773,6 @@ class Naufrago:
   cursor.close()
   self.treeindex[9998] = special
   self.treeindex[9999] = special2
-
- def create_minimal_tree(self):
-  """Creates the simplied feed tree strucure, including only feeds with unread items."""
-  self.treestore.clear()
-  self.treeindex = {} # A dictionary of feed iters stored by their id
-
-  cursor = self.conn.cursor()
-  self.lock.acquire()
-  cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
-  rows = cursor.fetchall()
-  self.lock.release()
-  for row2 in rows:
-   self.lock.acquire()
-   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `row2[0]` + ' AND leido=0 AND ghost=0')
-   row3 = cursor.fetchone()
-   self.lock.release()
-   cursor.close()
-   if row3[0] > 0:
-    feed_label = row2[1] + ' [' + `row3[0]` + ']'
-    font_style = 'bold'
-    if os.path.exists(favicon_path + '/' + `row2[0]`):
-     son = self.treestore.append(None, [feed_label, `row2[0]`, row2[0], font_style]) # Initial tree creation
-    else:
-     son = self.treestore.append(None, [feed_label, 'rss-image', row2[0], font_style]) # Initial tree creation
-    self.treeindex[row2[0]] = son
-
- def populate_feeds(self):
-  """Obtains the user feed tree structure"""
-  self.populate_favicons() # Populate all favicons we have prior to use them
-  if self.clear_mode == 1:
-   self.create_minimal_tree()
-  else:
-   self.create_full_tree()
 
  def populate_entries(self, id_feed, search_request_entry_ids=None):
   """Obtains the entries of the selected feed"""
@@ -2436,47 +2403,27 @@ class Naufrago:
    if iter is not None:
     id_cat = model.get_value(iter, 2)
 
- def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode, aux_clear_mode):
+ def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode):
   """Restores the state of the linked checkboxes unfolded_tree and driven_mode."""
   if aux_init_unfolded_tree == 1:
    self.treeview.expand_all()
   elif aux_driven_mode == 1:
    self.driven_mode_action()
-  elif aux_clear_mode == 1:
-   # Aquí expandir a arbol-PEQUE!
-   pass
   else:
    self.treeview.collapse_all()
 
- def unfolded_or_driven_toggle_cb(self, checkboxparent, checkboxchild1, checkboxchild2, caller_id):
-  """Controlls the linked checkboxes unfolded_tree, driven_mode and clear_mode."""
+ def unfolded_or_driven_toggle_cb(self, checkboxparent, checkboxchild, caller_id):
+  """Controlls the linked checkboxes unfolded_tree and driven_mode."""
   if checkboxparent.get_active():
-   checkboxchild1.set_active(False)
-   checkboxchild2.set_active(False)
+   checkboxchild.set_active(False)
    if caller_id == 1:
-    if self.clear_mode == 1: # Si venimos del clear_mode...
-     # Aquí hay que popularizar el arbol-GRANDE!
-     self.create_full_tree()
     self.init_unfolded_tree = 1
     self.driven_mode = 0
-    self.clear_mode = 0
     self.treeview.expand_all()
-   else if caller_id == 2:
-    if self.clear_mode == 1: # Si venimos del clear_mode...
-     # Aquí hay que popularizar el arbol-GRANDE!
-     self.create_full_tree()
+   else:
     self.init_unfolded_tree = 0
     self.driven_mode = 1
-    self.clear_mode = 0
     self.driven_mode_action()
-   else:
-    if (self.init_unfolded_tree == 1) or (self.driven_mode == 1): # Si venimos del init_unfolded_tree o del driven_mode...
-     # Aquí hay que popularizar el arbol-PEQUE!
-     self.create_minimal_tree()
-    self.init_unfolded_tree = 0
-    self.driven_mode = 0
-    self.clear_mode = 1
-
   else:
    if caller_id == 1:
     self.init_unfolded_tree = 0
@@ -2484,10 +2431,6 @@ class Naufrago:
    elif caller_id == 2:
     self.driven_mode = 0
     self.treeview.collapse_all()
-   else:
-    self.clear_mode = 0
-    # Aquí hay que popularizar el arbol-GRANDE!
-    self.create_full_tree()
 
  def preferences(self, data=None):
   """Preferences dialog."""
@@ -2503,7 +2446,6 @@ class Naufrago:
   notebook = gtk.Notebook()
   notebook.set_tab_pos(gtk.POS_TOP)
 
-  # Tab 1
   vbox2 = gtk.VBox(homogeneous=True)
   align = gtk.Alignment()
   align.set_padding(10, 0, 15, 0)
@@ -2512,8 +2454,7 @@ class Naufrago:
   if(self.init_unfolded_tree == 1) and (self.driven_mode == 0): checkbox.set_active(True)
   else: checkbox.set_active(False)
   checkbox8 = gtk.CheckButton(_("Driven mode"))
-  checkbox10 = gtk.CheckButton(_("Clear mode"))
-  checkbox.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox8, checkbox10, 1)
+  checkbox.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox8, 1)
   vbox2.pack_start(checkbox, True, True, 5)
   checkbox2 = gtk.CheckButton(_("Start in Tray Icon"))
   if self.show_trayicon == 1:
@@ -2534,7 +2475,6 @@ class Naufrago:
   align.add(vbox2)
   notebook.append_page(align, gtk.Label(_("Start")))
 
-  # Tab 2
   vbox3 = gtk.VBox(homogeneous=True)
   align2 = gtk.Alignment()
   align2.set_padding(10, 0, 15, 0)
@@ -2576,7 +2516,6 @@ class Naufrago:
   align2.add(vbox3)
   notebook.append_page(align2, gtk.Label(_("Feeds & articles")))
 
-  # Tab 3
   vbox4 = gtk.VBox(homogeneous=True)
   align3 = gtk.Alignment()
   align3.set_padding(10, 0, 15, 0)
@@ -2611,7 +2550,6 @@ class Naufrago:
   align3.add(vbox4)
   notebook.append_page(align3, gtk.Label(_("Interface")))
 
-  # Tab 4
   vbox5 = gtk.VBox(homogeneous=True)
   align4 = gtk.Alignment()
   align4.set_padding(10, 0, 15, 0)
@@ -2621,18 +2559,10 @@ class Naufrago:
   vbox5.pack_start(checkbox0, True, True, 5)
   #checkbox8 = gtk.CheckButton(_("Driven mode")) # Declared a while ago...
   aux_driven_mode = self.driven_mode
-  if(self.driven_mode == 1) and (self.clear_mode == 0) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
+  if(self.driven_mode == 1) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
   else: checkbox8.set_active(False)
-  checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox10, 2)
+  checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, 2)
   vbox5.pack_start(checkbox8, True, True, 5)
-  # NEW
-  #checkbox10 = gtk.CheckButton(_("Clear mode"))
-  #aux_clear_mode = self.clear_mode
-  #if(self.clear_mode == 1) and (self.driven_mode == 0) and (self.init_unfolded_tree == 0): checkbox10.set_active(True)
-  #else: checkbox10.set_active(False)
-  #checkbox10.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox8, 3)
-  #vbox5.pack_start(checkbox10, True, True, 5)
-  # NEW
   align4.add(vbox5)
   notebook.append_page(align4, gtk.Label(_("Modes")))
 

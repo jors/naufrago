@@ -1,0 +1,7 @@
+
+PYCHECKER:
+----------
+
+PYLINT:
+-------
+pylint -d W0311,C0301,C0302,C0103,E0601,W0333,C0103,C0321,W0702,W0613,W0622,C0324,C0322 naufrago-debian.py > pylint.report
