@@ -1751,6 +1751,7 @@ class Naufrago:
      self.treeview.expand_row(model.get_path(dad), open_all=False)
    # END NEW: Driven mode
 
+  self.force_gui_refresh()
   # These ones are "special" folders...
   self.add_icon_to_factory('importantes')
   self.add_icon_to_factory('no-leidos')
@@ -1789,7 +1790,6 @@ class Naufrago:
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `row2[0]` + ' AND leido=0 AND ghost=0')
    row3 = cursor.fetchone()
    self.lock.release()
-   cursor.close()
    if row3[0] > 0:
     feed_label = row2[1] + ' [' + `row3[0]` + ']'
     font_style = 'bold'
@@ -1798,6 +1798,7 @@ class Naufrago:
     else:
      son = self.treestore.append(None, [feed_label, 'rss-image', row2[0], font_style]) # Initial tree creation
     self.treeindex[row2[0]] = son
+  cursor.close()
 
  def populate_feeds(self):
   """Obtains the user feed tree structure"""
@@ -2436,43 +2437,59 @@ class Naufrago:
    if iter is not None:
     id_cat = model.get_value(iter, 2)
 
- def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode, aux_clear_mode):
+ def unfolded_or_driven_toggle(self, aux_init_unfolded_tree, aux_driven_mode, aux_clear_mode, hbox_throbber1, hbox_throbber2):
   """Restores the state of the linked checkboxes unfolded_tree and driven_mode."""
-  if aux_init_unfolded_tree == 1:
+  hbox_throbber1.show()
+  hbox_throbber2.show()
+  self.force_gui_refresh()
+  if (aux_init_unfolded_tree == 1) and (self.init_unfolded_tree == 0):
+   self.init_unfolded_tree = 1
+   self.driven_mode = 0
+   self.clear_mode = 0
+   self.create_full_tree()
    self.treeview.expand_all()
-  elif aux_driven_mode == 1:
+
+  elif (aux_driven_mode == 1) and (self.driven_mode == 0):
+   self.init_unfolded_tree = 0
+   self.driven_mode = 1
+   self.clear_mode = 0
+   self.create_full_tree()
+   self.force_gui_refresh()
    self.driven_mode_action()
-  elif aux_clear_mode == 1:
-   # Aquí expandir a arbol-PEQUE!
-   pass
+
+  elif (aux_clear_mode == 1) and (self.clear_mode == 0):
+   self.init_unfolded_tree = 0
+   self.driven_mode = 0
+   self.clear_mode = 1
+   self.create_minimal_tree()
+
   else:
    self.treeview.collapse_all()
 
- def unfolded_or_driven_toggle_cb(self, checkboxparent, checkboxchild1, checkboxchild2, caller_id):
+  hbox_throbber1.hide()
+  hbox_throbber2.hide()
+
+ def unfolded_or_driven_toggle_cb(self, checkboxparent, checkboxchild1, checkboxchild2, caller_id, hbox_throbber):
   """Controlls the linked checkboxes unfolded_tree, driven_mode and clear_mode."""
+  hbox_throbber.show()
+  self.force_gui_refresh()
   if checkboxparent.get_active():
    checkboxchild1.set_active(False)
    checkboxchild2.set_active(False)
    if caller_id == 1:
-    if self.clear_mode == 1: # Si venimos del clear_mode...
-     # Aquí hay que popularizar el arbol-GRANDE!
-     self.create_full_tree()
+    self.create_full_tree()
     self.init_unfolded_tree = 1
     self.driven_mode = 0
     self.clear_mode = 0
     self.treeview.expand_all()
-   else if caller_id == 2:
-    if self.clear_mode == 1: # Si venimos del clear_mode...
-     # Aquí hay que popularizar el arbol-GRANDE!
-     self.create_full_tree()
+   elif caller_id == 2:
+    self.create_full_tree()
     self.init_unfolded_tree = 0
     self.driven_mode = 1
     self.clear_mode = 0
     self.driven_mode_action()
-   else:
-    if (self.init_unfolded_tree == 1) or (self.driven_mode == 1): # Si venimos del init_unfolded_tree o del driven_mode...
-     # Aquí hay que popularizar el arbol-PEQUE!
-     self.create_minimal_tree()
+   elif caller_id == 3:
+    self.create_minimal_tree()
     self.init_unfolded_tree = 0
     self.driven_mode = 0
     self.clear_mode = 1
@@ -2480,14 +2497,30 @@ class Naufrago:
   else:
    if caller_id == 1:
     self.init_unfolded_tree = 0
-    self.treeview.collapse_all()
    elif caller_id == 2:
     self.driven_mode = 0
-    self.treeview.collapse_all()
-   else:
+   elif caller_id == 3:
     self.clear_mode = 0
-    # Aquí hay que popularizar el arbol-GRANDE!
     self.create_full_tree()
+   self.treeview.collapse_all()
+  hbox_throbber.hide()
+
+ def force_gui_refresh(self):
+  """Forces updates to the application windows during a long callback or other internal operation."""
+  # Found at: http://faq.pygtk.org/index.py?req=show&file=faq03.007.htp
+  while gtk.events_pending():
+   gtk.main_iteration(False)
+
+ def progress_factory(self):
+  """It is a factory of progress items (to avoid duplicating objects; pygtk doesn't like!)."""
+  # Progress element present in some tabs...
+  hbox_throbber = gtk.HBox()
+  label = gtk.Label(_("Applying changes..."))
+  progress = gtk.Image()
+  progress.set_from_file(app_path + 'media/throbber.gif')
+  hbox_throbber.pack_start(progress, False, False, 3)
+  hbox_throbber.pack_start(label, False, False, 3)
+  return hbox_throbber
 
  def preferences(self, data=None):
   """Preferences dialog."""
@@ -2513,7 +2546,8 @@ class Naufrago:
   else: checkbox.set_active(False)
   checkbox8 = gtk.CheckButton(_("Driven mode"))
   checkbox10 = gtk.CheckButton(_("Clear mode"))
-  checkbox.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox8, checkbox10, 1)
+  hbox_throbber1 = self.progress_factory()
+  checkbox.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox8, checkbox10, 1, hbox_throbber1)
   vbox2.pack_start(checkbox, True, True, 5)
   checkbox2 = gtk.CheckButton(_("Start in Tray Icon"))
   if self.show_trayicon == 1:
@@ -2531,6 +2565,7 @@ class Naufrago:
   if(self.init_check_app_updates == 1): checkbox9.set_active(True)
   else: checkbox9.set_active(False)
   vbox2.pack_start(checkbox9, True, True, 5)
+  vbox2.pack_start(hbox_throbber1, True, True, 5)
   align.add(vbox2)
   notebook.append_page(align, gtk.Label(_("Start")))
 
@@ -2619,25 +2654,27 @@ class Naufrago:
   if(self.offline_mode == 1): checkbox0.set_active(True)
   else: checkbox0.set_active(False)
   vbox5.pack_start(checkbox0, True, True, 5)
-  #checkbox8 = gtk.CheckButton(_("Driven mode")) # Declared a while ago...
   aux_driven_mode = self.driven_mode
   if(self.driven_mode == 1) and (self.clear_mode == 0) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
   else: checkbox8.set_active(False)
-  checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox10, 2)
+  hbox_throbber2 = self.progress_factory()
+  checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox10, 2, hbox_throbber2)
   vbox5.pack_start(checkbox8, True, True, 5)
   # NEW
-  #checkbox10 = gtk.CheckButton(_("Clear mode"))
-  #aux_clear_mode = self.clear_mode
-  #if(self.clear_mode == 1) and (self.driven_mode == 0) and (self.init_unfolded_tree == 0): checkbox10.set_active(True)
-  #else: checkbox10.set_active(False)
-  #checkbox10.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox8, 3)
-  #vbox5.pack_start(checkbox10, True, True, 5)
+  aux_clear_mode = self.clear_mode
+  if(self.clear_mode == 1) and (self.driven_mode == 0) and (self.init_unfolded_tree == 0): checkbox10.set_active(True)
+  else: checkbox10.set_active(False)
+  checkbox10.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox8, 3, hbox_throbber2)
+  vbox5.pack_start(checkbox10, True, True, 5)
+  vbox5.pack_start(hbox_throbber2, False, False, 5)
   # NEW
   align4.add(vbox5)
   notebook.append_page(align4, gtk.Label(_("Modes")))
 
   dialog.vbox.pack_start(notebook)
   dialog.show_all()
+  hbox_throbber1.hide()
+  hbox_throbber2.hide()
   response = dialog.run() # Dialog loop
   dialog.destroy()
 
@@ -2687,7 +2724,7 @@ class Naufrago:
    self.show_trayicon = aux_show_trayicon
    self.hide_read_entries(aux_hide_readentries)
    self.hide_date_column(aux_hide_dates)
-   self.unfolded_or_driven_toggle(aux_init_unfolded_tree, aux_driven_mode)
+   self.unfolded_or_driven_toggle(aux_init_unfolded_tree, aux_driven_mode, aux_clear_mode, hbox_throbber1, hbox_throbber2)
 
  def treeview_copy_row(self, treeview, model, source, target, drop_position):
   """Copy tree model rows from treeiter source into, before or after treeiter target.
