@@ -226,3 +226,6 @@ ROADMAP 0.4:
 - NEW: toolbar button to 'Mark EVERYTHING as read'.
 - NEW: 'follow feed link' available per-feed basis.
 
+- PROBLEMA: Cuando se le pone un código de versión superior, al iniciar la aplicación se
+  queda con la ventana sin dibujar. ¿Algún problema de threading?
+

@@ -290,7 +290,9 @@ class Naufrago:
    if(iter is not None): # Hay algún nodo seleccionado
     id_feed = self.treestore.get_value(iter, 2)
 
-    if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999): # Si es HOJA...
+    # OLD: if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999): # Si es HOJA...
+    # Si es HOJA...
+    if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999) or (model.iter_depth(iter) == 0 and self.clear_mode == 1):
 
      # 1º vamos a por el label del feed...
      # START NAME PARSING (nodo origen) #
@@ -318,81 +320,82 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
 
-     # START NAME PARSING (nodo destino) #
-     if nombre_feed == _("Unread"):
-      #print 'Destino: feed normal'
-      q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
-      self.lock.acquire()
-      cursor.execute(q)
-      row = cursor.fetchall()
-      self.lock.release()
-      if (row is not None) and (len(row)>0):
-       for feed in row:
-        dest_iter = self.treeindex[feed[0]]
-        nombre_feed_destino = model.get_value(dest_iter, 0)
-        nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-        feed_label = nombre_feed_destino
-        font_style = 'normal'
-        model.set(dest_iter, 0, feed_label, 3, font_style)
-       ### START: ¡También cabe actualizar su compañero de batallas!
-       self.update_special_folder(9998) # Actualizamos Important
-       ### END: ¡También cabe actualizar su compañero de batallas!
-       # Bold/unbold de TODAS las categorias
-       self.toggle_category_bold('all')
-       # Y si aplica, fold de TODAS las categorias
-       if (self.driven_mode == 1):
-        self.treeview.collapse_all() # Fold de todo!
+     if self.clear_mode == 0: # NEW
+      # START NAME PARSING (nodo destino) #
+      if nombre_feed == _("Unread"):
+       #print 'Destino: feed normal'
+       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+       self.lock.acquire()
+       cursor.execute(q)
+       row = cursor.fetchall()
+       self.lock.release()
+       if (row is not None) and (len(row)>0):
+        for feed in row:
+         dest_iter = self.treeindex[feed[0]]
+         nombre_feed_destino = model.get_value(dest_iter, 0)
+         nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+         feed_label = nombre_feed_destino
+         font_style = 'normal'
+         model.set(dest_iter, 0, feed_label, 3, font_style)
+        ### START: ¡También cabe actualizar su compañero de batallas!
+        self.update_special_folder(9998) # Actualizamos Important
+        ### END: ¡También cabe actualizar su compañero de batallas!
+        # Bold/unbold de TODAS las categorias
+        self.toggle_category_bold('all')
+        # Y si aplica, fold de TODAS las categorias
+        if (self.driven_mode == 1):
+         self.treeview.collapse_all() # Fold de todo!
 
-     elif nombre_feed == _("Important"):
-      #print 'Destino: feed normal'
-      q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
-      self.lock.acquire()
-      cursor.execute(q)
-      row = cursor.fetchall()
-      self.lock.release()
-      if (row is not None) and (len(row)>0):
-       for feed in row:
-        dest_iter = self.treeindex[feed[0]]
-        nombre_feed_destino = model.get_value(dest_iter, 0)
-        nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-        q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido = 0 AND ghost = 0'
-        self.lock.acquire()
-        cursor.execute(q)
-        count = cursor.fetchone()[0]
-        self.lock.release()
-        if count is not None:
-         if count > 0:
-          feed_label = nombre_feed_destino + ' [' + `count` + ']'
-          font_style = 'bold'
+      elif nombre_feed == _("Important"):
+       #print 'Destino: feed normal'
+       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+       self.lock.acquire()
+       cursor.execute(q)
+       row = cursor.fetchall()
+       self.lock.release()
+       if (row is not None) and (len(row)>0):
+        for feed in row:
+         dest_iter = self.treeindex[feed[0]]
+         nombre_feed_destino = model.get_value(dest_iter, 0)
+         nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+         q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido = 0 AND ghost = 0'
+         self.lock.acquire()
+         cursor.execute(q)
+         count = cursor.fetchone()[0]
+         self.lock.release()
+         if count is not None:
+          if count > 0:
+           feed_label = nombre_feed_destino + ' [' + `count` + ']'
+           font_style = 'bold'
+          else:
+           feed_label = nombre_feed_destino
+           font_style = 'normal'
          else:
           feed_label = nombre_feed_destino
           font_style = 'normal'
-        else:
-         feed_label = nombre_feed_destino
-         font_style = 'normal'
-        model.set(dest_iter, 0, feed_label, 3, font_style)
-       ### START: ¡También cabe actualizar su compañero de batallas!
-       self.update_special_folder(9999) # Actualizamos Unread
-       ### END: ¡También cabe actualizar su compañero de batallas!
-       # Bold/unbold de ALGUNAS categorias
-       self.toggle_category_bold_all()
-       # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
+         model.set(dest_iter, 0, feed_label, 3, font_style)
+        ### START: ¡También cabe actualizar su compañero de batallas!
+        self.update_special_folder(9999) # Actualizamos Unread
+        ### END: ¡También cabe actualizar su compañero de batallas!
+        # Bold/unbold de ALGUNAS categorias
+        self.toggle_category_bold_all()
+        # Y si aplica, fold de ALGUNAS categorias (las que no tengan feeds con entries por leer)
+        if (self.driven_mode == 1):
+         self.driven_mode_action() # Fold de lo que esté 'vacio'
+
+      else:
+       # Bold/unbold de la categoria
+       self.toggle_category_bold()
+       # Y si aplica, fold de la categoria
        if (self.driven_mode == 1):
-        self.driven_mode_action() # Fold de lo que esté 'vacio'
+        self.driven_mode_action()
+       # Destino: No leídos
+       self.update_special_folder(9999)
+       # Destino: Importantes
+       self.update_special_folder(9998)
+      # END NAME PARSING (nodo destino) #
 
-     else:
-      # Bold/unbold de la categoria
-      self.toggle_category_bold()
-      # Y si aplica, fold de la categoria
-      if (self.driven_mode == 1):
-       self.driven_mode_action()
-      # Destino: No leídos
-      self.update_special_folder(9999)
-      # Destino: Importantes
-      self.update_special_folder(9998)
-     # END NAME PARSING (nodo destino) #
-
-     # NEW: Limpieza de la GUI
+     # Limpieza de la GUI
      if self.hide_readentries:
       self.liststore.clear() # Limpieza de tabla de entries/articulos
       self.scrolled_window2.set_size_request(0,0)
@@ -406,7 +409,8 @@ class Naufrago:
       self.eb.hide()
       self.eb_image_zoom.hide()
 
-    elif(model.iter_depth(iter) == 0): # Si es PADRE...
+    # OLD: elif(model.iter_depth(iter) == 0): # Si es PADRE...
+    elif(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es PADRE...
 
      # 1º vamos a por el label de los feeds...
      feed_ids = ''
@@ -497,36 +501,37 @@ class Naufrago:
       model.set(iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo origen) #
 
-      # START NAME PARSING (nodo destino) #
-      if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-       self.lock.acquire()
-       cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
-       id_feed = cursor.fetchone()[0]
-       self.lock.release()
-       cursor.close()
-       dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
-       nombre_feed_destino = model.get_value(dest_iter, 0)
-       (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-       if no_leidos is not None:
-        no_leidos = int(no_leidos) + 1
-        feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
+      if self.clear_mode == 0: # NEW
+       # START NAME PARSING (nodo destino) #
+       if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+        self.lock.acquire()
+        cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
+        id_feed = cursor.fetchone()[0]
+        self.lock.release()
+        cursor.close()
+        dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
+        nombre_feed_destino = model.get_value(dest_iter, 0)
+        (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+        if no_leidos is not None:
+         no_leidos = int(no_leidos) + 1
+         feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
+        else:
+         feed_label = nombre_feed_destino + ' [1]'
+        model.set(dest_iter, 0, feed_label, 3, 'bold')
+        ### START: ¡También cabe actualizar su compañero de batallas!
+        if nombre_feed == _("Important"):
+         # Actualizamos Unread
+         self.update_special_folder(9999)
+        elif nombre_feed == _("Unread"):
+         # Actualizamos Important
+         self.update_special_folder(9998)
+        ### END: ¡También cabe actualizar su compañero de batallas!
        else:
-        feed_label = nombre_feed_destino + ' [1]'
-       model.set(dest_iter, 0, feed_label, 3, 'bold')
-       ### START: ¡También cabe actualizar su compañero de batallas!
-       if nombre_feed == _("Important"):
-        # Actualizamos Unread
+        # Destino: No leídos
         self.update_special_folder(9999)
-       elif nombre_feed == _("Unread"):
-        # Actualizamos Important
+        # Destino: Importantes
         self.update_special_folder(9998)
-       ### END: ¡También cabe actualizar su compañero de batallas!
-      else:
-       # Destino: No leídos
-       self.update_special_folder(9999)
-       # Destino: Importantes
-       self.update_special_folder(9998)
-      # END NAME PARSING (nodo destino) #
+       # END NAME PARSING (nodo destino) #
        
 
      else: # if(font_style == 'bold')
@@ -571,42 +576,43 @@ class Naufrago:
       model.set(iter, 0, feed_label, 3, font_style)
       # END NAME PARSING (nodo origen) #
 
-      # START NAME PARSING (nodo destino) #
-      if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-       self.lock.acquire()
-       cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
-       id_feed = cursor.fetchone()[0]
-       self.lock.release()
-       cursor.close()
-       dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
-       nombre_feed_destino = model.get_value(dest_iter, 0)
-       (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-       if (no_leidos is not None) and (no_leidos > 0):
-        no_leidos = int(no_leidos) - 1
-        if no_leidos <= 0:
-         font_style = 'normal'
-         feed_label = nombre_feed_destino
+      if self.clear_mode == 0: # NEW
+       # START NAME PARSING (nodo destino) #
+       if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+        self.lock.acquire()
+        cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
+        id_feed = cursor.fetchone()[0]
+        self.lock.release()
+        cursor.close()
+        dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
+        nombre_feed_destino = model.get_value(dest_iter, 0)
+        (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+        if (no_leidos is not None) and (no_leidos > 0):
+         no_leidos = int(no_leidos) - 1
+         if no_leidos <= 0:
+          font_style = 'normal'
+          feed_label = nombre_feed_destino
+         else:
+          font_style = 'bold'
+          feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
         else:
-         font_style = 'bold'
-         feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
+         feed_label = nombre_feed_destino
+         font_style = 'normal'
+        model.set(dest_iter, 0, feed_label, 3, font_style)
+        ### START: ¡También cabe actualizar su compañero de batallas!
+        if nombre_feed == _("Important"):
+         # Actualizamos Unread
+         self.update_special_folder(9999)
+        elif nombre_feed == _("Unread"):
+         # Actualizamos Important
+         self.update_special_folder(9998)
+        ### END: ¡También cabe actualizar su compañero de batallas!
        else:
-        feed_label = nombre_feed_destino
-        font_style = 'normal'
-       model.set(dest_iter, 0, feed_label, 3, font_style)
-       ### START: ¡También cabe actualizar su compañero de batallas!
-       if nombre_feed == _("Important"):
-        # Actualizamos Unread
+        # Destino: No leídos
         self.update_special_folder(9999)
-       elif nombre_feed == _("Unread"):
-        # Actualizamos Important
+        # Destino: Importantes
         self.update_special_folder(9998)
-       ### END: ¡También cabe actualizar su compañero de batallas!
-      else:
-       # Destino: No leídos
-       self.update_special_folder(9999)
-       # Destino: Importantes
-       self.update_special_folder(9998)
-      # END NAME PARSING (nodo destino) #
+       # END NAME PARSING (nodo destino) #
 
 
     elif(data == 'all'):
@@ -666,10 +672,8 @@ class Naufrago:
        if nombre_feed == _("Important") or nombre_feed == _("Unread"):
         q = 'SELECT count(id) FROM articulo WHERE leido=0 AND ghost=0'
        else:
-        # START NEW
         if self.hide_readentries:
          q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id='+`id_articulo`+') AND ghost=0 AND leido=0'
-        # END NEW
         else:
          q = 'SELECT count(id) FROM articulo WHERE id_feed = (SELECT id_feed FROM articulo WHERE id='+`id_articulo`+') AND ghost=0'
        self.lock.acquire()
@@ -689,120 +693,121 @@ class Naufrago:
       model.set(iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo origen) #
 
-     # START NAME PARSING (nodo destino) #
-     if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-      #print 'Destino: feed normal'
-      if liststore_font_style == 'bold':
-       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
-       self.lock.acquire()
-       cursor.execute(q)
-       row = cursor.fetchall()
-       self.lock.release()
-       if (row is not None) and (len(row)>0):
-        for feed in row:
-         q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido=0 AND ghost=0'
-         self.lock.acquire()
-         cursor.execute(q)
-         count = cursor.fetchone()
-         self.lock.release()
-         dest_iter = self.treeindex[feed[0]]
-         nombre_feed_destino = model.get_value(dest_iter, 0)
-         nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-         if count[0] is not None:
-          if count[0] > 0:
-           feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
-           font_style = 'bold'
+     if self.clear_mode == 0: # NEW
+      # START NAME PARSING (nodo destino) #
+      if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+       #print 'Destino: feed normal'
+       if liststore_font_style == 'bold':
+        q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+        self.lock.acquire()
+        cursor.execute(q)
+        row = cursor.fetchall()
+        self.lock.release()
+        if (row is not None) and (len(row)>0):
+         for feed in row:
+          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido=0 AND ghost=0'
+          self.lock.acquire()
+          cursor.execute(q)
+          count = cursor.fetchone()
+          self.lock.release()
+          dest_iter = self.treeindex[feed[0]]
+          nombre_feed_destino = model.get_value(dest_iter, 0)
+          nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+          if count[0] is not None:
+           if count[0] > 0:
+            feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
+            font_style = 'bold'
+           else:
+            feed_label = nombre_feed_destino
+            font_style = 'normal'
           else:
            feed_label = nombre_feed_destino
            font_style = 'normal'
-         else:
-          feed_label = nombre_feed_destino
-          font_style = 'normal'
-         model.set(dest_iter, 0, feed_label, 3, font_style)
-         ### START: ¡También cabe actualizar su compañero de batallas!
-         if nombre_feed == _("Important"):
-          # Actualizamos Unread
-          self.update_special_folder(9999)
-         elif nombre_feed == _("Unread"):
-          # Actualizamos Important
-          self.update_special_folder(9998)
-         ### END: ¡También cabe actualizar su compañero de batallas!
-      elif liststore_font_style == 'normal':
-       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
-       self.lock.acquire()
-       cursor.execute(q)
-       row = cursor.fetchall()
-       self.lock.release()
-       if row is not None:
-        for feed in row:
-         q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido=0 AND ghost=0'
-         self.lock.acquire()
-         cursor.execute(q)
-         count = cursor.fetchone()
-         self.lock.release()
-         dest_iter = self.treeindex[feed[0]]
-         nombre_feed_destino = model.get_value(dest_iter, 0)
-         nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-         if count[0] is not None:
-          if count[0] > 0:
-           feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
-           font_style = 'bold'
+          model.set(dest_iter, 0, feed_label, 3, font_style)
+          ### START: ¡También cabe actualizar su compañero de batallas!
+          if nombre_feed == _("Important"):
+           # Actualizamos Unread
+           self.update_special_folder(9999)
+          elif nombre_feed == _("Unread"):
+           # Actualizamos Important
+           self.update_special_folder(9998)
+          ### END: ¡También cabe actualizar su compañero de batallas!
+       elif liststore_font_style == 'normal':
+        q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
+        self.lock.acquire()
+        cursor.execute(q)
+        row = cursor.fetchall()
+        self.lock.release()
+        if row is not None:
+         for feed in row:
+          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `feed[0]` + ' AND leido=0 AND ghost=0'
+          self.lock.acquire()
+          cursor.execute(q)
+          count = cursor.fetchone()
+          self.lock.release()
+          dest_iter = self.treeindex[feed[0]]
+          nombre_feed_destino = model.get_value(dest_iter, 0)
+          nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+          if count[0] is not None:
+           if count[0] > 0:
+            feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
+            font_style = 'bold'
+           else:
+            feed_label = nombre_feed_destino
+            font_style = 'normal'
           else:
            feed_label = nombre_feed_destino
            font_style = 'normal'
-         else:
-          feed_label = nombre_feed_destino
-          font_style = 'normal'
-         model.set(dest_iter, 0, feed_label, 3, 'bold')
-         ### START: ¡También cabe actualizar su compañero de batallas!
-         if nombre_feed == _("Important"):
-          # Actualizamos Unread
-          self.update_special_folder(9999)
-         elif nombre_feed == _("Unread"):
-          # Actualizamos Important
-          self.update_special_folder(9998)
-         ### END: ¡También cabe actualizar su compañero de batallas!
-     else:
-      # Destino: No leídos
-      self.update_special_folder(9999)
-      # Destino: Importantes
-      self.update_special_folder(9998)
+          model.set(dest_iter, 0, feed_label, 3, 'bold')
+          ### START: ¡También cabe actualizar su compañero de batallas!
+          if nombre_feed == _("Important"):
+           # Actualizamos Unread
+           self.update_special_folder(9999)
+          elif nombre_feed == _("Unread"):
+           # Actualizamos Important
+           self.update_special_folder(9998)
+          ### END: ¡También cabe actualizar su compañero de batallas!
+      else:
+       # Destino: No leídos
+       self.update_special_folder(9999)
+       # Destino: Importantes
+       self.update_special_folder(9998)
 
-      if on_a_search:
-       # Actualizar todos los feeds!!!
-       i = 0
-       font_style = ''
-       if liststore_font_style == 'bold': # Si antes era bold...
-        for nombre_feed in nombre_feeds:
-         feed_label = self.simple_name_parsing(nombre_feed)
-         iter = self.treeindex[id_feeds[i][0]]
-         model.set(iter, 0, feed_label, 3, 'normal')
-         i += 1
-       elif liststore_font_style == 'normal': # Sino, si antes era normal...
-        for nombre_feed in nombre_feeds:
-         nombre_feed = self.simple_name_parsing(nombre_feed)
-         q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feeds[i][0]` + ' AND leido=0 AND ghost=0'
-         self.lock.acquire()
-         cursor.execute(q)
-         count = cursor.fetchone()
-         self.lock.release()
-         if count[0] is not None:
-          if count[0] > 0:
-           feed_label = nombre_feed + ' [' + `count[0]` + ']'
-           font_style = 'bold'
+       if on_a_search:
+        # Actualizar todos los feeds!!!
+        i = 0
+        font_style = ''
+        if liststore_font_style == 'bold': # Si antes era bold...
+         for nombre_feed in nombre_feeds:
+          feed_label = self.simple_name_parsing(nombre_feed)
+          iter = self.treeindex[id_feeds[i][0]]
+          model.set(iter, 0, feed_label, 3, 'normal')
+          i += 1
+        elif liststore_font_style == 'normal': # Sino, si antes era normal...
+         for nombre_feed in nombre_feeds:
+          nombre_feed = self.simple_name_parsing(nombre_feed)
+          q = 'SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feeds[i][0]` + ' AND leido=0 AND ghost=0'
+          self.lock.acquire()
+          cursor.execute(q)
+          count = cursor.fetchone()
+          self.lock.release()
+          if count[0] is not None:
+           if count[0] > 0:
+            feed_label = nombre_feed + ' [' + `count[0]` + ']'
+            font_style = 'bold'
+           else:
+            feed_label = nombre_feed
+            font_style = 'normal'
           else:
            feed_label = nombre_feed
            font_style = 'normal'
-         else:
-          feed_label = nombre_feed
-          font_style = 'normal'
-         iter = self.treeindex[id_feeds[i][0]]
-         model.set(iter, 0, feed_label, 3, font_style)
-         i += 1
-     # END NAME PARSING (nodo destino) #
+          iter = self.treeindex[id_feeds[i][0]]
+          model.set(iter, 0, feed_label, 3, font_style)
+          i += 1
+      # END NAME PARSING (nodo destino) #
      cursor.close()
 
-     # NEW: Limpieza de la GUI
+     # Limpieza de la GUI
      if liststore_font_style == 'bold':
       if self.hide_readentries:
        self.liststore.clear() # Limpieza de tabla de entries/articulos
@@ -817,8 +822,9 @@ class Naufrago:
        self.eb.hide()
        self.eb_image_zoom.hide()
 
-    # Unbold categories (if needed).
-    self.toggle_category_bold_all()
+    if self.clear_mode == 0: # NEW
+     # Unbold categories (if needed).
+     self.toggle_category_bold_all()
 
  def abrir_browser(self, event=None, data=None):
   """Opens a given url in the user sensible web browser."""
@@ -963,48 +969,49 @@ class Naufrago:
      font_style = 'normal'
     model.set(iter, 0, feed_label, 3, font_style)
    # END NAME PARSING (nodo origen) #
-    # START NAME PARSING (nodo destino) #
-    if nombre_feed == _("Important") or nombre_feed == _("Unread"):
-     #print 'Destino: feed normal'
-     self.lock.acquire()
-     cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
-     id_feed = cursor.fetchone()[0]
-     self.lock.release()
-     dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
-     nombre_feed_destino = model.get_value(dest_iter, 0)
-     (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-     if no_leidos is not None:
-      no_leidos = int(no_leidos) - 1
-      if no_leidos == 0: # Si no quedan entries del feed por leer...
-       font_style = 'normal'
-       feed_label = nombre_feed_destino
-      else: # Y si todavía quedan...
-       font_style = 'bold'
-       feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
-      model.set(dest_iter, 0, feed_label, 3, font_style)
-     ### START: ¡También cabe actualizar su compañero de batallas!
-     if nombre_feed == _("Important"):
-      # Actualizamos Unread
-      self.update_special_folder(9999)
-     elif nombre_feed == _("Unread"):
-      # Actualizamos Important
-      self.update_special_folder(9998)
-      # ESTO ES ABSOLUTAMENTE NECESARIO para que 'Important' no actúe si no tenemos el flag_importante.
-      # Aplicarlo en los demás sitios que falte.
-      if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
+    if self.clear_mode == 0: # NEW
+     # START NAME PARSING (nodo destino) #
+     if nombre_feed == _("Important") or nombre_feed == _("Unread"):
+      #print 'Destino: feed normal'
+      self.lock.acquire()
+      cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
+      id_feed = cursor.fetchone()[0]
+      self.lock.release()
+      dest_iter = self.treeindex[id_feed] # dictionary to the rescue!
+      nombre_feed_destino = model.get_value(dest_iter, 0)
+      (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+      if no_leidos is not None:
+       no_leidos = int(no_leidos) - 1
+       if no_leidos == 0: # Si no quedan entries del feed por leer...
+        font_style = 'normal'
+        feed_label = nombre_feed_destino
+       else: # Y si todavía quedan...
+        font_style = 'bold'
+        feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
        model.set(dest_iter, 0, feed_label, 3, font_style)
-     ### END: ¡También cabe actualizar su compañero de batallas!
-     # Unbold categories (if needed).
-     self.toggle_category_bold_all()
-    else:
-     # Destino: No leídos
-     self.update_special_folder(9999)
-     # Destino: Importantes
-     if flag_importante:
-      self.update_special_folder(9998)
-    # END NAME PARSING (nodo destino) #
-    # Unbold category if needed.
-    self.toggle_category_bold()
+      ### START: ¡También cabe actualizar su compañero de batallas!
+      if nombre_feed == _("Important"):
+       # Actualizamos Unread
+       self.update_special_folder(9999)
+      elif nombre_feed == _("Unread"):
+       # Actualizamos Important
+       self.update_special_folder(9998)
+       # ESTO ES ABSOLUTAMENTE NECESARIO para que 'Important' no actúe si no tenemos el flag_importante.
+       # Aplicarlo en los demás sitios que falte.
+       if nombre_feed == _("Important") or (nombre_feed == _("Unread") and flag_importante is True):
+        model.set(dest_iter, 0, feed_label, 3, font_style)
+      ### END: ¡También cabe actualizar su compañero de batallas!
+      # Unbold categories (if needed).
+      self.toggle_category_bold_all()
+     else:
+      # Destino: No leídos
+      self.update_special_folder(9999)
+      # Destino: Importantes
+      if flag_importante:
+       self.update_special_folder(9998)
+     # END NAME PARSING (nodo destino) #
+     # Unbold category if needed.
+     self.toggle_category_bold()
 
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
@@ -1017,7 +1024,8 @@ class Naufrago:
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     nombre_feed = self.simple_name_parsing(row_name)
     self.webview.load_string("<h2>" + _("Special folder") + ": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
-   elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
+   # OLD: elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
+   elif(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # Si es hoja, presentar entradas
     self.populate_entries(id_feed)
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     cursor = self.conn.cursor()
@@ -1031,7 +1039,8 @@ class Naufrago:
     # END NAME PARSING #
     FEED_PAGE = "<h2>Feed: " + row_name + "</h2><p>" + _("Source") + ": <a href='" + url + "'>" + url + "</a></p>"
     self.webview.load_string(FEED_PAGE, "text/html", "utf-8", "valid_link")
-   elif(model.iter_depth(iter) == 0): # Si es padre, limpliar 
+   # OLD: elif(model.iter_depth(iter) == 0): # Si es padre, limpliar 
+   elif(model.iter_depth(iter) == 0 and self.clear_mode == 0): # Si es padre, limpliar
     self.liststore.clear() # Limpieza de tabla de entries/articulos
     self.scrolled_window2.set_size_request(0,0)
     self.scrolled_window2.hide()
@@ -1715,11 +1724,11 @@ class Naufrago:
   self.lock.release()
   for row in rows:
    boldornot = self.toggle_category_bold(row[0])
-   # START NEW: Driven mode
+   # START: Driven mode
    if (self.driven_mode == 1):
     if boldornot == 'normal': category_icon = gtk.STOCK_DIRECTORY
     else: category_icon = gtk.STOCK_OPEN
-   # START NEW: Driven mode
+   # END: Driven mode
    dad = self.treestore.append(None, [row[1], category_icon, row[0], boldornot]) # Initial tree creation
    self.treeindex_cat[row[0]] = dad
    self.lock.acquire()
@@ -1742,14 +1751,14 @@ class Naufrago:
     else:
      son = self.treestore.append(dad, [feed_label, 'rss-image', row2[0], font_style]) # Initial tree creation
     self.treeindex[row2[0]] = son
-   # START NEW: Driven mode
+   # START: Driven mode
    if (self.driven_mode == 1):
     (model, useless_iter) = self.treeselection.get_selected()
     if boldornot == 'normal':
      self.treeview.collapse_row(model.get_path(dad))
     else:
      self.treeview.expand_row(model.get_path(dad), open_all=False)
-   # END NEW: Driven mode
+   # END: Driven mode
 
   self.force_gui_refresh()
   # These ones are "special" folders...
@@ -1903,17 +1912,20 @@ class Naufrago:
       model.set(iter, 0, text)
       self.lock.acquire()
       cursor.execute('UPDATE categoria SET nombre = ? WHERE id = ?', [text.decode("utf-8"),data])
+      self.conn.commit()
+      self.lock.release()
     else:
-     self.lock.acquire()
-     cursor.execute('SELECT MAX(id) FROM categoria')
-     row = cursor.fetchone()
-     self.lock.release()
-     dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
-     self.treeindex_cat[row[0]+1] = dad # Update category dict
+     if self.clear_mode == 0: # NEW
+      self.lock.acquire()
+      cursor.execute('SELECT MAX(id) FROM categoria')
+      row = cursor.fetchone()
+      self.lock.release()
+      dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+      self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
-    self.conn.commit()
-    self.lock.release()
+     self.conn.commit()
+     self.lock.release()
    else:
     self.warning_message(_('Category <b>already present</b>!'))
    cursor.close()
@@ -1949,7 +1961,8 @@ class Naufrago:
   """Deletes a category from the user feed tree structure"""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   if(model.iter_depth(iter) == 0): # ... y es un nodo padre
+   # OLD: if(model.iter_depth(iter) == 0): # ... y es un nodo padre
+   if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # ... y es un nodo padre
     id_categoria = self.treestore.get_value(iter, 2)
     if(id_categoria != 1) and (id_categoria != 9998) and (id_categoria != 9999):
      dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
@@ -2115,18 +2128,20 @@ class Naufrago:
     row = cursor.fetchone()
     self.lock.release()
     if(row is None):
-     # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
-     id_categoria = 1
-     if(iter is not None): # Si hay algún nodo seleccionado..
-      if(model.iter_depth(iter) == 0): # ... y es un nodo padre
-       id_categoria = self.treestore.get_value(iter, 2)
-      elif(model.iter_depth(iter) == 1): # ... y es un nodo hijo
-       iter = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
-       id_categoria = self.treestore.get_value(iter, 2)
+     if self.clear_mode == 0: # NEW
+      # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
+      id_categoria = 1
+      if(iter is not None): # Si hay algún nodo seleccionado..
+       if(model.iter_depth(iter) == 0): # ... y es un nodo padre
+        id_categoria = self.treestore.get_value(iter, 2)
+       elif(model.iter_depth(iter) == 1): # ... y es un nodo hijo
+        iter = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
+        id_categoria = self.treestore.get_value(iter, 2)
+       else:
+        iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
       else:
        iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
-     else:
-      iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
+
      self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM feed')
      row = cursor.fetchone()
@@ -2135,7 +2150,10 @@ class Naufrago:
      if row[0] is not None:
       id_feed = row[0]
      self.get_favicon(id_feed+1, textURL) # Downloads favicon & adds to the icon factory.
-     son = self.treestore.append(iter, [textName, `id_feed+1`, id_feed+1, 'normal'])
+     if self.clear_mode == 0: # NEW
+      son = self.treestore.append(iter, [textName, `id_feed+1`, id_feed+1, 'normal'])
+     else: # NEW
+      son = self.treestore.append(None, [textName, `id_feed+1`, id_feed+1, 'normal']) # NEW
      self.treeindex[id_feed+1] = son # Update feeds dict
      self.treeview.expand_row(model.get_path(iter), open_all=False) # Expand parent!
      self.lock.acquire()
@@ -2180,7 +2198,8 @@ class Naufrago:
   """Deletes a feed from the user feed tree structure"""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo
+   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo
+   if(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
     dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
     dialog.set_title(_('Delete feed'))
     dialog.set_markup(_('Delete selected <b>feed</b>?'))
@@ -2222,16 +2241,18 @@ class Naufrago:
      if os.path.exists(favicon_path + '/'+ `id_feed`):
       os.unlink(favicon_path + '/'+ `id_feed`)
 
-     # Unbold category if needed.
-     self.toggle_category_bold()
+     if self.clear_mode == 0: # NEW
+      # Unbold category if needed.
+      self.toggle_category_bold()
 
      self.treestore.remove(iter)
      del self.treeindex[id_feed] # Update feeds dict
      self.liststore.clear() # Limpieza de tabla de entries/articulos
 
-     # Actualizamos No-leidos e Importantes
-     self.update_special_folder(9999)
-     self.update_special_folder(9998)
+     if self.clear_mode == 0: # NEW
+      # Actualizamos No-leidos e Importantes
+      self.update_special_folder(9999)
+      self.update_special_folder(9998)
 
      # Finalmente ponemos las cosas en su sitio
      self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
@@ -2246,9 +2267,10 @@ class Naufrago:
   """Summons deleting feed or category, depending on selection."""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   if(model.iter_depth(iter) == 0): # Si es un nodo padre...
+   # OLD: if(model.iter_depth(iter) == 0): # Si es un nodo padre...
+   if(model.iter_depth(iter) == 0 and self.clear_mode == 0): # Si es un nodo padre...
     self.delete_category()
-   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo
+   else: # ... y es un nodo hijo
     self.delete_feed()
 
  def edit(self, data=None):
@@ -2256,12 +2278,13 @@ class Naufrago:
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
    id_categoria_o_feed = model.get_value(iter, 2)
-   if(model.iter_depth(iter) == 0): # ... y es un nodo padre
+   # OLD: if(model.iter_depth(iter) == 0): # ... y es un nodo padre
+   if(model.iter_depth(iter) == 0 and self.clear_mode == 0): # ... y es un nodo padre
     if(id_categoria_o_feed != 1) and (id_categoria_o_feed != 9998) and (id_categoria_o_feed != 9999):
      self.add_category(id_categoria_o_feed)
     else:
      self.warning_message(_('This category <b>cannot be edited</b>!'))
-   elif(model.iter_depth(iter) == 1): # ... y es un nodo hijo
+   else: # ... y es un nodo hijo
     self.add_feed(id_categoria_o_feed)
   else:
    self.warning_message(_('You <b>must choose a category or a feed</b> to edit!'))
@@ -2367,7 +2390,8 @@ class Naufrago:
   self.hide_readentries = aux_hide_readentries
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+   if model.iter_depth(iter) == 1 or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo (o sea, un feed)
     id_selected_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_selected_feed)
 
@@ -2375,7 +2399,8 @@ class Naufrago:
   """Controlls the read entry hidding of the preferences dialog."""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
+   if model.iter_depth(iter) == 1 or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo (o sea, un feed)
     if checkbox.get_active(): self.hide_readentries = 1
     else: self.hide_readentries = 0
     id_selected_feed = self.treestore.get_value(iter, 2)
@@ -2409,7 +2434,8 @@ class Naufrago:
   iter = model.get_iter_root() # Magic
   id_cat = model.get_value(iter, 2)
   while (iter is not None):
-   if(model.iter_depth(iter) == 0) and (id_cat != 9998) and (id_cat != 9999): # Si es padre
+   # OLD: if(model.iter_depth(iter) == 0) and (id_cat != 9998 and id_cat != 9999): # Si es padre
+   if(model.iter_depth(iter) == 0) and (self.clear_mode == 0) and (id_cat != 9998 and id_cat != 9999): # Si es padre
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
      if (self.driven_mode == 1) and (useless_iter_id_cat is not None):
@@ -2774,7 +2800,8 @@ class Naufrago:
     (len(path_of_iter_to_copy) == 1) or # source is parent
     (len(path_of_target_iter) == 2) or # dest is child
     (self.treestore.is_ancestor(target_iter, iter_to_copy)) or # dest is already child's parent
-    (target_iter_id == 9998) or (target_iter_id == 9999)): # dest is a special folder
+    (target_iter_id == 9998) or (target_iter_id == 9999) or # dest is a special folder
+    (self.clear_mode == 1)): # NEW: clear_mode doesn't allow this
      return False
   else:
    return True
@@ -2977,7 +3004,8 @@ class Naufrago:
   if(iter is not None): # Si hay algún nodo seleccionado...
    nodes = {} # Dictionary! (key:value pairs containing id_feed:iter)
    id_category = self.treestore.get_value(iter, 2)
-   if(model.iter_depth(iter) == 0) and (id_category != 9998) and (id_category != 9999): # Si es un nodo padre...
+   # OLD: if(model.iter_depth(iter) == 0) and (id_category != 9998) and (id_category != 9999): # Si es un nodo padre...
+   if(model.iter_depth(iter) == 0) and (self.clear_mode == 0) and (id_category != 9998 and id_category != 9999): # Si es un nodo padre...
     # Update all feeds of this category
     iter = model.iter_children(iter)
     while iter:
@@ -2985,7 +3013,8 @@ class Naufrago:
      nodes[id_feed] = iter # Storing id_feed:iter pairs...
      iter = self.treestore.iter_next(iter)
     # Old way: self.get_feed(feed_ids)
-   elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
+   # OLD: elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
+   else: # NEW: Si es un nodo hijo...
     # Update this single feed
     id_feed = self.treestore.get_value(iter, 2)
     nodes[id_feed] = iter # Storing id_feed:iter pairs...
@@ -3350,17 +3379,28 @@ class Naufrago:
 
   gtk.gdk.threads_leave()
 
+  # MOVIDO JUSTO ABAJO!
   # Actualizamos la lista de entries del feed seleccionado
-  if(count != 0):
+  #if(count != 0):
+  # (model2, iter2) = self.treeselection.get_selected()
+  # if(iter2 is not None): # Si hay algún nodo seleccionado...
+    # OLD: if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
+  #  if(model2.iter_depth(iter2) == 1) or (model2.iter_depth(iter2) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
+  #   id_selected_feed = self.treestore.get_value(iter2, 2)
+  #   if id_selected_feed == id_feed:
+  #    self.populate_entries(id_feed)
+
+  if new_posts:
+   # Actualizamos la lista de entries del feed seleccionado
    (model2, iter2) = self.treeselection.get_selected()
    if(iter2 is not None): # Si hay algún nodo seleccionado...
-    if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
+    # OLD: if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
+    if(model2.iter_depth(iter2) == 1) or (model2.iter_depth(iter2) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
      id_selected_feed = self.treestore.get_value(iter2, 2)
      if id_selected_feed == id_feed:
       self.populate_entries(id_feed)
 
-  # Luego el recuento del feed
-  if new_posts:
+   # Luego el recuento del feed
    self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feed` + ' AND leido=0 AND ghost=0')
    row = cursor.fetchone()
@@ -3371,60 +3411,64 @@ class Naufrago:
    else:
     feed_label = nombre_feed + ' [' + `row[0]` + ']'
     font_style = 'bold'
-   if (count != 0):
-    if mode == 'all':
-     model2.set(child, 0, feed_label, 3, font_style)
-    else:
-     model.set(child, 0, feed_label, 3, font_style)
-   # Y luego el recuento de los No-leidos
-   (model3, useless_iter) = self.treeselection.get_selected()
-   dest_iter = self.treeindex[9999]
-   nombre_feed_destino = model3.get_value(dest_iter, 0)
-   nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
-   self.lock.acquire()
-   cursor.execute('SELECT count(id) FROM articulo WHERE leido=0 AND ghost=0')
-   count = cursor.fetchone()
-   self.lock.release()
-   if count is not None:
-    if count[0] > 0:
-     feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
-     font_style = 'bold'
-     # Y luego el resaltado de la categoría
-     model.set(iter, 3, 'bold')
+   #if (count != 0):
+   if mode == 'all':
+    print 'a'
+    model2.set(child, 0, feed_label, 3, font_style)
+   else:
+    print 'b'
+    model.set(child, 0, feed_label, 3, font_style)
+
+   if self.clear_mode == 0: # NEW
+    # Y luego el recuento de los No-leidos
+    (model3, useless_iter) = self.treeselection.get_selected()
+    dest_iter = self.treeindex[9999]
+    nombre_feed_destino = model3.get_value(dest_iter, 0)
+    nombre_feed_destino = self.simple_name_parsing(nombre_feed_destino)
+    self.lock.acquire()
+    cursor.execute('SELECT count(id) FROM articulo WHERE leido=0 AND ghost=0')
+    count = cursor.fetchone()
+    self.lock.release()
+    if count is not None:
+     if count[0] > 0:
+      feed_label = nombre_feed_destino + ' [' + `count[0]` + ']'
+      font_style = 'bold'
+      # Y luego el resaltado de la categoría
+      model.set(iter, 3, 'bold')
+     else:
+      feed_label = nombre_feed_destino
+      font_style = 'normal'
     else:
      feed_label = nombre_feed_destino
      font_style = 'normal'
-   else:
-    feed_label = nombre_feed_destino
-    font_style = 'normal'
-   model3.set(dest_iter, 0, feed_label, 3, font_style)
-   # Y luego el resaltado de la categoría
-   #model.set(iter, 3, 'bold')
+    model3.set(dest_iter, 0, feed_label, 3, font_style)
 
-  # START NEW: Driven mode, parte 1
-  # Cualquier feed con nuevas entradas expanderá la categoria.
-  if (self.driven_mode == 1):
-   if new_posts:
-    self.treeview.expand_row(model.get_path(iter), open_all=False)
-  # END NEW: Driven mode, parte 1
+  if self.clear_mode == 0: # NEW
+   # START: Driven mode, parte 1
+   # Cualquier feed con nuevas entradas expanderá la categoria.
+   if (self.driven_mode == 1):
+    if new_posts:
+     self.treeview.expand_row(model.get_path(iter), open_all=False)
+   # END: Driven mode, parte 1
 
   # ¿Hay cancelación?
   if self.stop_feed_update_lock:
    #break
    return (new_posts, num_new_posts_total, True)
 
-  # START NEW: Driven mode, parte 2
-  # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
-  # contraeremos la categoria.
-  if (self.driven_mode == 1):
-   if num_new_posts_total == aux_num_new_posts_total:
-    if mode == 'all':
-     boldornot = self.toggle_category_bold(id_category)
-    else: # mode == 'single'
-     boldornot = self.toggle_category_bold()
-    if boldornot == 'normal':
-     self.treeview.collapse_row(model.get_path(iter))
-  # END NEW: Driven mode, parte 2
+  if self.clear_mode == 0: # NEW
+   # START: Driven mode, parte 2
+   # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
+   # contraeremos la categoria.
+   if (self.driven_mode == 1):
+    if num_new_posts_total == aux_num_new_posts_total:
+     if mode == 'all':
+      boldornot = self.toggle_category_bold(id_category)
+     else: # mode == 'single'
+      boldornot = self.toggle_category_bold()
+     if boldornot == 'normal':
+      self.treeview.collapse_row(model.get_path(iter))
+   # END: Driven mode, parte 2
 
   return (new_posts, num_new_posts_total, False)
 
@@ -3442,7 +3486,8 @@ class Naufrago:
    iter = model.get_iter_root() # Magic
    cursor = self.conn.cursor()
    while (iter is not None) and (not self.stop_feed_update_lock):
-    if(model.iter_depth(iter) == 0): # Si es padre
+    # OLD: if(model.iter_depth(iter) == 0): # Si es padre
+    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es padre
      id_category = model.get_value(iter, 2)
      new_posts = False # Reset
      aux_num_new_posts_total = num_new_posts_total
@@ -3452,6 +3497,16 @@ class Naufrago:
       (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
       if break_flag:
        break
+    # NEW
+    else:
+     print model.get_value(iter, 0)
+     new_posts = False # Reset
+     aux_num_new_posts_total = num_new_posts_total
+     id_feed = model.get_value(iter, 2)
+     (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+     if break_flag:
+      break
+    # NEW
     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
 
