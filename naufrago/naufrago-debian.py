@@ -3180,6 +3180,8 @@ class Naufrago:
   dont_parse = False
   count = 0
   bozo_invalid = ['urlopen', 'Document is empty'] # Custom non-wanted bozos
+
+  # This is for handling clear_mode feeds.
   if self.treeindex.has_key(id_feed):
    dest_iter = self.treeindex[id_feed]
   else:
@@ -3444,8 +3446,12 @@ class Naufrago:
     else:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
       print 'Feed "' + feed_label + '" NO encontrado, insertando en el árbol...'
-      feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
+      # TEST
+      feed_iter = self.alphabetical_category_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
       self.treeindex[id_feed] = feed_iter
+      # TEST
+      #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
+      #self.treeindex[id_feed] = feed_iter
      else:
       model2.set(child, 0, feed_label, 3, font_style)
    else:
