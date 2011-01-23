@@ -3180,7 +3180,10 @@ class Naufrago:
   dont_parse = False
   count = 0
   bozo_invalid = ['urlopen', 'Document is empty'] # Custom non-wanted bozos
-  dest_iter = self.treeindex[id_feed]
+  if self.treeindex.has_key(id_feed):
+   dest_iter = self.treeindex[id_feed]
+  else:
+   dest_iter = None
 
   if not len(d.entries) > 0: # Feed has no entries...
    self.lock.acquire()
@@ -3188,28 +3191,34 @@ class Naufrago:
    num_entries = cursor.fetchone()[0]
    self.lock.release()
    if num_entries == 0: # ... and never had! Fingerprinted as invalid!
-    model.set(dest_iter, 1, 'crossout-image')
+    if dest_iter is not None:
+     model.set(dest_iter, 1, 'crossout-image')
     dont_parse = True
   elif hasattr(d,'bozo_exception'): # Feed HAS a bozo exception...
    #print d.bozo_exception
    for item in bozo_invalid:
     if item in str(d.bozo_exception):
-     model.set(dest_iter, 1, 'crossout-image')
+     if dest_iter is not None:
+      model.set(dest_iter, 1, 'crossout-image')
      dont_parse = True
      break
     elif count == len(bozo_invalid):
      # Si el feed no tiene icono propio, procurarle el generico!
      if not os.path.exists(favicon_path + '/' + `id_feed`):
-      model.set(dest_iter, 1, 'rss-image')
+      if dest_iter is not None:
+       model.set(dest_iter, 1, 'rss-image')
      else:
-      model.set(dest_iter, 1, `id_feed`)
+      if dest_iter is not None:
+       model.set(dest_iter, 1, `id_feed`)
     count += 1
   else: # Feed HAS NOT any bozo exception...
    # Si el feed no tiene icono propio, procurarle el generico!
    if not os.path.exists(favicon_path + '/' + `id_feed`):
-    model.set(dest_iter, 1, 'rss-image')
-   else: 
-    model.set(dest_iter, 1, `id_feed`)
+    if dest_iter is not None:
+     model.set(dest_iter, 1, 'rss-image')
+   else:
+    if dest_iter is not None: 
+     model.set(dest_iter, 1, `id_feed`)
 
   if dont_parse:
    return True
@@ -3223,14 +3232,23 @@ class Naufrago:
   global APP_VERSION
 
   # START NAME PARSING #
-  nombre_feed = model.get_value(child, 0)
-  nombre_feed = self.simple_name_parsing(nombre_feed)
+  #if child is not None: # Check que descarta feeds que todavia no tienen entradas (en clear_mode)
+  # nombre_feed = model.get_value(child, 0)
+  # nombre_feed = self.simple_name_parsing(nombre_feed)
+  #else:
+  # self.lock.acquire()
+  #  cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed`)
+  #  row = cursor.fetchone()
+  #  self.lock.release()
+  #  nombre_feed = row[0]
   # END NAME PARSING #
 
   # Primero obtenemos el feed (los datos)...
   self.lock.acquire()
-  cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
-  url = cursor.fetchone()[0]
+  cursor.execute('SELECT nombre,url FROM feed WHERE id = ?', [id_feed])
+  row = cursor.fetchone()
+  nombre_feed = row[0]
+  url = row[1]
   self.lock.release()
   self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
@@ -3401,6 +3419,13 @@ class Naufrago:
       self.populate_entries(id_feed)
 
    # Luego el recuento del feed
+   #if nombre_feed is None:
+   # self.lock.acquire()
+   # cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed`)
+   # row = cursor.fetchone()
+   # self.lock.release()
+   # nombre_feed = row[0]
+
    self.lock.acquire()
    cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feed` + ' AND leido=0 AND ghost=0')
    row = cursor.fetchone()
@@ -3414,7 +3439,15 @@ class Naufrago:
    #if (count != 0):
    if mode == 'all':
     print 'a'
-    model2.set(child, 0, feed_label, 3, font_style)
+    if self.clear_mode == 0:
+     model2.set(child, 0, feed_label, 3, font_style)
+    else:
+     if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
+      print 'Feed "' + feed_label + '" NO encontrado, insertando en el árbol...'
+      feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
+      self.treeindex[id_feed] = feed_iter
+     else:
+      model2.set(child, 0, feed_label, 3, font_style)
    else:
     print 'b'
     model.set(child, 0, feed_label, 3, font_style)
@@ -3498,14 +3531,38 @@ class Naufrago:
       if break_flag:
        break
     # NEW
+    #
+    # TODO; Esto NO puede iterarse por las ramas del árbol. Tiene que hacerse por SQL!!!
+    #
     else:
-     print model.get_value(iter, 0)
-     new_posts = False # Reset
-     aux_num_new_posts_total = num_new_posts_total
-     id_feed = model.get_value(iter, 2)
-     (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
-     if break_flag:
-      break
+     self.lock.acquire()
+     cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
+     rows = cursor.fetchall()
+     self.lock.release()
+     for row in rows:
+      new_posts = False # Reset
+      aux_num_new_posts_total = num_new_posts_total
+      id_feed = row[0]
+      #feed_label = row[1]
+      if not self.treeindex.has_key(id_feed):
+       #print 'Feed id "' + `id_feed` + '" NO encontrado, insertando en el árbol...'
+       #iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, 'normal'])
+       #self.treeindex[id_feed] = iter
+       iter = None
+      else:
+       iter = self.treeindex[id_feed]
+      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+      if break_flag:
+       break
+     break # <--- break para salir del while!
+    #else:
+    # print model.get_value(iter, 0)
+    # new_posts = False # Reset
+    # aux_num_new_posts_total = num_new_posts_total
+    # id_feed = model.get_value(iter, 2)
+    # (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+    # if break_flag:
+    #  break
     # NEW
     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
