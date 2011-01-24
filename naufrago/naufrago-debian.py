@@ -294,12 +294,18 @@ class Naufrago:
     # Si es HOJA...
     if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999) or (model.iter_depth(iter) == 0 and self.clear_mode == 1):
 
-     # 1º vamos a por el label del feed...
-     # START NAME PARSING (nodo origen) #
-     nombre_feed = model.get_value(iter, 0)
-     nombre_feed = self.simple_name_parsing(nombre_feed)
-     model.set(iter, 0, nombre_feed, 3, 'normal')
-     # END NAME PARSING (nodo origen) #
+     # NEW
+     if self.clear_mode == 1 and self.treeindex.has_key(id_feed):
+      self.treestore.remove(iter)
+      del self.treeindex[id_feed] # Update feeds dict
+     else:
+     # NEW
+      # 1º vamos a por el label del feed...
+      # START NAME PARSING (nodo origen) #
+      nombre_feed = model.get_value(iter, 0)
+      nombre_feed = self.simple_name_parsing(nombre_feed)
+      model.set(iter, 0, nombre_feed, 3, 'normal')
+      # END NAME PARSING (nodo origen) #
 
      # 2º vamos a por las entries del feed...
      (model2, iter2) = self.treeselection2.get_selected()
@@ -483,6 +489,7 @@ class Naufrago:
       # Little hack for being able to mark read/unread the entries found on a search.
       try: # Feed seleccionado en el tree
        nombre_feed = model.get_value(iter, 0)
+       id_feed = model.get_value(iter, 2)
       except: # Busqueda
        q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
        self.lock.acquire()
@@ -498,7 +505,13 @@ class Naufrago:
        feed_label = nombre_feed + ' [' + `no_leidos` + ']'
       else:
        feed_label = nombre_feed + ' [1]'
-      model.set(iter, 0, feed_label, 3, 'bold')
+      # NEW
+      if self.clear_mode == 1 and not self.treeindex.has_key(id_feed):
+       feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+       self.treeindex[id_feed] = feed_iter
+      else:
+      # NEW
+       model.set(iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo origen) #
 
       if self.clear_mode == 0: # NEW
@@ -552,6 +565,7 @@ class Naufrago:
       # Little hack for being able to mark read/unread the entries found on a search.
       try: # Feed seleccionado en el tree
        nombre_feed = model.get_value(iter, 0)
+       id_feed = model.get_value(iter, 2)
       except: # Busqueda
        q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
        self.lock.acquire()
@@ -573,7 +587,13 @@ class Naufrago:
       else:
        feed_label = nombre_feed
        font_style = 'normal'
-      model.set(iter, 0, feed_label, 3, font_style)
+      # NEW
+      if self.clear_mode == 1 and self.treeindex.has_key(id_feed) and ('[' not in feed_label and ']' not in feed_label):
+       self.treestore.remove(iter)
+       del self.treeindex[id_feed] # Update feeds dict
+      else:
+      # NEW
+       model.set(iter, 0, feed_label, 3, font_style)
       # END NAME PARSING (nodo origen) #
 
       if self.clear_mode == 0: # NEW
@@ -1920,7 +1940,7 @@ class Naufrago:
       cursor.execute('SELECT MAX(id) FROM categoria')
       row = cursor.fetchone()
       self.lock.release()
-      dad = self.alphabetical_category_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+      dad = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
       self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
@@ -1930,32 +1950,32 @@ class Naufrago:
     self.warning_message(_('Category <b>already present</b>!'))
    cursor.close()
 
- def alphabetical_category_insertion(self, categoria_a_insertar, category_data):
+ def alphabetical_node_insertion(self, nodo_a_insertar, node_data):
   """Inserts a new category in the feed list alphabetically."""
   iter = self.treestore.get_iter_root() # Magic
-  iter = self.do_comparison(categoria_a_insertar, iter)
-  self.treestore.insert_before(None, iter, category_data)
+  iter = self.do_comparison(nodo_a_insertar, iter)
+  self.treestore.insert_before(None, iter, node_data)
   return iter
 
- def do_comparison(self, categoria_a_insertar, iter_categoria_curr):
+ def do_comparison(self, nodo_a_insertar, iter_node_curr):
   """Recursion also does magic!"""
-  categoria_curr = self.treestore.get_value(iter_categoria_curr, 0)
-  id_categoria_curr = self.treestore.get_value(iter_categoria_curr, 2)
-  if (id_categoria_curr == 9998) or (id_categoria_curr == 9999):
-   return iter_categoria_curr
+  node_curr = self.treestore.get_value(iter_node_curr, 0)
+  id_node_curr = self.treestore.get_value(iter_node_curr, 2)
+  if (id_node_curr == 9998) or (id_node_curr == 9999):
+   return iter_node_curr
 
-  res = cmp(categoria_a_insertar, categoria_curr)
+  res = cmp(nodo_a_insertar, node_curr)
   if res == 0: # Same strings
-   return iter_categoria_curr
+   return iter_node_curr
   elif res == -1: # 'categoria_a_insertar' goes before
-   return iter_categoria_curr
+   return iter_node_curr
   elif res == 1: # 'categoria_a_insertar' goes after
-   iter = self.treestore.iter_next(iter_categoria_curr) # Pasamos al siguiente Padre...
+   iter = self.treestore.iter_next(iter_node_curr) # Pasamos al siguiente Padre...
    if (iter is not None):
-    iter = self.do_comparison(categoria_a_insertar, iter)
+    iter = self.do_comparison(nodo_a_insertar, iter)
     return iter
    else:
-    return iter_categoria_curr
+    return iter_node_curr
 
  def delete_category(self, data=None):
   """Deletes a category from the user feed tree structure"""
@@ -3447,7 +3467,7 @@ class Naufrago:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
       print 'Feed "' + feed_label + '" NO encontrado, insertando en el árbol...'
       # TEST
-      feed_iter = self.alphabetical_category_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
+      feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
       self.treeindex[id_feed] = feed_iter
       # TEST
       #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
