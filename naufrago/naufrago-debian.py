@@ -2621,7 +2621,7 @@ class Naufrago:
   hbox_throbber = gtk.HBox()
   label = gtk.Label(_("Applying changes..."))
   progress = gtk.Image()
-  progress.set_from_file(app_path + 'media/throbber.gif')
+  progress.set_from_file(app_path + 'media/clock.png')
   hbox_throbber.pack_start(progress, False, False, 3)
   hbox_throbber.pack_start(label, False, False, 3)
   return hbox_throbber
