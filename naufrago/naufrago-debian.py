@@ -487,30 +487,35 @@ class Naufrago:
       # 3º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
       # Little hack for being able to mark read/unread the entries found on a search.
-      try: # Feed seleccionado en el tree
+      try:
        nombre_feed = model.get_value(iter, 0)
        id_feed = model.get_value(iter, 2)
-      except: # Busqueda
-       q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
+       (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
+       add_unit = True
+      except:
        self.lock.acquire()
-       cursor.execute(q)
+       cursor.execute('SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`)
        id_feed = cursor.fetchone()[0]
+       cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed`)
+       nombre_feed = cursor.fetchone()[0]
+       cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ' + `id_feed` + ' AND leido = 0 AND ghost = 0')
+       no_leidos = cursor.fetchone()[0]
        self.lock.release()
-       iter = self.treeindex[id_feed]
-       nombre_feed = model.get_value(iter, 0)
+       add_unit = False
 
-      (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
       if no_leidos is not None:
-       no_leidos = int(no_leidos) + 1
+       if add_unit is True:
+        no_leidos = int(no_leidos) + 1
        feed_label = nombre_feed + ' [' + `no_leidos` + ']'
       else:
        feed_label = nombre_feed + ' [1]'
       # NEW
-      if self.clear_mode == 1 and not self.treeindex.has_key(id_feed):
-       feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+      if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
+       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
        self.treeindex[id_feed] = feed_iter
       else:
       # NEW
+       iter = self.treeindex[id_feed]
        model.set(iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo origen) #
 
@@ -563,17 +568,17 @@ class Naufrago:
       # 3º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
       # Little hack for being able to mark read/unread the entries found on a search.
-      try: # Feed seleccionado en el tree
-       nombre_feed = model.get_value(iter, 0)
-       id_feed = model.get_value(iter, 2)
-      except: # Busqueda
-       q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
-       self.lock.acquire()
-       cursor.execute(q)
-       id_feed = cursor.fetchone()[0]
-       self.lock.release()
-       iter = self.treeindex[id_feed]
-       nombre_feed = model.get_value(iter, 0)
+      #try: # Feed seleccionado en el tree
+      # nombre_feed = model.get_value(iter, 0)
+      # id_feed = model.get_value(iter, 2)
+      #except: # Busqueda
+      q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
+      self.lock.acquire()
+      cursor.execute(q)
+      id_feed = cursor.fetchone()[0]
+      self.lock.release()
+      iter = self.treeindex[id_feed]
+      nombre_feed = model.get_value(iter, 0)
 
       (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
       if (no_leidos is not None) and (no_leidos > 0):
@@ -664,29 +669,51 @@ class Naufrago:
      (model, iter) = self.treeselection.get_selected()
      # START NAME PARSING (nodo origen) #
      # Little hack -slightly different- for being able to mark read/unread the entries found on a search.
-     id_feeds = []
      nombre_feeds = []
-     on_a_search = False
+     id_feeds = []
+     ###on_a_search = False
      try: # Feed seleccionado en el tree
       nombre_feeds.append(model.get_value(iter, 0))
-     except: # Busqueda
-      on_a_search = True
+      id_feeds.append(model.get_value(iter, 2))
+      id_feed = id_feeds[0]
+     except: # Busqueda o clear_mode?
+      ###on_a_search = True # OLD
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
       self.lock.acquire()
       cursor.execute(q)
       id_feeds = cursor.fetchall()
       self.lock.release()
-      for id_feed in id_feeds:
-       iter = self.treeindex[id_feed[0]]
-       nombre_feeds.append(model.get_value(iter, 0))
+      id_feed = id_feeds[0][0]
+      ###if len(id_feeds) > 1: # NEW (Dirty hack!!! Puede fallar con busquedas con 1 solo feed como resultado!)
+      ### on_a_search = True # NEW
+      for id_feed_tmp in id_feeds:
+       try: # NEW
+        iter = self.treeindex[id_feed_tmp[0]]
+        nombre_feeds.append(model.get_value(iter, 0))
+       except: # NEW
+        self.lock.acquire() # NEW
+        cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed_tmp[0]`) # NEW
+        nombre_feed = cursor.fetchone()[0] # NEW
+        nombre_feeds.append(nombre_feed) # NEW
+        self.lock.release() # NEW
 
+     ###id_feed = id_feeds[0]
      nombre_feed = nombre_feeds[0]
-     if not on_a_search:
+     ###if not on_a_search:
+     if self.on_a_search == False:
       font_style = ''
       if liststore_font_style == 'bold': # Si antes era bold...
        nombre_feed = self.simple_name_parsing(nombre_feed)
        feed_label = nombre_feed
        font_style = 'normal'
+       # NEW
+       # TODO: Borrar el feed de la lista #
+       if self.clear_mode == 1 and self.treeindex.has_key(id_feed):
+        self.treestore.remove(iter) # <-- es el iter que queremos u otro? xD
+        del self.treeindex[id_feed]
+       else:
+        model.set(iter, 0, feed_label, 3, font_style)
+       # NEW
       elif liststore_font_style == 'normal': # Si antes era normal...
        nombre_feed = self.simple_name_parsing(nombre_feed)
        if nombre_feed == _("Important") or nombre_feed == _("Unread"):
@@ -710,7 +737,23 @@ class Naufrago:
        else:
         feed_label = nombre_feed
         font_style = 'normal'
-      model.set(iter, 0, feed_label, 3, font_style)
+       # NEW
+       # TODO: Añadir el feed a la lista #
+       if font_style == 'bold':
+        if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
+         useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+         self.treeindex[id_feed] = feed_iter
+        else:
+         model.set(iter, 0, feed_label, 3, font_style)
+       # TODO: Eliminar el feed de la lista #
+       else:
+        if self.clear_mode == 1 and self.treeindex.has_key(id_feed) and ('[' not in feed_label and ']' not in feed_label):
+         self.treestore.remove(iter)
+         del self.treeindex[id_feed]
+        else:
+         model.set(iter, 0, feed_label, 3, font_style)
+       # NEW
+       ###model.set(iter, 0, feed_label, 3, font_style)
      # END NAME PARSING (nodo origen) #
 
      if self.clear_mode == 0: # NEW
@@ -793,7 +836,8 @@ class Naufrago:
        # Destino: Importantes
        self.update_special_folder(9998)
 
-       if on_a_search:
+       ###if on_a_search:
+       if self.on_a_search:
         # Actualizar todos los feeds!!!
         i = 0
         font_style = ''
@@ -903,6 +947,7 @@ class Naufrago:
 
   (model, iter) = self.treeselection2.get_selected()
   if(iter is not None): # Hay alguna fila de la lista seleccionada
+   self.on_a_search = False # NEW (Resets the on_a_search flag)
    flag_importante = self.liststore.get_value(iter, 1)
    titulo = self.liststore.get_value(iter, 2)
    id_articulo = self.liststore.get_value(iter, 4)
@@ -964,16 +1009,17 @@ class Naufrago:
    if liststore_font_style == 'bold': # Si la entry era bold, cabe actualizar el nodo del feed
     feed_label = ''
     # Little hack for being able to mark read/unread the entries found on a search.
-    try:
-     nombre_feed = model.get_value(iter, 0)
-    except:
-     q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
-     self.lock.acquire()
-     cursor.execute(q)
-     id_feed = cursor.fetchone()[0]
-     self.lock.release()
-     iter = self.treeindex[id_feed]
-     nombre_feed = model.get_value(iter, 0)
+    #try:
+    # nombre_feed = model.get_value(iter, 0)
+    # id_feed = model.get_value(iter, 2)
+    #except:
+    q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
+    self.lock.acquire()
+    cursor.execute(q)
+    id_feed = cursor.fetchone()[0]
+    self.lock.release()
+    iter = self.treeindex[id_feed]
+    nombre_feed = model.get_value(iter, 0)
 
     (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
     if (no_leidos is not None) and (no_leidos > 0):
@@ -987,7 +1033,13 @@ class Naufrago:
     else:
      feed_label = nombre_feed
      font_style = 'normal'
-    model.set(iter, 0, feed_label, 3, font_style)
+    # NEW
+    if self.clear_mode == 1 and self.treeindex.has_key(id_feed) and ('[' not in feed_label and ']' not in feed_label):
+     self.treestore.remove(iter)
+     del self.treeindex[id_feed] # Update feeds dict
+    else:
+    # NEW
+     model.set(iter, 0, feed_label, 3, font_style)
    # END NAME PARSING (nodo origen) #
     if self.clear_mode == 0: # NEW
      # START NAME PARSING (nodo destino) #
@@ -1940,7 +1992,8 @@ class Naufrago:
       cursor.execute('SELECT MAX(id) FROM categoria')
       row = cursor.fetchone()
       self.lock.release()
-      dad = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+      # OLD: dad = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
+      dad, useless_iter = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal']) # NEW
       self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
@@ -1954,8 +2007,12 @@ class Naufrago:
   """Inserts a new category in the feed list alphabetically."""
   iter = self.treestore.get_iter_root() # Magic
   iter = self.do_comparison(nodo_a_insertar, iter)
-  self.treestore.insert_before(None, iter, node_data)
-  return iter
+  #self.treestore.insert_before(None, iter, node_data)
+  #return iter
+  # NEW
+  inserted_iter = self.treestore.insert_before(None, iter, node_data)
+  return iter, inserted_iter
+  # NEW
 
  def do_comparison(self, nodo_a_insertar, iter_node_curr):
   """Recursion also does magic!"""
@@ -2327,6 +2384,7 @@ class Naufrago:
   dialog.destroy()
 
   if((text != '') and (response == gtk.RESPONSE_ACCEPT)):
+   self.on_a_search = True # NEW (flag that points out that we did a search)
    self.throbber.show()
    self.treeselection.unselect_all()
 
@@ -3467,7 +3525,7 @@ class Naufrago:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
       print 'Feed "' + feed_label + '" NO encontrado, insertando en el árbol...'
       # TEST
-      feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
+      useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
       self.treeindex[id_feed] = feed_iter
       # TEST
       #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
