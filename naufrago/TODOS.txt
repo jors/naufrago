@@ -222,7 +222,7 @@ ROADMAP 0.4:
 - FIX: Lazy bug that imported feeds the bad way. DONE
 - FIX: the pynotify message was not gettexted. DONE
 - IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). DONE
-- NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). ONGOING...
+- NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
 - NEW: toolbar button to 'Mark EVERYTHING as read'.
 - NEW: 'follow feed link' available per-feed basis.
 

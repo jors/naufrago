@@ -165,37 +165,40 @@ class Naufrago:
   """Sets the toggled state on the toggle button to true or false"""
 
   # Si el marcado/desmarcado del importante está sin leer, cabe actualizar su nodo.
-  (model2, iter) = self.treeselection.get_selected()
-  dest_iter = self.treeindex[9998]
-  nombre_feed_destino = model2.get_value(dest_iter, 0)
-  (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
-  feed_label = nombre_feed_destino
-  font_style = 'bold'
+  if self.clear_mode == 0:
+   (model2, iter) = self.treeselection.get_selected()
+   dest_iter = self.treeindex[9998]
+   nombre_feed_destino = model2.get_value(dest_iter, 0)
+   (nombre_feed_destino, no_leidos) = self.less_simple_name_parsing(nombre_feed_destino)
+   feed_label = nombre_feed_destino
+   font_style = 'bold'
 
   model[path][1] = not model[path][1]
   if model[path][1]:
    self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("pink")) # Entry title bg glow
-   if model[path][3] == 'bold':
-    if no_leidos is not None:
-     no_leidos = int(no_leidos) + 1
-     feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
-    else:
-     feed_label = nombre_feed_destino + ' [1]'
-    model2.set(dest_iter, 0, feed_label, 3, font_style)
+   if self.clear_mode == 0: # NEW
+    if model[path][3] == 'bold':
+     if no_leidos is not None:
+      no_leidos = int(no_leidos) + 1
+      feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
+     else:
+      feed_label = nombre_feed_destino + ' [1]'
+     model2.set(dest_iter, 0, feed_label, 3, font_style)
   else:
    self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB")) # Entry title bg normalize
-   if model[path][3] == 'bold':
-    if no_leidos is not None:
-     no_leidos = int(no_leidos) - 1
-     if no_leidos == 0:
+   if self.clear_mode == 0: # NEW
+    if model[path][3] == 'bold':
+     if no_leidos is not None:
+      no_leidos = int(no_leidos) - 1
+      if no_leidos == 0:
+       feed_label = nombre_feed_destino
+       font_style = 'normal'
+      else:
+       feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
+     else:
       feed_label = nombre_feed_destino
       font_style = 'normal'
-     else:
-      feed_label = nombre_feed_destino + ' [' + `no_leidos` + ']'
-    else:
-     feed_label = nombre_feed_destino
-     font_style = 'normal'
-    model2.set(dest_iter, 0, feed_label, 3, font_style)
+     model2.set(dest_iter, 0, feed_label, 3, font_style)
 
   cursor = self.conn.cursor()
   self.lock.acquire()
@@ -279,6 +282,32 @@ class Naufrago:
    if id_cat_aux is None:
     model.set(iter, 3, 'bold')
    return 'bold' # Sometimes we don't need return values, but.. life goes on
+
+ def mark_all_as_read(self, data=None):
+  """Marks all feed items as read."""
+  response = self.yes_no_message(_('¿Seguro que quieres <b>marcarlo TODO como leído</b>?'))
+  if response == gtk.RESPONSE_ACCEPT:
+   (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
+   iter = self.treestore.get_iter_root() # Magic
+   while iter is not None:
+    label = model.get_value(iter, 0)
+    if self.clear_mode == 0:
+     if '[' in label and ']' in label:
+      label = self.simple_name_parsing(label)
+      model.set(iter, 0, label, 3, 'normal')
+     else:
+      model.set(iter, 3, 'normal')
+    else:
+     self.treestore.clear()
+     break
+    iter = self.treestore.iter_next(iter)
+
+   cursor = self.conn.cursor()
+   self.lock.acquire()
+   cursor.execute('UPDATE articulo SET leido = 1')
+   self.conn.commit()
+   self.lock.release()
+   cursor.close()
 
  def toggle_leido(self, event, data=None):
   """Toggle entries between read/non-read states."""
@@ -408,10 +437,15 @@ class Naufrago:
       self.scrolled_window2.hide()
       (model_tmp, iter_tmp) = self.treeselection.get_selected()
       if type(iter_tmp) is gtk.TreeIter:
-       if(model_tmp.iter_depth(iter_tmp) == 1): # Si es hoja
-        self.webview.load_string("<h2>"+_("Feed")+": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
-       elif(model.iter_depth(iter) == 0): # Si es padre
+       if(model_tmp.iter_depth(iter_tmp) == 1) or (self.clear_mode == 1 and model_tmp.iter_depth(iter_tmp) == 0): # Si es hoja
+        if self.clear_mode == 0:
+         self.webview.load_string("<h2>"+_("Feed")+": "+model_tmp.get_value(iter_tmp, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+        else:
+         self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
+       else: # Si es padre
         self.webview.load_string("<h2>"+_("Category")+": "+model_tmp.get_value(iter_tmp, 0)+"</h2>", "text/html", "utf-8", "valid_link")
+      else:
+       self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
       self.eb.hide()
       self.eb_image_zoom.hide()
 
@@ -1158,6 +1192,18 @@ class Naufrago:
    self.window.show()
    window_visible = True
 
+ def yes_no_message(self, str):
+  """Shows a custom yes/no message dialog."""
+  dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_WARNING, gtk.BUTTONS_NONE, None)
+  dialog.set_title(_('Warning!'))
+  dialog.set_markup(str)
+  dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+  dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+  dialog.set_default_response(gtk.RESPONSE_REJECT) # Sets default response
+  response = dialog.run()
+  dialog.destroy()
+  return response
+
  def warning_message(self, str):
   """Shows a custom warning message dialog"""
   dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, None)
@@ -1273,6 +1319,7 @@ class Naufrago:
                 <menu action='EditMenu'>
                  <menuitem action='Edit'/>
                  <menuitem action='Search'/>
+                 <menuitem action='Read all'/>
                  <menuitem action='Preferences'/>
                 </menu>
                 <menu action='NetworkMenu'>
@@ -1291,6 +1338,7 @@ class Naufrago:
                 <separator name='sep1'/>
                 <toolitem name='Update all' action='Update all'/>
                 <toolitem name='Stop update' action='Stop update'/>
+                <toolitem name='Read all' action='Read all'/>
                 <separator name='sep2'/>
                 <toolitem name='Search' action='Search'/>
                 <toolitem name='Preferences' action='Preferences'/>
@@ -1325,6 +1373,7 @@ class Naufrago:
             ('EditMenu', None, _('E_dit')),
             ('Edit', gtk.STOCK_EDIT, _('_Edit'), '<control>E', _('Edits the selected element'), self.edit),
             ('Search', gtk.STOCK_FIND, _('Search'), '<control>F', _('Searchs for a term in the feeds'), self.search),
+            ('Read all', gtk.STOCK_SORT_ASCENDING, _('Read all'), '<control>M', _('Mark all feed items as read'), self.mark_all_as_read),
             ('Preferences', gtk.STOCK_EXECUTE, _('_Preferences'), '<control>P', _('Shows preferences'), self.preferences),
             ('NetworkMenu', None, _('_Network')),
             ('Update', None, _('_Update'), '<control>U', _('Updates the selected feed'), self.update_feed),
@@ -3235,9 +3284,9 @@ class Naufrago:
   item_list = ["/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
                "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
                "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
-               "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
+               "/Menubar/EditMenu/Read all", "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
                "/Menubar/NetworkMenu/Update all", "/Menubar/HelpMenu/Check updates",
-               "/Toolbar/Update all", "/Toolbar/Search", "/Toolbar/Preferences"]
+               "/Toolbar/Update all", "/Toolbar/Read all", "/Toolbar/Search", "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
