@@ -223,7 +223,8 @@ ROADMAP 0.4:
 - FIX: the pynotify message was not gettexted. DONE
 - IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). DONE
 - NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
-- NEW: toolbar button to 'Mark EVERYTHING as read'.
+- IMPROVED: live feed items hidding (with hide_readentries enabled). DONE
+- NEW: toolbar button to 'Mark EVERYTHING as read'. DONE
 - NEW: 'follow feed link' available per-feed basis.
 
 - PROBLEMA: Cuando se le pone un código de versión superior, al iniciar la aplicación se

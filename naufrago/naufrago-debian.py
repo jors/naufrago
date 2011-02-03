@@ -988,7 +988,22 @@ class Naufrago:
    liststore_font_style = self.liststore.get_value(iter, 3)
    if liststore_font_style == 'bold':
     model.set(iter, 3, 'normal')
-   
+
+   # NEW: live feed item removal!
+   if self.hide_readentries:
+    iter_tmp = self.liststore.get_iter_root() # Magic
+    while iter_tmp:
+     font_style_tmp = self.liststore.get_value(iter_tmp, 3)
+     id_articulo_tmp = self.liststore.get_value(iter_tmp, 4)
+     if (id_articulo != id_articulo_tmp) and (font_style_tmp == 'normal'):
+      # Quitamos item de la lista
+      self.liststore.remove(iter_tmp)
+     if self.liststore.iter_is_valid(iter_tmp):
+      iter_tmp = self.liststore.iter_next(iter_tmp) # Pasamos al siguiente
+     else:
+      break
+   # NEW
+
    # Coloración de la barra del título de la entry caso de ser importante
    if flag_importante:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("pink"))
@@ -3567,12 +3582,10 @@ class Naufrago:
     font_style = 'bold'
    #if (count != 0):
    if mode == 'all':
-    print 'a'
     if self.clear_mode == 0:
      model2.set(child, 0, feed_label, 3, font_style)
     else:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
-      print 'Feed "' + feed_label + '" NO encontrado, insertando en el árbol...'
       # TEST
       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
       self.treeindex[id_feed] = feed_iter
@@ -3582,7 +3595,6 @@ class Naufrago:
      else:
       model2.set(child, 0, feed_label, 3, font_style)
    else:
-    print 'b'
     model.set(child, 0, feed_label, 3, font_style)
 
    if self.clear_mode == 0: # NEW
