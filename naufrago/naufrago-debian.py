@@ -558,7 +558,10 @@ class Naufrago:
        feed_label = nombre_feed + ' [1]'
       # NEW
       if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
-       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+       if os.path.exists(favicon_path + '/' + `id_feed`):
+        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+       else:
+        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'])
        self.treeindex[id_feed] = feed_iter
       else:
       # NEW
@@ -788,7 +791,10 @@ class Naufrago:
        # TODO: Añadir el feed a la lista #
        if font_style == 'bold':
         if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
-         useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+         if os.path.exists(favicon_path + '/' + `id_feed`):
+          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+         else:
+          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'])
          self.treeindex[id_feed] = feed_iter
         else:
          model.set(iter, 0, feed_label, 3, font_style)
@@ -3601,7 +3607,10 @@ class Naufrago:
     else:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
       # TEST
-      useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
+      if os.path.exists(favicon_path + '/' + `id_feed`):
+       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
+      else:
+       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, font_style])
       self.treeindex[id_feed] = feed_iter
       # TEST
       #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
