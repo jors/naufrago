@@ -227,8 +227,9 @@ ROADMAP 0.4:
 - NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
 - NEW: 'follow feed link' available per-feed basis.
 
+- PROBLEMA_0: 'Marcar todo como leido' no chuta con el driven mode. DONE
 - PROBLEMA_1: Cuando 'aparece' un feed que no fue propagado inicialmente, le falta el icono.
-  Cabe comprobar que el icono esté, y si no lo está, añadirlo antes!
+  Cabe comprobar que el icono esté, y si no lo está, añadirlo antes! DONE
 - PROBLEMA_2: Cuando se le pone un código de versión superior, al iniciar la aplicación se
   queda con la ventana sin dibujar. ¿Algún problema de threading?
 
