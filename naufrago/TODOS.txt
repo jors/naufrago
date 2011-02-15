@@ -219,14 +219,16 @@ BUGS DEL CASI y otros PENDING (addendums):
 
 ROADMAP 0.4:
 - IMPROVED: User-Agent identifier set to app name + version. DONE
-- FIX: Lazy bug that imported feeds the bad way. DONE
+- FIX: Lazy bug that imported feeds the bad way (not importing uncategorized ones). DONE
 - FIX: the pynotify message was not gettexted. DONE
 - IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). DONE
 - NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
-- IMPROVED: live feed items hidding (with hide_readentries enabled). DONE
-- NEW: toolbar button to 'Mark EVERYTHING as read'. DONE
+- IMPROVED: live feed items hidding (when hide_readentries is enabled). DONE
+- NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
 - NEW: 'follow feed link' available per-feed basis.
 
-- PROBLEMA: Cuando se le pone un código de versión superior, al iniciar la aplicación se
+- PROBLEMA_1: Cuando 'aparece' un feed que no fue propagado inicialmente, le falta el icono.
+  Cabe comprobar que el icono esté, y si no lo está, añadirlo antes!
+- PROBLEMA_2: Cuando se le pone un código de versión superior, al iniciar la aplicación se
   queda con la ventana sin dibujar. ¿Algún problema de threading?
 

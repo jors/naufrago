@@ -290,13 +290,21 @@ class Naufrago:
    (model, useless_iter) = self.treeselection.get_selected() # We only want the model here...
    iter = self.treestore.get_iter_root() # Magic
    while iter is not None:
-    label = model.get_value(iter, 0)
     if self.clear_mode == 0:
-     if '[' in label and ']' in label:
-      label = self.simple_name_parsing(label)
-      model.set(iter, 0, label, 3, 'normal')
-     else:
-      model.set(iter, 3, 'normal')
+     id_cat = model.get_value(iter, 2)
+     font_style = model.get_value(iter, 3)
+     if (id_cat is not 9998 or id_cat is not 9999) and font_style == 'bold':
+      model.set(iter, 3, 'normal') # CATEGORIA
+      iter2 = model.iter_children(iter)
+      while iter2:
+       label = model.get_value(iter2, 0)
+       if '[' in label and ']' in label:
+        label = self.simple_name_parsing(label)
+        model.set(iter2, 0, label, 3, 'normal') # FEED
+       iter2 = self.treestore.iter_next(iter2)
+     # Fold category (if applies).
+     if (self.driven_mode == 1):
+      self.treeview.collapse_row(model.get_path(iter))
     else:
      self.treestore.clear()
      break
@@ -308,6 +316,11 @@ class Naufrago:
    self.conn.commit()
    self.lock.release()
    cursor.close()
+
+   if self.clear_mode == 0:
+    # Must update special folders...
+    self.update_special_folder(9999)
+    self.update_special_folder(9998)
 
  def toggle_leido(self, event, data=None):
   """Toggle entries between read/non-read states."""
@@ -2070,7 +2083,8 @@ class Naufrago:
  def alphabetical_node_insertion(self, nodo_a_insertar, node_data):
   """Inserts a new category in the feed list alphabetically."""
   iter = self.treestore.get_iter_root() # Magic
-  iter = self.do_comparison(nodo_a_insertar, iter)
+  if iter is not None:
+   iter = self.do_comparison(nodo_a_insertar, iter)
   #self.treestore.insert_before(None, iter, node_data)
   #return iter
   # NEW
@@ -2269,9 +2283,8 @@ class Naufrago:
     row = cursor.fetchone()
     self.lock.release()
     if(row is None):
+     id_categoria = 1 # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
      if self.clear_mode == 0: # NEW
-      # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
-      id_categoria = 1
       if(iter is not None): # Si hay algún nodo seleccionado..
        if(model.iter_depth(iter) == 0): # ... y es un nodo padre
         id_categoria = self.treestore.get_value(iter, 2)
@@ -2296,7 +2309,8 @@ class Naufrago:
      else: # NEW
       son = self.treestore.append(None, [textName, `id_feed+1`, id_feed+1, 'normal']) # NEW
      self.treeindex[id_feed+1] = son # Update feeds dict
-     self.treeview.expand_row(model.get_path(iter), open_all=False) # Expand parent!
+     if self.clear_mode == 0:
+      self.treeview.expand_row(model.get_path(iter), open_all=False) # Expand parent!
      self.lock.acquire()
      cursor.execute('INSERT INTO feed VALUES(null, ?, ?, ?)', [textName.decode("utf-8"),textURL.decode("utf-8"),id_categoria])
      self.conn.commit()
@@ -3397,7 +3411,7 @@ class Naufrago:
   self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
 
   gtk.gdk.threads_enter()
-  d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+' +http://sourceforge.net/projects/naufrago/')
+  d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')
 
   dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
   if dont_parse:
