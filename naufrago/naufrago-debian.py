@@ -147,10 +147,13 @@ class Naufrago:
   if(key == 'Delete'): # ARBOL DE FEEDS
    (model, iter) = self.treeselection.get_selected()
    if(iter is not None): # Si hay algún nodo seleccionado...
-    if(model.iter_depth(iter) == 0): # Si es un nodo padre...
-     self.delete_category()
-    elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
+    if self.clear_mode == 1:
      self.delete_feed()
+    else:
+     if(model.iter_depth(iter) == 0): # Si es un nodo padre...
+      self.delete_category()
+     elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
+      self.delete_feed()
   elif(key == 'Return'): # LISTA DE ENTRIES
    self.abrir_browser()
 
@@ -559,9 +562,9 @@ class Naufrago:
       # NEW
       if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
        if os.path.exists(favicon_path + '/' + `id_feed`):
-        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'], 'feed')
        else:
-        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'])
+        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'], 'feed')
        self.treeindex[id_feed] = feed_iter
       else:
       # NEW
@@ -792,9 +795,9 @@ class Naufrago:
        if font_style == 'bold':
         if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
          if os.path.exists(favicon_path + '/' + `id_feed`):
-          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'])
+          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'], 'feed')
          else:
-          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'])
+          useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'], 'feed')
          self.treeindex[id_feed] = feed_iter
         else:
          model.set(iter, 0, feed_label, 3, font_style)
@@ -2076,7 +2079,7 @@ class Naufrago:
       row = cursor.fetchone()
       self.lock.release()
       # OLD: dad = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
-      dad, useless_iter = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal']) # NEW
+      dad, useless_iter = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'], 'category') # NEW
       self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
      cursor.execute('INSERT INTO categoria VALUES(null, ?)', [text.decode("utf-8")])
@@ -2086,17 +2089,67 @@ class Naufrago:
     self.warning_message(_('Category <b>already present</b>!'))
    cursor.close()
 
- def alphabetical_node_insertion(self, nodo_a_insertar, node_data):
-  """Inserts a new category in the feed list alphabetically."""
-  iter = self.treestore.get_iter_root() # Magic
-  if iter is not None:
-   iter = self.do_comparison(nodo_a_insertar, iter)
-  #self.treestore.insert_before(None, iter, node_data)
-  #return iter
-  # NEW
-  inserted_iter = self.treestore.insert_before(None, iter, node_data)
-  return iter, inserted_iter
-  # NEW
+ def alphabetical_node_insertion(self, nodo_a_insertar, node_data, node_type):
+  """Inserts a new node in the feed list alphabetically. Oriented to feeds & categories."""
+  if self.clear_mode == 1 or (self.clear_mode == 0 and node_type == 'category'): # Just a security check!
+   print 'clear_mode = 1 o clear_mode = 0 siendo categoria'
+   iter = self.treestore.get_iter_root() # Magic
+   if iter is not None:
+    iter = self.do_comparison(nodo_a_insertar, iter)
+   inserted_iter = self.treestore.insert_before(None, iter, node_data)
+   return iter, inserted_iter
+
+  else: # if self.clear_mode == 0 and node_type == 'feed':
+   print 'clear_mode = 0 siendo feed'
+   # START NEW
+   (model, iter) = self.treeselection.get_selected()
+   iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
+   if iter_parent is None:
+    iter_parent = self.treeindex_cat[1]
+   iter = model.iter_children(iter_parent)
+   if iter is not None:
+    iter = self.do_comparison(nodo_a_insertar, iter)
+   inserted_iter = self.treestore.insert_before(None, iter, node_data)
+   return iter, inserted_iter
+   # END NEW
+
+# def alphabetical_node_insertion(self, nodo_a_insertar, node_data):
+#  """Inserts a new node in the feed list alphabetically."""
+#  iter = self.treestore.get_iter_root() # Magic
+#  if iter is not None:
+#   iter = self.do_comparison(nodo_a_insertar, iter)
+#  inserted_iter = self.treestore.insert_before(None, iter, node_data)
+#  return iter, inserted_iter
+
+ def alphabetical_node_ordering(self, iter_del_nodo_a_insertar):
+  """Orders a node in the feed list alphabetically. Oriented ONLY to feeds."""
+  if self.clear_mode == 1:
+   print 'En alphabetical_node_ordering, clear_mode == 1'
+   iter = self.treestore.get_iter_root() # Magic
+   if iter is not None:
+    nodo_a_insertar = self.treestore.get_value(iter_del_nodo_a_insertar, 0)
+    iter = self.do_comparison(nodo_a_insertar, iter)
+   self.treestore.move_before(iter_del_nodo_a_insertar, iter)
+
+  else: #self.clear_mode == 0
+   print 'En alphabetical_node_ordering, clear_mode == 0'
+   (model, iter) = self.treeselection.get_selected()
+   iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
+   if iter_parent is None:
+    iter_parent = self.treeindex_cat[1]
+   iter = model.iter_children(iter_parent)
+   if iter is not None:
+    nodo_a_insertar = self.treestore.get_value(iter_del_nodo_a_insertar, 0)
+    iter = self.do_comparison(nodo_a_insertar, iter)
+   self.treestore.move_before(iter_del_nodo_a_insertar, iter)
+
+# def alphabetical_node_ordering(self, iter_del_nodo_a_insertar):
+#  """Orders a node in the feed list alphabetically. Oriented ONLY to feeds."""
+#  iter = self.treestore.get_iter_root() # Magic
+#  if iter is not None:
+#   nodo_a_insertar = self.treestore.get_value(iter_del_nodo_a_insertar, 0)
+#   iter = self.do_comparison(nodo_a_insertar, iter)
+#  self.treestore.move_before(iter_del_nodo_a_insertar, iter)
 
  def do_comparison(self, nodo_a_insertar, iter_node_curr):
   """Recursion also does magic!"""
@@ -2105,10 +2158,12 @@ class Naufrago:
   if (id_node_curr == 9998) or (id_node_curr == 9999):
    return iter_node_curr
 
+  #print 'Comparando "' + nodo_a_insertar + '" con "' + node_curr + '"...'
   res = cmp(nodo_a_insertar, node_curr)
   if res == 0: # Same strings
    return iter_node_curr
   elif res == -1: # 'categoria_a_insertar' goes before
+   #print 'Salimos e insertamos categoria antes que la '+node_curr+'!'
    return iter_node_curr
   elif res == 1: # 'categoria_a_insertar' goes after
    iter = self.treestore.iter_next(iter_node_curr) # Pasamos al siguiente Padre...
@@ -2294,13 +2349,16 @@ class Naufrago:
       if(iter is not None): # Si hay algún nodo seleccionado..
        if(model.iter_depth(iter) == 0): # ... y es un nodo padre
         id_categoria = self.treestore.get_value(iter, 2)
+        if id_categoria == 9998 or id_categoria == 9999:
+         id_categoria = 1
+         iter = self.treeindex_cat[1] # Hallamos el iter del nodo 'General'
        elif(model.iter_depth(iter) == 1): # ... y es un nodo hijo
         iter = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
         id_categoria = self.treestore.get_value(iter, 2)
        else:
-        iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
+        iter = self.treeindex_cat[1] # Hallamos el iter del nodo 'General'
       else:
-       iter = self.treestore.get_iter((0,)) # Hallamos el iter del nodo 'General'
+       iter = self.treeindex_cat[1] # Hallamos el iter del nodo 'General'
 
      self.lock.acquire()
      cursor.execute('SELECT MAX(id) FROM feed')
@@ -2314,6 +2372,9 @@ class Naufrago:
       son = self.treestore.append(iter, [textName, `id_feed+1`, id_feed+1, 'normal'])
      else: # NEW
       son = self.treestore.append(None, [textName, `id_feed+1`, id_feed+1, 'normal']) # NEW
+      # TODO: En lugar de ordenarlo aquí (erroneamente porque todavia no tenemos el titulo),
+      # lo haremos en get_feed_helper una vez tengamos dicho titulo.
+      # NEW :useless_iter, son = self.alphabetical_node_insertion(textName, [textName, `id_feed+1`, id_feed+1, 'normal']) # NEW
      self.treeindex[id_feed+1] = son # Update feeds dict
      if self.clear_mode == 0:
       self.treeview.expand_row(model.get_path(iter), open_all=False) # Expand parent!
@@ -2651,8 +2712,9 @@ class Naufrago:
    self.clear_mode = 1
    self.create_minimal_tree()
 
-  else:
-   self.treeview.collapse_all()
+  #else:
+  # self.treeview.collapse_all()
+  # print 'd'
 
   hbox_throbber1.hide()
   hbox_throbber2.hide()
@@ -3303,10 +3365,20 @@ class Naufrago:
      local_file.close()
      web_file.close()
     except:
-     pass
+     # Si falla, habria que (1) borrar la referencia de la bd y (2) borrar lo que se haya bajado.
+     # De este modo, a la próxima volverá a intentar descargarla!
+     self.lock.acquire()
+     #cursor.execute('SELECT MAX(id) FROM imagen')
+     #id_last_inserted_entry = cursor.fetchone()[0]
+     cursor.execute('DELETE FROM imagen WHERE id = ?', [id_entry_max])
+     self.conn.commit()
+     self.lock.release()
+     if os.path.exists(images_path + '/' + `id_entry_max`):
+      os.unlink(images_path + '/' + `id_entry_max`)
+     #pass
     self.statusbar.set_text('')
    else:
-    # b) Si existe, comprobamos que no sea una entrada repe...
+    # b) Si existe, no la descargamos, solo la referenciamos en la bd
     self.lock.acquire()
     cursor.execute('INSERT INTO imagen VALUES(null, ?, ?, ?)', [row[0],i,id_articulo])
     self.conn.commit()
@@ -3441,6 +3513,9 @@ class Naufrago:
     self.lock.release()
     # Update feed tree...
     model_tmp.set(iter_tmp, 0, title)
+    #if self.clear_mode == 1:
+    # self.alphabetical_node_ordering(iter_tmp) # OLD
+    self.alphabetical_node_ordering(iter_tmp) # NEW
 
   limit = count = len(d.entries)
   if count > self.num_entries:
@@ -3608,9 +3683,9 @@ class Naufrago:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
       # TEST
       if os.path.exists(favicon_path + '/' + `id_feed`):
-       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style])
+       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style], 'feed')
       else:
-       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, font_style])
+       useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, font_style], 'feed')
       self.treeindex[id_feed] = feed_iter
       # TEST
       #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
@@ -3699,9 +3774,6 @@ class Naufrago:
       if break_flag:
        break
     # NEW
-    #
-    # TODO; Esto NO puede iterarse por las ramas del árbol. Tiene que hacerse por SQL!!!
-    #
     else:
      self.lock.acquire()
      cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')

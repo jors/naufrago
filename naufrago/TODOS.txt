@@ -221,9 +221,10 @@ ROADMAP 0.4:
 - IMPROVED: User-Agent identifier set to app name + version. DONE
 - FIX: Lazy bug that imported feeds the bad way (not importing uncategorized ones). DONE
 - FIX: the pynotify message was not gettexted. DONE
+- FIX: images that couldn't be retrieved are now retried on next round. DONE
 - IMPROVED: pychecker & pylint clean process (unused vars, boolean checks). DONE
-- NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
 - IMPROVED: live feed items hidding (when hide_readentries is enabled). DONE
+- NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
 - NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
 - NEW: 'follow feed link' available per-feed basis.
 
@@ -231,5 +232,7 @@ ROADMAP 0.4:
 - PROBLEMA_1: Cuando 'aparece' un feed que no fue propagado inicialmente, le falta el icono.
   Cabe comprobar que el icono esté, y si no lo está, añadirlo antes! DONE
 - PROBLEMA_2: Cuando se le pone un código de versión superior, al iniciar la aplicación se
-  queda con la ventana sin dibujar. ¿Algún problema de threading?
+  queda con la ventana sin dibujar. ¿Algún problema de threading? PENDING
+- PROBLEMA_3: la tecla 'supr' no chuta en clear_mode. DONE
+- PROBLEMA_4: cuando se añade un feed, debe insertarlo alfabeticamente. DONE
 
