@@ -2092,7 +2092,7 @@ class Naufrago:
  def alphabetical_node_insertion(self, nodo_a_insertar, node_data, node_type):
   """Inserts a new node in the feed list alphabetically. Oriented to feeds & categories."""
   if self.clear_mode == 1 or (self.clear_mode == 0 and node_type == 'category'): # Just a security check!
-   print 'clear_mode = 1 o clear_mode = 0 siendo categoria'
+   #print 'clear_mode = 1 o clear_mode = 0 siendo categoria'
    iter = self.treestore.get_iter_root() # Magic
    if iter is not None:
     iter = self.do_comparison(nodo_a_insertar, iter)
@@ -2100,7 +2100,7 @@ class Naufrago:
    return iter, inserted_iter
 
   else: # if self.clear_mode == 0 and node_type == 'feed':
-   print 'clear_mode = 0 siendo feed'
+   #print 'clear_mode = 0 siendo feed'
    # START NEW
    (model, iter) = self.treeselection.get_selected()
    iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
