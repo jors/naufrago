@@ -24,30 +24,38 @@
 #############################################################################
 
 try:
- import sys
+ #import sys
+ from sys import exit,exc_info
  import pygtk
  pygtk.require('2.0')
  import gtk
  import gobject
  gobject.threads_init()
  import os
- import sqlite3
+ #import sqlite3
+ from sqlite3 import connect
  import feedparser
- import time
- import datetime
+ #import time
+ from time import mktime
+ #import datetime
+ from datetime import datetime
  import webkit
  import threading
  import webbrowser
  import pango
- import urllib2
+ #import urllib2
+ from urllib2 import urlopen
  import re
  from xml.etree import ElementTree
  from xml.sax import saxutils
- import htmlentitydefs
- import hashlib
+ #import htmlentitydefs
+ from htmlentitydefs import name2codepoint
+ #import hashlib
+ from hashlib import md5
  import locale
  import gettext
- import socket
+ #import socket
+ from socket import socket
  import pynotify
 except ImportError:
  print _('Error importing modules: ') + `sys.exc_info()[1]`
@@ -1268,7 +1276,8 @@ class Naufrago:
   global APP_VERSION
   try:
    gtk.gdk.threads_enter()
-   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
+   #web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
+   web_file = urlopen('http://enchufado.com/proyectos/naufrago/app_version')
    read = web_file.read().rstrip()
    web_file.close()
    gtk.gdk.threads_leave()
@@ -1434,7 +1443,8 @@ class Naufrago:
    if distro_package:
     os.makedirs(os.getenv("HOME") + '/.config/naufrago/')
 
-   self.conn = sqlite3.connect(db_path, check_same_thread=False)
+   #self.conn = sqlite3.connect(db_path, check_same_thread=False)
+   self.conn = connect(db_path, check_same_thread=False)
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
@@ -1452,7 +1462,8 @@ class Naufrago:
    os.makedirs(favicon_path)
    os.makedirs(images_path)
   else:
-   self.conn = sqlite3.connect(db_path, check_same_thread=False)
+   #self.conn = sqlite3.connect(db_path, check_same_thread=False)
+   self.conn = connect(db_path, check_same_thread=False)
 
  def get_config(self):
   """Retrieves the app configuration"""
@@ -2000,8 +2011,10 @@ class Naufrago:
   p2 = re.compile('\s{2,}') # Translate 2 o + joined whitespaces to only one
   for row in rows:
    if (not self.hide_readentries) or (self.hide_readentries and row[3] == 0) or (search_request_entry_ids is not None) or id_feed == 9998:
-    now = datetime.datetime.now().strftime("%Y-%m-%d")
-    fecha = datetime.datetime.fromtimestamp(row[2]).strftime("%Y-%m-%d")
+    #now = datetime.datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now().strftime("%Y-%m-%d")
+    #fecha = datetime.datetime.fromtimestamp(row[2]).strftime("%Y-%m-%d")
+    fecha = datetime.fromtimestamp(row[2]).strftime("%Y-%m-%d")
     if now == fecha: fecha = _('Today')
     if row[3] == 1: font_style='normal'
     else: font_style='bold'
@@ -3269,22 +3282,30 @@ class Naufrago:
   if(hasattr(dentry,'date_parsed')):
    dp = dentry.date_parsed
    try:
-    secs = time.mktime(datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
+    #secs = time.mktime(datetime.datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
+    #secs = time.mktime(datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
+    secs = mktime(datetime(dp[0], dp[1], dp[2], dp[3], dp[4], dp[5], dp[6]).timetuple())
     #print 'Correct date taken: ' + str(dp)
    except:
     #print 'Dentry.date_parsed exist, BUT correct date could not be taken; creating my own...'
-    split = str(datetime.datetime.now()).split(' ')
+    #split = str(datetime.datetime.now()).split(' ')
+    split = str(datetime.now()).split(' ')
     ds = split[0].split('-')
     ts = split[1].split(':')
-    t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
-    secs = time.mktime(t.timetuple())
+    #t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
+    t = datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
+    #secs = time.mktime(t.timetuple())
+    secs = mktime(t.timetuple())
   else:
    #print 'Date entry does not exist! Creating my own...'
-   split = str(datetime.datetime.now()).split(' ')
+   #split = str(datetime.datetime.now()).split(' ')
+   split = str(datetime.now()).split(' ')
    ds = split[0].split('-')
    ts = split[1].split(':')
-   t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
-   secs = time.mktime(t.timetuple())
+   #t = datetime.datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
+   t = datetime(int(ds[0]), int(ds[1]), int(ds[2]), int(ts[0]), int(ts[1]), int(float(ts[2])))
+   #secs = time.mktime(t.timetuple())
+   secs = mktime(t.timetuple())
   
   if hasattr(dentry,'title'):
    if dentry.title is not None: title = dentry.title.encode("utf-8")
@@ -3306,14 +3327,18 @@ class Naufrago:
     id = dentry.id.encode("utf-8")
    else:
     if title != '':
-     id = hashlib.md5(title).hexdigest().encode("utf-8")
+     #id = hashlib.md5(title).hexdigest().encode("utf-8")
+     id = md5(title).hexdigest().encode("utf-8")
     else:
-     id = hashlib.md5(description).hexdigest().encode("utf-8")
+     #id = hashlib.md5(description).hexdigest().encode("utf-8")
+     id = md5(description).hexdigest().encode("utf-8")
   else:
    if title != '':
-    id = hashlib.md5(title).hexdigest().encode("utf-8")
+    #id = hashlib.md5(title).hexdigest().encode("utf-8")
+    id = md5(title).hexdigest().encode("utf-8")
    else:
-    id = hashlib.md5(description).hexdigest().encode("utf-8")
+    #id = hashlib.md5(description).hexdigest().encode("utf-8")
+    id = md5(description).hexdigest().encode("utf-8")
 
   return (secs, title, description, link, id)
 
@@ -3358,7 +3383,8 @@ class Naufrago:
     self.conn.commit()
     self.lock.release()
     try:
-     web_file = urllib2.urlopen(i, timeout=10)
+     #web_file = urllib2.urlopen(i, timeout=10)
+     web_file = urlopen(i, timeout=10)
      image = images_path + '/' + `id_entry_max`
      local_file = open(image, 'w')
      local_file.write(web_file.read())
@@ -3996,7 +4022,8 @@ class Naufrago:
   try:
    split = url.split("/")
    favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
-   web_file = urllib2.urlopen(favicon_url, timeout=10)
+   #web_file = urllib2.urlopen(favicon_url, timeout=10)
+   web_file = urlopen(favicon_url, timeout=10)
    favicon = favicon_path + '/' + `id_feed`
    local_file = open(favicon, 'w')
    local_file.write(web_file.read())
