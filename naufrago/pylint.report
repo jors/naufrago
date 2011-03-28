@@ -1,0 +1,296 @@
+************* Module naufrago-debian
+C:  1: Missing docstring
+R:131:Naufrago: Too many instance attributes (73/7)
+C:131:Naufrago: Missing docstring
+W:168:Naufrago.toggle_importante: Unused variable 'iter'
+R:208:Naufrago.simple_name_parsing: Method could be a function
+R:217:Naufrago.less_simple_name_parsing: Method could be a function
+W:235:Naufrago.toggle_category_bold_all: Unused variable 'useless_iter'
+W:248:Naufrago.toggle_category_bold: Unused variable 'useless_iter'
+R:283:Naufrago.toggle_leido: Too many local variables (31/15)
+R:283:Naufrago.toggle_leido: Too many branches (103/12)
+R:283:Naufrago.toggle_leido: Too many statements (399/50)
+W:825:Naufrago.abrir_browser: Unused variable 'model'
+W:841:Naufrago.copiar_al_portapapeles: Unused variable 'model'
+C:859:Naufrago.htmlentitydecode.fixup: Missing docstring
+R:857:Naufrago.htmlentitydecode: Method could be a function
+R:875:Naufrago.list_row_selection: Too many local variables (21/15)
+W:919:Naufrago.list_row_selection: Using possibly undefined loop variable 'img'
+W:920:Naufrago.list_row_selection: Using possibly undefined loop variable 'img'
+R:875:Naufrago.list_row_selection: Too many branches (25/12)
+R:875:Naufrago.list_row_selection: Too many statements (99/50)
+W:1055:Naufrago.tree_row_collapsed: Unused variable 'useless_iter'
+W:1060:Naufrago.tree_row_expanded: Unused variable 'useless_iter'
+W:1065:Naufrago.statusicon_activate: Using the global statement
+W:1104:Naufrago.check_app_updates_helper: Using global for 'APP_VERSION' but no assignment is done
+E:1118:Naufrago.check_app_updates_helper: Class 'vbox' has no 'pack_start' member
+E:1131:Naufrago.check_app_updates_helper: Class 'vbox' has no 'pack_start' member
+E:1132:Naufrago.check_app_updates_helper: Class 'vbox' has no 'pack_start' member
+E:1143:Naufrago.check_app_updates_helper: Class 'vbox' has no 'pack_start' member
+W:1150:Naufrago.help_about: Using global for 'APP_VERSION' but no assignment is done
+W:1292:Naufrago.get_config: Using the global statement
+E:1530:Naufrago.create_main_window: Module 'webkit' has no 'WebView' member
+E:1592:Naufrago.create_main_window: Class 'window' has no 'set_cursor' member
+E:1592:Naufrago.create_main_window: Class 'window' has no 'set_cursor' member
+E:1592:Naufrago.create_main_window: Class 'window' has no 'set_cursor' member
+E:1592:Naufrago.create_main_window: Class 'window' has no 'set_cursor' member
+R:1409:Naufrago.create_main_window: Too many statements (134/50)
+R:1621:Naufrago.zoom_in_cb: Method could be a function
+R:1625:Naufrago.zoom_out_cb: Method could be a function
+R:1629:Naufrago.zoom_hundred_cb: Method could be a function
+R:1634:Naufrago.navigation_requested: Too many arguments (6/5)
+E:1695:Naufrago.create_trayicon: Module 'pynotify' has no 'init' member
+W:1698:Naufrago.statusicon_popup_menu: Redefining name 'time' from outer scope (line 36)
+R:1702:Naufrago.populate_feeds: Too many local variables (17/15)
+R:1702:Naufrago.populate_feeds: Too many branches (18/12)
+R:1702:Naufrago.populate_feeds: Too many statements (67/50)
+W:1747:Naufrago.populate_feeds: Unused variable 'useless_iter'
+R:1777:Naufrago.populate_entries: Too many branches (13/12)
+E:1848:Naufrago.add_category: Class 'vbox' has no 'pack_end' member
+E:1848:Naufrago.add_category: Class 'vbox' has no 'pack_end' member
+R:1822:Naufrago.add_category: Too many statements (57/50)
+R:1914:Naufrago.delete_category: Too many branches (13/12)
+R:1914:Naufrago.delete_category: Too many statements (64/50)
+R:1999:Naufrago.add_feed: Too many local variables (22/15)
+E:2031:Naufrago.add_feed: Class 'vbox' has no 'pack_start' member
+E:2031:Naufrago.add_feed: Class 'vbox' has no 'pack_start' member
+E:2035:Naufrago.add_feed: Class 'vbox' has no 'pack_start' member
+E:2035:Naufrago.add_feed: Class 'vbox' has no 'pack_start' member
+R:1999:Naufrago.add_feed: Too many branches (22/12)
+R:1999:Naufrago.add_feed: Too many statements (110/50)
+W:2119:Naufrago.update_special_folder: Unused variable 'useless_iter'
+R:2145:Naufrago.delete_feed: Too many statements (53/50)
+E:2246:Naufrago.search: Class 'vbox' has no 'pack_end' member
+E:2246:Naufrago.search: Class 'vbox' has no 'pack_end' member
+R:2435:Naufrago.preferences: Too many local variables (42/15)
+E:2569:Naufrago.preferences: Class 'vbox' has no 'pack_start' member
+R:2435:Naufrago.preferences: Too many branches (46/12)
+R:2435:Naufrago.preferences: Too many statements (207/50)
+R:2622:Naufrago.treeview_copy_row: Too many arguments (6/5)
+R:2675:Naufrago.treeview_on_drag_data_received: Too many arguments (8/5)
+R:2716:Naufrago.tree_button_press_event: Too many local variables (22/15)
+R:2716:Naufrago.tree_button_press_event: Too many statements (57/50)
+W:2726:Naufrago.tree_button_press_event: Unused variable 'celly'
+W:2726:Naufrago.tree_button_press_event: Unused variable 'cellx'
+R:2789:Naufrago.tree2_button_press_event: Too many local variables (16/15)
+W:2791:Naufrago.tree2_button_press_event: Access to a protected member _2BUTTON_PRESS of a client class
+W:2798:Naufrago.tree2_button_press_event: Unused variable 'celly'
+W:2798:Naufrago.tree2_button_press_event: Unused variable 'cellx'
+W:2852:Naufrago.headerlink_mouse_enter: Unused variable 'model'
+R:2907:Naufrago.check_feed_item: Too many branches (21/12)
+R:2907:Naufrago.check_feed_item: Method could be a function
+R:2960:Naufrago.find_entry_images: Method could be a function
+R:3083:Naufrago.get_feed_helper: Too many arguments (12/5)
+R:3083:Naufrago.get_feed_helper: Too many local variables (50/15)
+W:3087:Naufrago.get_feed_helper: Using global for 'APP_VERSION' but no assignment is done
+R:3083:Naufrago.get_feed_helper: Too many branches (50/12)
+R:3083:Naufrago.get_feed_helper: Too many statements (175/50)
+W:3273:Naufrago.get_feed_helper: Unused variable 'useless_iter'
+R:3324:Naufrago.get_feed: Too many local variables (17/15)
+E:3370:Naufrago.get_feed: Module 'pynotify' has no 'Notification' member
+R:3381:Naufrago.import_feeds: Too many local variables (16/15)
+R:3381:Naufrago.import_feeds: Too many statements (57/50)
+R:3499:Naufrago.add_icon_to_factory: Method could be a function
+R:131:Naufrago: Too many public methods (88/20)
+W:2591:Naufrago.preferences: Attribute 'init_tray' defined outside __init__
+W:2599:Naufrago.preferences: Attribute 'hide_dates' defined outside __init__
+W:2843:Naufrago.image_zoom_button_press_event: Attribute 'fullscreen' defined outside __init__
+W:1499:Naufrago.create_main_window: Attribute 'image' defined outside __init__
+W:1675:Naufrago.create_trayicon: Attribute 'quit_item' defined outside __init__
+W:1478:Naufrago.create_main_window: Attribute 'vpaned' defined outside __init__
+W:1546:Naufrago.create_main_window: Attribute 'image_zoom' defined outside __init__
+W:1535:Naufrago.create_main_window: Attribute 'valid_links' defined outside __init__
+W:2617:Naufrago.preferences: Attribute 'show_trayicon' defined outside __init__
+W:2587:Naufrago.preferences: Attribute 'offline_mode' defined outside __init__
+W:1696:Naufrago.create_trayicon: Attribute 'imageURI' defined outside __init__
+W:3363:Naufrago.get_feed: Attribute 'on_a_feed_update' defined outside __init__
+W:2601:Naufrago.preferences: Attribute 'driven_mode' defined outside __init__
+W:1434:Naufrago.create_main_window: Attribute 'hpaned' defined outside __init__
+W:1488:Naufrago.create_main_window: Attribute 'treeselection2' defined outside __init__
+W:1288:Naufrago.create_base: Attribute 'conn' defined outside __init__
+W:1544:Naufrago.create_main_window: Attribute 'hbox' defined outside __init__
+W:1455:Naufrago.create_main_window: Attribute 'cellpb' defined outside __init__
+W:1456:Naufrago.create_main_window: Attribute 'cell' defined outside __init__
+W:2595:Naufrago.preferences: Attribute 'show_newentries_notification' defined outside __init__
+W:1669:Naufrago.create_trayicon: Attribute 'update_item' defined outside __init__
+W:1574:Naufrago.create_main_window: Attribute 'hbox2' defined outside __init__
+W:1542:Naufrago.create_main_window: Attribute 'vbox2' defined outside __init__
+W:1667:Naufrago.create_trayicon: Attribute 'statusicon_menu' defined outside __init__
+W:1659:Naufrago.create_trayicon: Attribute 'statusicon' defined outside __init__
+W:3362:Naufrago.get_feed: Attribute 'stop_feed_update_lock' defined outside __init__
+W:1412:Naufrago.create_main_window: Attribute 'window' defined outside __init__
+W:1451:Naufrago.create_main_window: Attribute 'tvcolumn' defined outside __init__
+W:2593:Naufrago.preferences: Attribute 'init_update_all' defined outside __init__
+W:1502:Naufrago.create_main_window: Attribute 'tvcolumn_important' defined outside __init__
+W:1710:Naufrago.populate_feeds: Attribute 'treeindex_cat' defined outside __init__
+W:2583:Naufrago.preferences: Attribute 'toolbar_mode' defined outside __init__
+W:1505:Naufrago.create_main_window: Attribute 'tvcolumn_titulo' defined outside __init__
+W:1468:Naufrago.create_main_window: Attribute 'scrolled_window1' defined outside __init__
+W:1518:Naufrago.create_main_window: Attribute 'scrolled_window2' defined outside __init__
+W:1528:Naufrago.create_main_window: Attribute 'scrolled_window3' defined outside __init__
+W:2317:Naufrago.change_timemode_cb: Attribute 'update_freq_timemode' defined outside __init__
+W:1495:Naufrago.create_main_window: Attribute 'celldate' defined outside __init__
+W:1549:Naufrago.create_main_window: Attribute 'eb_image_zoom' defined outside __init__
+W:1575:Naufrago.create_main_window: Attribute 'throbber' defined outside __init__
+W:1709:Naufrago.populate_feeds: Attribute 'treeindex' defined outside __init__
+W:1496:Naufrago.create_main_window: Attribute 'celltitle' defined outside __init__
+W:2597:Naufrago.preferences: Attribute 'hide_readentries' defined outside __init__
+W:1672:Naufrago.create_trayicon: Attribute 'stop_item' defined outside __init__
+W:1484:Naufrago.create_main_window: Attribute 'treeview2' defined outside __init__
+W:2603:Naufrago.preferences: Attribute 'init_check_app_updates' defined outside __init__
+W:1556:Naufrago.create_main_window: Attribute 'eb' defined outside __init__
+W:1504:Naufrago.create_main_window: Attribute 'tvcolumn_fecha' defined outside __init__
+W:1427:Naufrago.create_main_window: Attribute 'toolbar' defined outside __init__
+W:2589:Naufrago.preferences: Attribute 'init_unfolded_tree' defined outside __init__
+W:1304:Naufrago.get_config: Attribute 'a' defined outside __init__
+W:1306:Naufrago.get_config: Attribute 'c' defined outside __init__
+W:1305:Naufrago.get_config: Attribute 'b' defined outside __init__
+W:1307:Naufrago.get_config: Attribute 'd' defined outside __init__
+W:3040:Naufrago.toggle_menuitems_sensitiveness: Attribute 'ui_lock' defined outside __init__
+W:1578:Naufrago.create_main_window: Attribute 'statusbar' defined outside __init__
+W:1303:Naufrago.get_config: Attribute 'h' defined outside __init__
+W:1438:Naufrago.create_main_window: Attribute 'treestore' defined outside __init__
+W:1492:Naufrago.create_main_window: Attribute 'cellt' defined outside __init__
+W:1441:Naufrago.create_main_window: Attribute 'treeselection' defined outside __init__
+W:1423:Naufrago.create_main_window: Attribute 'vbox' defined outside __init__
+W:2577:Naufrago.preferences: Attribute 'num_entries' defined outside __init__
+W:1259:Naufrago.create_ui: Attribute 'ui' defined outside __init__
+W:2895:Naufrago.update_all_feeds: Attribute 't' defined outside __init__
+W:1302:Naufrago.get_config: Attribute 'w' defined outside __init__
+W:1554:Naufrago.create_main_window: Attribute 'headerlink' defined outside __init__
+W:1301:Naufrago.get_config: Attribute 'y' defined outside __init__
+W:1300:Naufrago.get_config: Attribute 'x' defined outside __init__
+W:1530:Naufrago.create_main_window: Attribute 'webview' defined outside __init__
+W:1440:Naufrago.create_main_window: Attribute 'treeview' defined outside __init__
+W:1482:Naufrago.create_main_window: Attribute 'liststore' defined outside __init__
+W:2580:Naufrago.preferences: Attribute 'update_freq' defined outside __init__
+C:3569:main: Missing docstring
+
+
+Report
+======
+2676 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |1      |1          |=          |0.00        |100.00   |
++---------+-------+-----------+-----------+------------+---------+
+|class    |1      |1          |=          |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|method   |89     |89         |=          |100.00      |1.12     |
++---------+-------+-----------+-----------+------------+---------+
+|function |2      |2          |=          |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |0        |=          |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |0.000    |=          |
++-------------------------+------+---------+-----------+
+
+
+
+Raw metrics
+-----------
+
++----------+-------+------+---------+-----------+
+|type      |number |%     |previous |difference |
++==========+=======+======+=========+===========+
+|code      |2827   |85.25 |2835     |-8.00      |
++----------+-------+------+---------+-----------+
+|docstring |109    |3.29  |109      |=          |
++----------+-------+------+---------+-----------+
+|comment   |156    |4.70  |148      |+8.00      |
++----------+-------+------+---------+-----------+
+|empty     |224    |6.76  |228      |-4.00      |
++----------+-------+------+---------+-----------+
+
+
+
+External dependencies
+---------------------
+::
+
+    feedparser (naufrago-debian)
+    gobject (naufrago-debian)
+    gtk (naufrago-debian)
+    pango (naufrago-debian)
+    pygtk (naufrago-debian)
+    pynotify (naufrago-debian)
+    webkit (naufrago-debian)
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |4      |4        |=          |
++-----------+-------+---------+-----------+
+|refactor   |46     |47       |-1.00      |
++-----------+-------+---------+-----------+
+|warning    |96     |100      |-4.00      |
++-----------+-------+---------+-----------+
+|error      |20     |20       |=          |
++-----------+-------+---------+-----------+
+
+
+
+Messages
+--------
+
++-----------+------------+
+|message id |occurrences |
++===========+============+
+|W0201      |72          |
++-----------+------------+
+|E1101      |20          |
++-----------+------------+
+|W0612      |15          |
++-----------+------------+
+|R0915      |12          |
++-----------+------------+
+|R0914      |10          |
++-----------+------------+
+|R0912      |9           |
++-----------+------------+
+|R0201      |9           |
++-----------+------------+
+|R0913      |4           |
++-----------+------------+
+|C0111      |4           |
++-----------+------------+
+|W0602      |3           |
++-----------+------------+
+|W0631      |2           |
++-----------+------------+
+|W0603      |2           |
++-----------+------------+
+|W0621      |1           |
++-----------+------------+
+|W0212      |1           |
++-----------+------------+
+|R0904      |1           |
++-----------+------------+
+|R0902      |1           |
++-----------+------------+
+
+
+
+Global evaluation
+-----------------
+Your code has been rated at 9.08/10 (previous run: 9.07/10)
+

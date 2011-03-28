@@ -1001,7 +1001,8 @@ class Naufrago:
     except ValueError: pass
    else: # named entity
     try:
-     text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+     #text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+     text = unichr(name2codepoint[text[1:-1]])
     except KeyError: pass
    return text # leave as is
   return re.sub("&#?\w+;", fixup, text)
