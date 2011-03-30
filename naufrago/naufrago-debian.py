@@ -24,7 +24,6 @@
 #############################################################################
 
 try:
- #import sys
  from sys import exit,exc_info
  import pygtk
  pygtk.require('2.0')
@@ -32,29 +31,22 @@ try:
  import gobject
  gobject.threads_init()
  import os
- #import sqlite3
  from sqlite3 import connect
  import feedparser
- #import time
  from time import mktime
- #import datetime
  from datetime import datetime
  import webkit
  import threading
  import webbrowser
  import pango
- #import urllib2
  from urllib2 import urlopen
  import re
  from xml.etree import ElementTree
  from xml.sax import saxutils
- #import htmlentitydefs
  from htmlentitydefs import name2codepoint
- #import hashlib
  from hashlib import md5
  import locale
  import gettext
- #import socket
  from socket import socket
  import pynotify
 except ImportError:
@@ -92,6 +84,7 @@ if distro_package: # We're running on 'Distro-mode' (intended for distribution p
  db_path = os.getenv("HOME") + '/.config/naufrago/naufrago.db'
  favicon_path = os.getenv("HOME") + '/.config/naufrago/favicons'
  images_path = os.getenv("HOME") + '/.config/naufrago/imagenes'
+ content_path = os.getenv("HOME") + '/.config/naufrago/contenido'
  if "es" in locale:
   index_path = app_path + 'content/index_es.html'
   puf_path = app_path + 'content/puf_es.html'
@@ -117,6 +110,7 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
  db_path = current_path + '/naufrago.db'
  favicon_path = current_path + '/favicons'
  images_path = current_path + '/imagenes'
+ content_path = current_path + '/contenido'
  if "es" in locale:
   index_path = current_path + '/content/index_es.html'
   puf_path = current_path + '/content/puf_es.html'
@@ -954,20 +948,54 @@ class Naufrago:
      # Unbold categories (if needed).
      self.toggle_category_bold_all()
 
+ def sortfunc(self, x, y):
+  """Fast & simple reverse sort."""
+  return cmp(y[1],x[1])
+
  def abrir_browser(self, event=None, data=None):
   """Opens a given url in the user sensible web browser."""
   (model, iter) = self.treeselection2.get_selected()
   if(iter is not None): # Hay alguna fila de la lista seleccionada
-   if data is not None:
-    link = data
+   # START NEW
+   links = {} # Diccionario de paginas html...
+   (model_tmp, iter_tmp) = self.treeselection.get_selected()
+   id_feed = self.treestore.get_value(iter_tmp, 2)
+   id_articulo = self.liststore.get_value(iter, 4)
+   full_path = content_path + "/" + `id_feed` + "/" + `id_articulo`
+   print 'full_path: ' + full_path
+   if (self.deep_offline_mode == 1) and os.path.exists(full_path):
+    # Acabar de componer la ruta con el archivo html a cargar
+    for f in os.listdir(full_path):
+     if f.lower().endswith('.html') or f.lower().endswith('.htm'):
+      links[f] = os.path.getsize(full_path + "/" + f)
+    # Nos quedamos con el html mayor
+    if len(links)>0:
+     print links
+     items = links.items() # Pasamos el dict a list...
+     items.sort(self.sortfunc) # ... lo ordenamos a la inversa por valor...
+     link = "file://" + full_path + "/" + items[0][0] # ... y nos quedamos con el mas grande
+     print 'link: ' + link
+    else:
+     if data is not None:
+      link = data
+     else:
+      cursor = self.conn.cursor()
+      self.lock.acquire()
+      cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
+      link = cursor.fetchone()[0]
+      self.lock.release()
+      cursor.close()
    else:
-    id_articulo = self.liststore.get_value(iter, 4)
-    cursor = self.conn.cursor()
-    self.lock.acquire()
-    cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
-    link = cursor.fetchone()[0]
-    self.lock.release()
-    cursor.close()
+   # END NEW
+    if data is not None:
+     link = data
+    else:
+     cursor = self.conn.cursor()
+     self.lock.acquire()
+     cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
+     link = cursor.fetchone()[0]
+     self.lock.release()
+     cursor.close()
    webbrowser.open_new(link) # New win!
 
  def copiar_al_portapapeles(self, event=None, data=None):
@@ -1460,11 +1488,20 @@ class Naufrago:
    self.conn.commit()
    self.lock.release()
    cursor.close()
-   os.makedirs(favicon_path)
-   os.makedirs(images_path)
+   #os.makedirs(favicon_path)
+   #os.makedirs(images_path)
   else:
    #self.conn = sqlite3.connect(db_path, check_same_thread=False)
    self.conn = connect(db_path, check_same_thread=False)
+
+  if not os.path.exists(favicon_path):
+   os.makedirs(favicon_path)
+
+  if not os.path.exists(images_path):
+   os.makedirs(images_path)
+
+  if not os.path.exists(content_path):
+   os.makedirs(content_path)
 
  def get_config(self):
   """Retrieves the app configuration"""
@@ -1499,6 +1536,7 @@ class Naufrago:
   self.update_freq_timemode = int(row[16])
   self.init_check_app_updates = int(row[17])
   self.clear_mode = int(row[18])
+  self.deep_offline_mode = 1
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -3360,8 +3398,8 @@ class Naufrago:
  def retrieve_entry_images(self, id_articulo, images):
   """Manages entry images. It discards downloading images that are already on the
      database to save space and bandwidth per URL basis."""
-  if not os.path.exists(images_path):
-   os.makedirs(images_path)
+  #if not os.path.exists(images_path):
+  # os.makedirs(images_path)
 
   cursor = self.conn.cursor()
   # Comprueba que esa URL no exista ya en la BD...
@@ -3411,6 +3449,12 @@ class Naufrago:
     self.conn.commit()
     self.lock.release()
   cursor.close()
+
+ def retrieve_full_content(self, id_feed, id_articulo, url):
+  """Download complete posts."""
+  full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
+  #full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
+  os.system("wget -q -p -nc -k -nd -P " + full_path + " " + url)
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -3581,6 +3625,7 @@ class Naufrago:
       self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
+      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
     # Accounting...
     if i < limit:
@@ -3602,6 +3647,7 @@ class Naufrago:
        self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
+      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
     else:
      self.lock.acquire()
@@ -3650,11 +3696,21 @@ class Naufrago:
      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
      self.conn.commit()
      self.lock.release()
+     # Ahora borramos el contenido offline. ALPHA, BETA & GAMMA!!!
+     full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
+     if os.path.exists(full_path):
+      for f in os.listdir(full_path):
+       try: os.unlink(f)
+       except: pass
+      try: os.unlink(full_path)
+      except: pass
+
      # Accounting...
      if len(new_entries) > 0:
       if id_articulo[0] in new_entries:
        num_new_posts_total -= 1
        new_entries.remove(id_articulo[0])
+
   # Accounting...
   if len(new_entries) > 0:
    new_posts = True
@@ -4016,8 +4072,8 @@ class Naufrago:
  def get_favicon(self, id_feed, url):
   """Obtains the favicon from a web and stores it on the filesystem. It should be
      called only once at feed entry creation OR on feed import process."""
-  if not os.path.exists(favicon_path):
-   os.makedirs(favicon_path)
+  #if not os.path.exists(favicon_path):
+  # os.makedirs(favicon_path)
 
   gtk.gdk.threads_enter()
   try:

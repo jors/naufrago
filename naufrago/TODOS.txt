@@ -236,3 +236,6 @@ ROADMAP 0.4:
 - PROBLEMA_3: la tecla 'supr' no chuta en clear_mode. DONE
 - PROBLEMA_4: cuando se añade un feed, debe insertarlo alfabeticamente. DONE
 
+El actual offline mode será llamado "Image caching" (porque en definitiva, es lo que hace),
+y el offline mode será la descarga completa de cada post con wget.
+
