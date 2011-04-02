@@ -49,7 +49,6 @@ try:
  import gettext
  from socket import socket
  import pynotify
- import subprocess
 except ImportError:
  print _('Error importing modules: ') + `sys.exc_info()[1]`
  sys.exit(1)
@@ -949,9 +948,9 @@ class Naufrago:
      # Unbold categories (if needed).
      self.toggle_category_bold_all()
 
-# def sortfunc(self, x, y):
-#  """Fast & simple reverse sort."""
-#  return cmp(y[1],x[1])
+ def sortfunc(self, x, y):
+  """Fast & simple reverse sort."""
+  return cmp(y[1],x[1])
 
  def abrir_browser(self, event=None, data=None):
   """Opens a given url in the user sensible web browser."""
@@ -960,42 +959,32 @@ class Naufrago:
    # START NEW
    links = {} # Diccionario de paginas html...
    (model_tmp, iter_tmp) = self.treeselection.get_selected()
+   id_feed = self.treestore.get_value(iter_tmp, 2)
    id_articulo = self.liststore.get_value(iter, 4)
-   try:
-    id_feed = self.treestore.get_value(iter_tmp, 2)
-   except:
-    cursor = self.conn.cursor()
-    self.lock.acquire()
-    cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
-    id_feed = cursor.fetchone()[0]
-    self.lock.release()
-    cursor.close()
-   #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo`
-   full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` + ".html"
+   full_path = content_path + "/" + `id_feed` + "/" + `id_articulo`
    print 'full_path: ' + full_path
    if (self.deep_offline_mode == 1) and os.path.exists(full_path):
-   # # Acabar de componer la ruta con el archivo html a cargar
-   # for f in os.listdir(full_path):
-   #  if f.lower().endswith('.html') or f.lower().endswith('.htm'):
-   #   links[f] = os.path.getsize(full_path + "/" + f)
-   # # Nos quedamos con el html mayor
-   # if len(links)>0:
-   #  print links
-   #  items = links.items() # Pasamos el dict a list...
-   #  items.sort(self.sortfunc) # ... lo ordenamos a la inversa por valor...
-   #  link = "file://" + full_path + "/" + items[0][0] # ... y nos quedamos con el mas grande
-   #  print 'link: ' + link
-   # else:
-   #  if data is not None:
-   #   link = data
-   #  else:
-   #   cursor = self.conn.cursor()
-   #   self.lock.acquire()
-   #   cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
-   #   link = cursor.fetchone()[0]
-   #   self.lock.release()
-   #   cursor.close()
-    link = "file://" + full_path
+    # Acabar de componer la ruta con el archivo html a cargar
+    for f in os.listdir(full_path):
+     if f.lower().endswith('.html') or f.lower().endswith('.htm'):
+      links[f] = os.path.getsize(full_path + "/" + f)
+    # Nos quedamos con el html mayor
+    if len(links)>0:
+     print links
+     items = links.items() # Pasamos el dict a list...
+     items.sort(self.sortfunc) # ... lo ordenamos a la inversa por valor...
+     link = "file://" + full_path + "/" + items[0][0] # ... y nos quedamos con el mas grande
+     print 'link: ' + link
+    else:
+     if data is not None:
+      link = data
+     else:
+      cursor = self.conn.cursor()
+      self.lock.acquire()
+      cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
+      link = cursor.fetchone()[0]
+      self.lock.release()
+      cursor.close()
    else:
    # END NEW
     if data is not None:
@@ -3461,44 +3450,11 @@ class Naufrago:
     self.lock.release()
   cursor.close()
 
-# def get_filename_from_url(self, url):
-#  filename = url.split("/")[-1]
-#  if filename == '':
-#   filename = "index.html"
-#  return filename
-
- def get_filename(self, url):
-  i = -1
-  filename = url.split("/")[i]
-  while filename == '':
-   i -= 1
-   filename = url.split("/")[i]
-  return filename
-
  def retrieve_full_content(self, id_feed, id_articulo, url):
   """Download complete posts."""
-  #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
-  full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
-  if not os.path.exists(full_path):
-   os.makedirs(full_path)
-  # Con esto, el nombre del html de un artículo será:
-  # - O bien el nombre del archivo html original (final del path de la url).
-  # - O bien index.html en su ausencia.
-  wget = "wget -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
-  print wget
-  #os.system(wget)
-
-  p = subprocess.Popen("wget --default-page=index.html -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-  output, errors = p.communicate()
-  rgxp = '''(Saving to:) `([^']*?)[']'''
-  m = re.search(rgxp, errors)
-  if m is not None:
-   filepath = m.group(2)
-   print "File saved to: " + filepath
-   filename = self.get_filename(filepath)
-   print "Filename: " + filename
-   print "rename " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-   os.rename(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html")
+  full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
+  #full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
+  os.system("wget -q -p -nc -k -nd -P " + full_path + " " + url)
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -3741,8 +3697,7 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
      # Ahora borramos el contenido offline. ALPHA, BETA & GAMMA!!!
-     #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
-     full_path = content_path + "/" + `id_feed`
+     full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
      if os.path.exists(full_path):
       for f in os.listdir(full_path):
        try: os.unlink(f)

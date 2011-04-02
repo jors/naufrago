@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+from urllib2 import urlopen
+import re
+
+full_path = "/home/jors/sources/proyectos/naufrago/samples/1/"
+url = "http://www.abc.es/20110328/local-castilla-leon/abci-tere-201103280754.html"
+
+# Retrieve html document
+web_file = urlopen(url)
+local_file = open(full_path + '1.html', 'w')
+local_file.write(web_file.read())
+local_file.close()
+web_file.close()
+
+# Filter needed content
+local_file = open(full_path + '1.html', 'r')
+page = local_file.read()
+local_file.close()
+rgxp = '''<(link|script|img|iframe)\s+[^>]*?(href|src)=["]?([^">]+)[^>]*?>'''
+m = re.findall(rgxp, page, re.I)
+url_list = []
+url_mod_list = []
+for img in m:
+ url_list.append(img[2])
+ if img[2].startswith("http") or img[2].startswith("https"):
+  url_mod_list.append(img[2])
+ else:
+  url_mod_list.append("http://www.abc.es/" + img[2])
+
+# Retrieve needed content
+url_mod_list = set(url_mod_list) # Remove duplicates
+for url in url_mod_list:
+ # Get file name to save
+ i = -1
+ filename = url.split("/")[i]
+ while filename == '':
+  i -= 1
+  filename = url.split("/")[i]
+ web_file = urlopen(url)
+ local_file = open(full_path + filename, 'w')
+ local_file.write(web_file.read())
+ local_file.close()
+ web_file.close()
+
+# Translate html document for local viewing
+local_file = open(full_path + '1.html', 'r')
+page = local_file.read()
+local_file.close()
+url_list = set(url_list) # Remove duplicates
+for url in url_list:
+ # Get file name to save
+ i = -1
+ filename = url.split("/")[i]
+ while filename == '':
+  i -= 1
+  filename = url.split("/")[i]
+ print "Reemplazamos '" + url + "' por '" + filename + "'."
+ page = page.replace(url, filename)
+local_file = open(full_path + '1.html', 'w')
+local_file.write(page)
+local_file.close()
+
