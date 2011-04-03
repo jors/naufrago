@@ -3632,6 +3632,17 @@ class Naufrago:
     # self.alphabetical_node_ordering(iter_tmp) # OLD
     self.alphabetical_node_ordering(iter_tmp) # NEW
 
+  # Limpieza de la cache previa si tenemos deep_offline_mode.
+  if (self.deep_offline_mode == 1):
+   print "Cleaning feed " + `id_feed` + "..."
+   full_path = content_path + "/" + `id_feed`
+   if os.path.exists(full_path):
+     for f in os.listdir(full_path):
+      try:
+       print "Deleting " + full_path + "/" + f + "..."
+       os.unlink(full_path + "/" + f)
+      except: pass
+
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
@@ -3669,6 +3680,7 @@ class Naufrago:
       self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
+     if (self.deep_offline_mode == 1):
       self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
     # Accounting...
@@ -3691,6 +3703,7 @@ class Naufrago:
        self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
+     if (self.deep_offline_mode == 1):
       self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
     else:
@@ -3742,13 +3755,13 @@ class Naufrago:
      self.lock.release()
      # Ahora borramos el contenido offline. ALPHA, BETA & GAMMA!!!
      #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
-     full_path = content_path + "/" + `id_feed`
-     if os.path.exists(full_path):
-      for f in os.listdir(full_path):
-       try: os.unlink(f)
-       except: pass
-      try: os.unlink(full_path)
-      except: pass
+     #full_path = content_path + "/" + `id_feed`
+     #if os.path.exists(full_path):
+     # for f in os.listdir(full_path):
+     #  try: os.unlink(f)
+     #  except: pass
+     # try: os.unlink(full_path)
+     # except: pass
 
      # Accounting...
      if len(new_entries) > 0:
