@@ -1488,12 +1488,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL, deep_offline_mode integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1547,7 +1547,7 @@ class Naufrago:
   self.update_freq_timemode = int(row[16])
   self.init_check_app_updates = int(row[17])
   self.clear_mode = int(row[18])
-  self.deep_offline_mode = 1
+  self.deep_offline_mode = int(row[19])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1583,7 +1583,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?, deep_offline_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode,self.deep_offline_mode])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -3484,11 +3484,11 @@ class Naufrago:
   # Con esto, el nombre del html de un artículo será:
   # - O bien el nombre del archivo html original (final del path de la url).
   # - O bien index.html en su ausencia.
-  wget = "wget -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
+  wget = "wget --default-page=index.html -T 20 -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
   print wget
   #os.system(wget)
 
-  p = subprocess.Popen("wget --default-page=index.html -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+  p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, errors = p.communicate()
   rgxp = '''(Saving to:) `([^']*?)[']'''
   m = re.search(rgxp, errors)
@@ -3497,8 +3497,10 @@ class Naufrago:
    print "File saved to: " + filepath
    filename = self.get_filename(filepath)
    print "Filename: " + filename
-   print "rename " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-   os.rename(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html")
+   #print "rename " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+   #os.rename(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html")
+   print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+   os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -3680,9 +3682,11 @@ class Naufrago:
       self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
-     if (self.deep_offline_mode == 1):
-      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
+    # START Deep offline mode
+    if (self.deep_offline_mode == 1):
+     self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
+    # END Deep offline mode
     # Accounting...
     if i < limit:
     # new_posts = True
@@ -3703,9 +3707,11 @@ class Naufrago:
        self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
-     if (self.deep_offline_mode == 1):
-      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
+    # START Deep offline mode
+    if (self.deep_offline_mode == 1):
+     self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
+    # END Deep offline mode
     else:
      self.lock.acquire()
      cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
@@ -3753,15 +3759,6 @@ class Naufrago:
      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
      self.conn.commit()
      self.lock.release()
-     # Ahora borramos el contenido offline. ALPHA, BETA & GAMMA!!!
-     #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
-     #full_path = content_path + "/" + `id_feed`
-     #if os.path.exists(full_path):
-     # for f in os.listdir(full_path):
-     #  try: os.unlink(f)
-     #  except: pass
-     # try: os.unlink(full_path)
-     # except: pass
 
      # Accounting...
      if len(new_entries) > 0:
