@@ -3712,11 +3712,11 @@ class Naufrago:
     if (self.deep_offline_mode == 1):
      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Deep offline mode
-    else:
-     self.lock.acquire()
-     cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
-     self.conn.commit()
-     self.lock.release()
+    #else:
+    # self.lock.acquire()
+    # cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
+    # self.conn.commit()
+    # self.lock.release()
 
   # CLEANUP: Check first is the feed is full (to do some cleanup)
   self.lock.acquire()
