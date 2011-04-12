@@ -226,16 +226,22 @@ ROADMAP 0.4:
 - IMPROVED: live feed items hidding (when hide_readentries is enabled). DONE
 - NEW: 'clear mode'? (Incompatible with 'Start with unfolded' & 'Driven mode'). DONE
 - NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
-- NEW: 'follow feed link' available per-feed basis.
+- NEW: 'follow feed link' available per-feed basis. Queda:
+  * Opción en las Preferencias.
+  * Cambiar la operativa para que cada artículo registre todos sus archivos en bd. ONGOING
 
 - PROBLEMA_0: 'Marcar todo como leido' no chuta con el driven mode. DONE
 - PROBLEMA_1: Cuando 'aparece' un feed que no fue propagado inicialmente, le falta el icono.
   Cabe comprobar que el icono esté, y si no lo está, añadirlo antes! DONE
 - PROBLEMA_2: Cuando se le pone un código de versión superior, al iniciar la aplicación se
-  queda con la ventana sin dibujar. ¿Algún problema de threading? PENDING
+  queda con la ventana sin dibujar. ¿Algún problema de threading? CANNOT REPRODUCE
 - PROBLEMA_3: la tecla 'supr' no chuta en clear_mode. DONE
 - PROBLEMA_4: cuando se añade un feed, debe insertarlo alfabeticamente. DONE
 
-El actual offline mode será llamado "Image caching" (porque en definitiva, es lo que hace),
-y el offline mode será la descarga completa de cada post con wget.
+---------------------------------------------------------------
+Presente			Futuro
+---------------------------------------------------------------
+Offline mode (¡más lento!)  ->	Image caching mode (¡más lento!)
+N/A			    ->  Offline mode (¡aún más lento!)
+---------------------------------------------------------------
 

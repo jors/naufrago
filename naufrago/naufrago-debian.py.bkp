@@ -49,6 +49,7 @@ try:
  import gettext
  from socket import socket
  import pynotify
+ import subprocess
 except ImportError:
  print _('Error importing modules: ') + `sys.exc_info()[1]`
  sys.exit(1)
@@ -948,9 +949,9 @@ class Naufrago:
      # Unbold categories (if needed).
      self.toggle_category_bold_all()
 
- def sortfunc(self, x, y):
-  """Fast & simple reverse sort."""
-  return cmp(y[1],x[1])
+# def sortfunc(self, x, y):
+#  """Fast & simple reverse sort."""
+#  return cmp(y[1],x[1])
 
  def abrir_browser(self, event=None, data=None):
   """Opens a given url in the user sensible web browser."""
@@ -959,32 +960,42 @@ class Naufrago:
    # START NEW
    links = {} # Diccionario de paginas html...
    (model_tmp, iter_tmp) = self.treeselection.get_selected()
-   id_feed = self.treestore.get_value(iter_tmp, 2)
    id_articulo = self.liststore.get_value(iter, 4)
-   full_path = content_path + "/" + `id_feed` + "/" + `id_articulo`
+   try:
+    id_feed = self.treestore.get_value(iter_tmp, 2)
+   except:
+    cursor = self.conn.cursor()
+    self.lock.acquire()
+    cursor.execute('SELECT id_feed FROM articulo WHERE id = ?', [id_articulo])
+    id_feed = cursor.fetchone()[0]
+    self.lock.release()
+    cursor.close()
+   #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo`
+   full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` + ".html"
    print 'full_path: ' + full_path
    if (self.deep_offline_mode == 1) and os.path.exists(full_path):
-    # Acabar de componer la ruta con el archivo html a cargar
-    for f in os.listdir(full_path):
-     if f.lower().endswith('.html') or f.lower().endswith('.htm'):
-      links[f] = os.path.getsize(full_path + "/" + f)
-    # Nos quedamos con el html mayor
-    if len(links)>0:
-     print links
-     items = links.items() # Pasamos el dict a list...
-     items.sort(self.sortfunc) # ... lo ordenamos a la inversa por valor...
-     link = "file://" + full_path + "/" + items[0][0] # ... y nos quedamos con el mas grande
-     print 'link: ' + link
-    else:
-     if data is not None:
-      link = data
-     else:
-      cursor = self.conn.cursor()
-      self.lock.acquire()
-      cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
-      link = cursor.fetchone()[0]
-      self.lock.release()
-      cursor.close()
+   # # Acabar de componer la ruta con el archivo html a cargar
+   # for f in os.listdir(full_path):
+   #  if f.lower().endswith('.html') or f.lower().endswith('.htm'):
+   #   links[f] = os.path.getsize(full_path + "/" + f)
+   # # Nos quedamos con el html mayor
+   # if len(links)>0:
+   #  print links
+   #  items = links.items() # Pasamos el dict a list...
+   #  items.sort(self.sortfunc) # ... lo ordenamos a la inversa por valor...
+   #  link = "file://" + full_path + "/" + items[0][0] # ... y nos quedamos con el mas grande
+   #  print 'link: ' + link
+   # else:
+   #  if data is not None:
+   #   link = data
+   #  else:
+   #   cursor = self.conn.cursor()
+   #   self.lock.acquire()
+   #   cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
+   #   link = cursor.fetchone()[0]
+   #   self.lock.release()
+   #   cursor.close()
+    link = "file://" + full_path
    else:
    # END NEW
     if data is not None:
@@ -1477,12 +1488,12 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL, deep_offline_mode integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
@@ -1536,7 +1547,7 @@ class Naufrago:
   self.update_freq_timemode = int(row[16])
   self.init_check_app_updates = int(row[17])
   self.clear_mode = int(row[18])
-  self.deep_offline_mode = 1
+  self.deep_offline_mode = int(row[19])
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1572,7 +1583,7 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?, deep_offline_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode,self.deep_offline_mode])
   self.conn.commit()
   self.lock.release()
   cursor.close()
@@ -3450,11 +3461,45 @@ class Naufrago:
     self.lock.release()
   cursor.close()
 
+# def get_filename_from_url(self, url):
+#  filename = url.split("/")[-1]
+#  if filename == '':
+#   filename = "index.html"
+#  return filename
+
+ def get_filename(self, url):
+  i = -1
+  filename = url.split("/")[i]
+  while filename == '':
+   i -= 1
+   filename = url.split("/")[i]
+  return filename
+
  def retrieve_full_content(self, id_feed, id_articulo, url):
   """Download complete posts."""
-  full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
-  #full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
-  os.system("wget -q -p -nc -k -nd -P " + full_path + " " + url)
+  #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
+  full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
+  if not os.path.exists(full_path):
+   os.makedirs(full_path)
+  # Con esto, el nombre del html de un artículo será:
+  # - O bien el nombre del archivo html original (final del path de la url).
+  # - O bien index.html en su ausencia.
+  wget = "wget --default-page=index.html -T 20 -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
+  print wget
+
+  p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+  output, errors = p.communicate()
+  rgxp = '''(Saving to:) `([^']*?)[']'''
+  m = re.search(rgxp, errors)
+  if m is not None:
+   filepath = m.group(2)
+   print "File saved to: " + filepath
+   filename = self.get_filename(filepath)
+   print "Filename: " + filename
+   #print "rename " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+   #os.rename(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html")
+   print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+   os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -3588,6 +3633,17 @@ class Naufrago:
     # self.alphabetical_node_ordering(iter_tmp) # OLD
     self.alphabetical_node_ordering(iter_tmp) # NEW
 
+  # Limpieza de la cache previa si tenemos deep_offline_mode.
+  if (self.deep_offline_mode == 1):
+   print "Cleaning feed " + `id_feed` + "..."
+   full_path = content_path + "/" + `id_feed`
+   if os.path.exists(full_path):
+     for f in os.listdir(full_path):
+      try:
+       print "Deleting " + full_path + "/" + f + "..."
+       os.unlink(full_path + "/" + f)
+      except: pass
+
   limit = count = len(d.entries)
   if count > self.num_entries:
    limit = self.num_entries
@@ -3625,8 +3681,11 @@ class Naufrago:
       self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
-      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
+    # START Deep offline mode
+    if (self.deep_offline_mode == 1):
+     self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
+    # END Deep offline mode
     # Accounting...
     if i < limit:
     # new_posts = True
@@ -3647,13 +3706,16 @@ class Naufrago:
        self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
-      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Offline mode image retrieving
-    else:
-     self.lock.acquire()
-     cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
-     self.conn.commit()
-     self.lock.release()
+    # START Deep offline mode
+    if (self.deep_offline_mode == 1):
+     self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
+    # END Deep offline mode
+    #else:
+    # self.lock.acquire()
+    # cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
+    # self.conn.commit()
+    # self.lock.release()
 
   # CLEANUP: Check first is the feed is full (to do some cleanup)
   self.lock.acquire()
@@ -3696,14 +3758,6 @@ class Naufrago:
      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
      self.conn.commit()
      self.lock.release()
-     # Ahora borramos el contenido offline. ALPHA, BETA & GAMMA!!!
-     full_path = content_path + "/" + `id_feed` + "/" + `id_articulo[0]`
-     if os.path.exists(full_path):
-      for f in os.listdir(full_path):
-       try: os.unlink(f)
-       except: pass
-      try: os.unlink(full_path)
-      except: pass
 
      # Accounting...
      if len(new_entries) > 0:

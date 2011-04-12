@@ -1493,6 +1493,7 @@ class Naufrago:
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
+     CREATE TABLE contenido_offline(id integer PRIMARY KEY, nombre varchar(256) NOT NULL, id_articulo integer NOT NULL);
      INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
@@ -3473,6 +3474,10 @@ class Naufrago:
   while filename == '':
    i -= 1
    filename = url.split("/")[i]
+  # Aquí convendría quitar los caracteres especiales antes de devolverlo (&, ?)
+  filename = filename.split("&")
+  filename = filename[0].split("&")
+  filename = filename[0]
   return filename
 
  def retrieve_full_content(self, id_feed, id_articulo, url):
@@ -3486,21 +3491,44 @@ class Naufrago:
   # - O bien index.html en su ausencia.
   wget = "wget --default-page=index.html -T 20 -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
   print wget
-  #os.system(wget)
 
   p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, errors = p.communicate()
   rgxp = '''(Saving to:) `([^']*?)[']'''
-  m = re.search(rgxp, errors)
+  #m = re.search(rgxp, errors)
+  #if m is not None:
+  # filepath = m.group(2)
+  # print "File saved to: " + filepath
+  # filename = self.get_filename(filepath)
+  # print "Filename: " + filename
+  # print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+  # os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
+  m = re.findall(rgxp, errors)
   if m is not None:
-   filepath = m.group(2)
-   print "File saved to: " + filepath
-   filename = self.get_filename(filepath)
-   print "Filename: " + filename
-   #print "rename " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-   #os.rename(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html")
-   print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-   os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
+   i = 0
+   q = ''
+   #cursor = self.conn.cursor()
+   for f in m:
+    filepath = f[1]
+    filename = self.get_filename(filepath)
+    print "File saved to: " + filepath + " (filename: " + filename + ")"
+    if i == 0:
+     print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
+     os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
+    q += "INSERT INTO contenido_offline VALUES(null, '" + filename + "', " + `id_articulo` + ");"
+    #self.lock.acquire()
+    # contenido: id, nombre, id_articulo
+    #cursor.execute('INSERT INTO contenido VALUES(null, ?, ?)', [filename,id_articulo])
+    #self.conn.commit()
+    #self.lock.release()
+    i += 1
+   if q != '':
+    cursor = self.conn.cursor()
+    self.lock.acquire()
+    cursor.executescript(q)
+    self.conn.commit()
+    self.lock.release()
+    cursor.close()
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -3635,15 +3663,15 @@ class Naufrago:
     self.alphabetical_node_ordering(iter_tmp) # NEW
 
   # Limpieza de la cache previa si tenemos deep_offline_mode.
-  if (self.deep_offline_mode == 1):
-   print "Cleaning feed " + `id_feed` + "..."
-   full_path = content_path + "/" + `id_feed`
-   if os.path.exists(full_path):
-     for f in os.listdir(full_path):
-      try:
-       print "Deleting " + full_path + "/" + f + "..."
-       os.unlink(full_path + "/" + f)
-      except: pass
+  #if (self.deep_offline_mode == 1):
+  # print "Cleaning feed " + `id_feed` + "..."
+  # full_path = content_path + "/" + `id_feed`
+  # if os.path.exists(full_path):
+  #   for f in os.listdir(full_path):
+  #    try:
+  #     print "Deleting " + full_path + "/" + f + "..."
+  #     os.unlink(full_path + "/" + f)
+  #    except: pass
 
   limit = count = len(d.entries)
   if count > self.num_entries:
@@ -3754,7 +3782,27 @@ class Naufrago:
       cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
       self.conn.commit()
       self.lock.release()
-
+     # Lo mismo con el contenido offline del filesystem, si procede
+     self.lock.acquire()
+     cursor.execute('SELECT id FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
+     contenido_offline = cursor.fetchall()
+     self.lock.release()
+     for i in contenido_offline:
+      self.lock.acquire()
+      cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+      num_contenido_offline = cursor.fetchone()
+      self.lock.release()
+      if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
+       full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+       if os.path.exists(full_path):
+        os.unlink(full_path)
+      self.lock.acquire()
+      cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
+      self.conn.commit()
+      self.lock.release()
+     if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`): # symlink path
+      os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`)
+     # Y finalmente borramos el articulo, propiamente
      self.lock.acquire()
      cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
      self.conn.commit()
