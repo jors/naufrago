@@ -3475,9 +3475,7 @@ class Naufrago:
    i -= 1
    filename = url.split("/")[i]
   # Aquí convendría quitar los caracteres especiales antes de devolverlo (&, ?)
-  filename = filename.split("&")
-  filename = filename[0].split("&")
-  filename = filename[0]
+  #return filename.split("&")[0].split("?")[0]
   return filename
 
  def retrieve_full_content(self, id_feed, id_articulo, url):
@@ -3512,9 +3510,10 @@ class Naufrago:
     filepath = f[1]
     filename = self.get_filename(filepath)
     print "File saved to: " + filepath + " (filename: " + filename + ")"
-    if i == 0:
-     print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-     os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
+    symlink_path = full_path + "/" + `id_articulo` + ".html"
+    if i == 0 and not os.path.exists(symlink_path):
+     print "symlink " + symlink_path
+     os.symlink(full_path + "/" + filename, symlink_path) # Saving some bandwidth & space!
     q += "INSERT INTO contenido_offline VALUES(null, '" + filename + "', " + `id_articulo` + ");"
     #self.lock.acquire()
     # contenido: id, nombre, id_articulo
