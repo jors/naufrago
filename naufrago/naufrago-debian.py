@@ -86,6 +86,7 @@ if distro_package: # We're running on 'Distro-mode' (intended for distribution p
  favicon_path = os.getenv("HOME") + '/.config/naufrago/favicons'
  images_path = os.getenv("HOME") + '/.config/naufrago/imagenes'
  content_path = os.getenv("HOME") + '/.config/naufrago/contenido'
+ tmp_cache_path = os.getenv("HOME") + '/.config/naufrago/tmp_cache'
  if "es" in locale:
   index_path = app_path + 'content/index_es.html'
   puf_path = app_path + 'content/puf_es.html'
@@ -112,6 +113,7 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
  favicon_path = current_path + '/favicons'
  images_path = current_path + '/imagenes'
  content_path = current_path + '/contenido'
+ tmp_cache_path = current_path + '/tmp_cache'
  if "es" in locale:
   index_path = current_path + '/content/index_es.html'
   puf_path = current_path + '/content/puf_es.html'
@@ -2281,22 +2283,23 @@ class Naufrago:
        articles = cursor.fetchall()
        self.lock.release()
        for art in articles:
-        self.lock.acquire()
-        cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
-        images = cursor.fetchall()
-        self.lock.release()
-        for i in images:
-         self.lock.acquire()
-         cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
-         row3 = cursor.fetchone()
-         self.lock.release()
-         if (row3 is not None) and (row3[0] <= 1):
-          if os.path.exists(images_path + '/'+ `i[1]`):
-           os.unlink(images_path + '/'+ `i[1]`)
-        self.lock.acquire()
-        cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
-        self.conn.commit()
-        self.lock.release()
+        self.content_cache_cleanup(self, cursor, art[0], feed[0]) # NEW
+        #self.lock.acquire()
+        #cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
+        #images = cursor.fetchall()
+        #self.lock.release()
+        #for i in images:
+        # self.lock.acquire()
+        # cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
+        # row3 = cursor.fetchone()
+        # self.lock.release()
+        # if (row3 is not None) and (row3[0] <= 1):
+        #  if os.path.exists(images_path + '/'+ `i[1]`):
+        #   os.unlink(images_path + '/'+ `i[1]`)
+        #self.lock.acquire()
+        #cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
+        #self.conn.commit()
+        #self.lock.release()
        self.lock.acquire()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
        self.conn.commit()
@@ -2502,22 +2505,23 @@ class Naufrago:
      articles = cursor.fetchall()
      self.lock.release()
      for art in articles:
-      self.lock.acquire()
-      cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
-      images = cursor.fetchall()
-      self.lock.release()
-      for i in images:
-       self.lock.acquire()
-       cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
-       row3 = cursor.fetchone()
-       self.lock.release()
-       if (row3 is not None) and (row3[0] <= 1):
-        if os.path.exists(images_path + '/'+ `i[1]`):
-         os.unlink(images_path + '/'+ `i[1]`)
-      self.lock.acquire()
-      cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
-      self.conn.commit()
-      self.lock.release()
+      self.content_cache_cleanup(cursor, art[0], id_feed) # NEW
+      #self.lock.acquire()
+      #cursor.execute('SELECT id,nombre FROM imagen WHERE id_articulo = ?', [art[0]])
+      #images = cursor.fetchall()
+      #self.lock.release()
+      #for i in images:
+      # self.lock.acquire()
+      # cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[1]])
+      # row3 = cursor.fetchone()
+      # self.lock.release()
+      # if (row3 is not None) and (row3[0] <= 1):
+      #  if os.path.exists(images_path + '/'+ `i[1]`):
+      #   os.unlink(images_path + '/'+ `i[1]`)
+      #self.lock.acquire()
+      #cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [art[0]])
+      #self.conn.commit()
+      #self.lock.release()
      self.lock.acquire()
      cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
      cursor.execute('DELETE FROM feed WHERE id = ?', [id_feed])
@@ -3469,12 +3473,13 @@ class Naufrago:
 #  return filename
 
  def get_filename(self, url):
+  """Returns filename slicing the url reveiced as parameter."""
   i = -1
   filename = url.split("/")[i]
   while filename == '':
    i -= 1
    filename = url.split("/")[i]
-  # Aquí convendría quitar los caracteres especiales antes de devolverlo (&, ?)
+  # NO quitamos los caracteres especiales (&, ?) antes de devolverlo porque wget conserva ese nombre
   #return filename.split("&")[0].split("?")[0]
   return filename
 
@@ -3493,33 +3498,21 @@ class Naufrago:
   p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, errors = p.communicate()
   rgxp = '''(Saving to:) `([^']*?)[']'''
-  #m = re.search(rgxp, errors)
-  #if m is not None:
-  # filepath = m.group(2)
-  # print "File saved to: " + filepath
-  # filename = self.get_filename(filepath)
-  # print "Filename: " + filename
-  # print "symlink " + full_path + "/" + filename + " to " + full_path + "/" + `id_articulo` + ".html"
-  # os.symlink(full_path + "/" + filename, full_path + "/" + `id_articulo` + ".html") # Saving some bandwidth & space!
   m = re.findall(rgxp, errors)
   if m is not None:
+   print m
    i = 0
    q = ''
-   #cursor = self.conn.cursor()
    for f in m:
     filepath = f[1]
     filename = self.get_filename(filepath)
     print "File saved to: " + filepath + " (filename: " + filename + ")"
     symlink_path = full_path + "/" + `id_articulo` + ".html"
     if i == 0 and not os.path.exists(symlink_path):
+     # TODO: EN LUGAR DEL SYMLINK (esto de aqui abajo), CAMBIARLE EL NOMBRE AL id_articulo.html
      print "symlink " + symlink_path
      os.symlink(full_path + "/" + filename, symlink_path) # Saving some bandwidth & space!
     q += "INSERT INTO contenido_offline VALUES(null, '" + filename + "', " + `id_articulo` + ");"
-    #self.lock.acquire()
-    # contenido: id, nombre, id_articulo
-    #cursor.execute('INSERT INTO contenido VALUES(null, ?, ?)', [filename,id_articulo])
-    #self.conn.commit()
-    #self.lock.release()
     i += 1
    if q != '':
     cursor = self.conn.cursor()
@@ -3604,6 +3597,52 @@ class Naufrago:
    return True
   else:
    return False
+
+ def content_cache_cleanup(self, cursor, id_articulo, id_feed):
+  """Deletes images & offline contents when needed."""
+  #i = 0
+  # Borramos las imagenes del filesystem, si procede
+  self.lock.acquire()
+  cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
+  images = cursor.fetchall()
+  self.lock.release()
+  for i in images:
+   self.lock.acquire()
+   cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
+   num_images = cursor.fetchone()
+   self.lock.release()
+   if (num_images is not None) and (num_images[0] == 1):
+    if os.path.exists(images_path + '/' + `i[0]`):
+     os.unlink(images_path + '/' + `i[0]`)
+   self.lock.acquire()
+   cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
+   self.conn.commit()
+   self.lock.release()
+  # Lo mismo con el contenido offline del filesystem, si procede
+  self.lock.acquire()
+  cursor.execute('SELECT id FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+  contenido_offline = cursor.fetchall()
+  self.lock.release()
+  for i in contenido_offline:
+   self.lock.acquire()
+   cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+   num_contenido_offline = cursor.fetchone()
+   self.lock.release()
+   if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
+    full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+    if os.path.exists(full_path):
+     os.unlink(full_path)
+   self.lock.acquire()
+   cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   self.conn.commit()
+   self.lock.release()
+  if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
+   os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
+  # Y finalmente borramos el articulo, propiamente
+  self.lock.acquire()
+  cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
+  self.conn.commit()
+  self.lock.release()
 
  def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
@@ -3764,48 +3803,49 @@ class Naufrago:
     row  = cursor.fetchall()
     self.lock.release()
     for id_articulo in row:
-     # Ahora borramos las imagenes del filesystem, si procede
-     self.lock.acquire()
-     cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
-     images = cursor.fetchall()
-     self.lock.release()
-     for i in images:
-      self.lock.acquire()
-      cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
-      num_images = cursor.fetchone()
-      self.lock.release()
-      if (num_images is not None) and (num_images[0] == 1):
-       if os.path.exists(images_path + '/' + `i[0]`):
-        os.unlink(images_path + '/' + `i[0]`)
-      self.lock.acquire()
-      cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
-      self.conn.commit()
-      self.lock.release()
-     # Lo mismo con el contenido offline del filesystem, si procede
-     self.lock.acquire()
-     cursor.execute('SELECT id FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
-     contenido_offline = cursor.fetchall()
-     self.lock.release()
-     for i in contenido_offline:
-      self.lock.acquire()
-      cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
-      num_contenido_offline = cursor.fetchone()
-      self.lock.release()
-      if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
-       full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
-       if os.path.exists(full_path):
-        os.unlink(full_path)
-      self.lock.acquire()
-      cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
-      self.conn.commit()
-      self.lock.release()
-     if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`): # symlink path
-      os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`)
-     # Y finalmente borramos el articulo, propiamente
-     self.lock.acquire()
-     cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
-     self.conn.commit()
-     self.lock.release()
+     self.content_cache_cleanup(cursor, id_articulo[0], id_feed) # NEW
+     ## Ahora borramos las imagenes del filesystem, si procede
+     #self.lock.acquire()
+     #cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
+     #images = cursor.fetchall()
+     #self.lock.release()
+     #for i in images:
+     # self.lock.acquire()
+     # cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
+     # num_images = cursor.fetchone()
+     # self.lock.release()
+     # if (num_images is not None) and (num_images[0] == 1):
+     #  if os.path.exists(images_path + '/' + `i[0]`):
+     #   os.unlink(images_path + '/' + `i[0]`)
+     # self.lock.acquire()
+     # cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
+     # self.conn.commit()
+     # self.lock.release()
+     ## Lo mismo con el contenido offline del filesystem, si procede
+     #self.lock.acquire()
+     #cursor.execute('SELECT id FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
+     #contenido_offline = cursor.fetchall()
+     #self.lock.release()
+     #for i in contenido_offline:
+     # self.lock.acquire()
+     # cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+     # num_contenido_offline = cursor.fetchone()
+     # self.lock.release()
+     # if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
+     #  full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+     #  if os.path.exists(full_path):
+     #   os.unlink(full_path)
+     # self.lock.acquire()
+     # cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo[0]])
+     # self.conn.commit()
+     # self.lock.release()
+     #if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`): # symlink path
+     # os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo[0]`)
+     ## Y finalmente borramos el articulo, propiamente
+     #self.lock.acquire()
+     #cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo[0]])
+     #self.conn.commit()
+     #self.lock.release()
 
      # Accounting...
      if len(new_entries) > 0:

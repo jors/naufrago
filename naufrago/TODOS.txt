@@ -228,7 +228,9 @@ ROADMAP 0.4:
 - NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
 - NEW: 'follow feed link' available per-feed basis. Queda:
   * Opción en las Preferencias.
-  * Cambiar la operativa para que cada artículo registre todos sus archivos en bd. ONGOING
+  * Avisar de la descarga de contenido offline en la statusbar.
+  * Cambiar la operativa para que cada artículo registre todos sus archivos en bd. DONE
+  * Tener en cuenta el borrado en delete_feed y delete_category. DONE (tests pending on delete feed/category)
 
 - PROBLEMA_0: 'Marcar todo como leido' no chuta con el driven mode. DONE
 - PROBLEMA_1: Cuando 'aparece' un feed que no fue propagado inicialmente, le falta el icono.
@@ -237,6 +239,11 @@ ROADMAP 0.4:
   queda con la ventana sin dibujar. ¿Algún problema de threading? CANNOT REPRODUCE
 - PROBLEMA_3: la tecla 'supr' no chuta en clear_mode. DONE
 - PROBLEMA_4: cuando se añade un feed, debe insertarlo alfabeticamente. DONE
+- PROBLEMA_5: con algunos feeds (p.ej. elmundo), la descarga de ficheros principales (html) con el mismo
+  nombre, hace que se machaquen o se consideren ya presentes. Workaround: hacer la descarga en curso en
+  un directorio temporal (.config/naufrago/tmp_cache), renombrarlo a (p.ej.) el numero de articulo (de 
+  paso, con esto nos quitamos de encima el tema del symlink) y moverlo posteriormente a su directorio 
+  (.config/contenido/id_feed). PENDING!
 
 ---------------------------------------------------------------
 Presente			Futuro
