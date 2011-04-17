@@ -1517,6 +1517,9 @@ class Naufrago:
   if not os.path.exists(content_path):
    os.makedirs(content_path)
 
+  if not os.path.exists(tmp_cache_path):
+   os.makedirs(tmp_cache_path)
+
  def get_config(self):
   """Retrieves the app configuration"""
   global ABOUT_PAGE, PUF_PAGE
@@ -3479,8 +3482,7 @@ class Naufrago:
   while filename == '':
    i -= 1
    filename = url.split("/")[i]
-  # NO quitamos los caracteres especiales (&, ?) antes de devolverlo porque wget conserva ese nombre
-  #return filename.split("&")[0].split("?")[0]
+  #return filename.split("&")[0].split("?")[0] # NO quitamos los caracteres especiales (&, ?) porque wget conserva ese nombre
   return filename
 
  def retrieve_full_content(self, id_feed, id_articulo, url):
