@@ -13,12 +13,17 @@ def get_filename(url):
   filename = url.split("/")[i]
  return filename
 
-def rebuild_link(original_url, relative_link):
+def rebuild_link(original_url, relative_link, base_url):
  """Builds an absolute link from a relative one."""
  clean_original_url = original_url.split("http://")[1] # http://blog.liw.fi/posts/obnam-0.16/ => blog.liw.fi/posts/obnam-0.16/
  original_url_split = clean_original_url.split("/") # blog.liw.fi/posts/obnam-0.16/ => ('blog.liw.fi', 'posts', 'obnam-0.16', '')
  original_url_split = filter(None, original_url_split)
  relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
+
+ if len(relative_link_split) == 1:
+  print "Rebuild_link: returning " + base_url + "/" + relative_link_split[0]
+  return base_url + "/" + relative_link_split[0]
+
  for elem in relative_link_split:
   print 'elem: ' + elem
   if elem == '..':
@@ -26,7 +31,7 @@ def rebuild_link(original_url, relative_link):
    print 'link: ' + `original_url_split`
   else:
    break
- print "Rebuild_link: reeturning " + "http://" + "/".join(original_url_split) + "/" + relative_link_split[-1]
+ print "Rebuild_link: returning " + "http://" + "/".join(original_url_split) + "/" + relative_link_split[-1]
  return "http://" + "/".join(original_url_split) + "/" + relative_link_split[-1]
 
 def filter_needed_content(page, original_url):
@@ -40,7 +45,6 @@ def filter_needed_content(page, original_url):
  regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["]?([^">]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''')
  url_list = [] # Dict for original urls
  url_mod_list = [] # Dict for modified urls
- rgxp_lap = 0
  for rgxp in regexps:
   tags = re.findall(rgxp, page, re.I)
   for tag in tags:
@@ -51,12 +55,8 @@ def filter_needed_content(page, original_url):
      url_mod_list.append(tag[2])
     else: # Enlace relativo. ¡Cabría recontruir el link!
      #url_mod_list.append(base_url + tag[2])
-     if rgxp_lap == 0:
-      url = rebuild_link(original_url, tag[2])
-      url_mod_list.append(url)
-     else:
-      url_mod_list.append(base_url + tag[2])
-  rgxp_lap += 1
+     url = rebuild_link(original_url, tag[2], base_url)
+     url_mod_list.append(url)
  return page, url_list, url_mod_list
 
 def retrieve_needed_content(url_mod_list):
