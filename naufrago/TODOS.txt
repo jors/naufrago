@@ -243,7 +243,7 @@ ROADMAP 0.4:
   nombre, hace que se machaquen o se consideren ya presentes. Workaround: hacer la descarga en curso en
   un directorio temporal (.config/naufrago/tmp_cache), renombrarlo a (p.ej.) el numero de articulo (de 
   paso, con esto nos quitamos de encima el tema del symlink) y moverlo posteriormente a su directorio 
-  (.config/contenido/id_feed). PENDING!
+  (.config/contenido/id_feed). DISCARDED (prescindiendo de wget y creando fetcher propio)
 
 ---------------------------------------------------------------
 Presente			Futuro
