@@ -4,62 +4,173 @@
 import os
 from urllib2 import urlopen
 import re
+import sys
 
-full_path = "/home/jors/sources/proyectos/naufrago/samples/1/"
-url = "http://www.abc.es/20110328/local-castilla-leon/abci-tere-201103280754.html"
+def get_filename(url):
+ i = -1
+ filename = url.split("/")[i]
+ while filename == '':
+  i -= 1
+  filename = url.split("/")[i]
+ return filename
 
-# Retrieve html document
-web_file = urlopen(url)
-local_file = open(full_path + '1.html', 'w')
-local_file.write(web_file.read())
-local_file.close()
-web_file.close()
-
-# Filter needed content
-local_file = open(full_path + '1.html', 'r')
-page = local_file.read()
-local_file.close()
-rgxp = '''<(link|script|img|iframe)\s+[^>]*?(href|src)=["]?([^">]+)[^>]*?>'''
-m = re.findall(rgxp, page, re.I)
-url_list = []
-url_mod_list = []
-for img in m:
- url_list.append(img[2])
- if img[2].startswith("http") or img[2].startswith("https"):
-  url_mod_list.append(img[2])
+def get_base_url(original_url):
+ # Obtain base url
+ rgxp = '''(http|https)://+[^/]*?/'''
+ m = re.search(rgxp, original_url)
+ if m is not None:
+  base_url = m.group(0)
  else:
-  url_mod_list.append("http://www.abc.es/" + img[2])
+  base_url = original_url
+ return base_url
 
-# Retrieve needed content
-url_mod_list = set(url_mod_list) # Remove duplicates
-for url in url_mod_list:
- # Get file name to save
- i = -1
- filename = url.split("/")[i]
- while filename == '':
-  i -= 1
-  filename = url.split("/")[i]
- web_file = urlopen(url)
- local_file = open(full_path + filename, 'w')
- local_file.write(web_file.read())
+def rebuild_link(original_url, relative_link, url_mod_list):
+ """Builds an absolute link from a relative one."""
+ original_url2 = original_url.split("http://")[1] # http://blog.liw.fi/posts/obnam-0.16/ => blog.liw.fi/posts/obnam-0.16/
+ original_url_split = original_url2.split("/") # blog.liw.fi/posts/obnam-0.16/ => ('blog.liw.fi', 'posts', 'obnam-0.16', '')
+ copy_of_clean_original_url_split = clean_original_url_split = filter(None, original_url_split)
+ relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
+ clean_relative_link_split = filter(None, relative_link_split)
+
+ if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
+  a = base_url = get_base_url(original_url)
+  b = "/".join(clean_relative_link_split)
+  if a.endswith("/") or b.startswith("/"):
+   final_url = a + b
+  else:
+   final_url = a + "/" + b
+  url_mod_list.append(final_url)
+  print 'Rebuilt_link (A): ' + final_url
+ else:
+  for elem in clean_relative_link_split:
+   if elem == ".": # ./archivo.html
+    clean_relative_link_split.remove(elem)
+   elif elem == "..": # ../archivo.html
+    clean_relative_link_split.remove(elem)
+    copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
+
+  a = "http://" + "/".join(copy_of_clean_original_url_split)
+  b = "/".join(clean_relative_link_split)
+  if a.endswith("/") or b.startswith("/"):
+   final_url = a + b
+  else:
+   final_url = a + "/" + b
+  url_mod_list.append(final_url)
+  print 'Rebuilt_link (B): ' + final_url
+
+ base_url = get_base_url(original_url)
+ alt_final_url = base_url + b
+ url_mod_list.append(alt_final_url)
+ print 'Rebuilt_link (C): ' + alt_final_url
+
+ return url_mod_list
+
+def filter_needed_content(original_url, read_from_web=False):
+ """Obtains the needed content to correctly show a page offline."""
+ if read_from_web:
+  # Retrieve main html document
+  if not os.path.exists(full_path + '1.html'):
+   web_file = urlopen(original_url)
+   local_file = open(full_path + '1.html', 'w')
+   page = web_file.read()
+   web_file.close()
+   local_file.write(page)
+   local_file.close()
+ else:
+  if os.path.exists(full_path + '1.html'):
+   local_file = open(full_path + f, 'r')
+   page = local_file.read()
+   local_file.close()
+
+ # Obtain base url
+ base_url = get_base_url(original_url)
+ regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["]?([^">\s]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''')
+ url_list = [] # Dict for original urls
+ url_mod_list = [] # Dict for modified urls
+ css_list = [] # Dict for css files
+ for rgxp in regexps:
+  tags = re.findall(rgxp, page, re.I)
+  for tag in tags:
+   if tag[2] != base_url and tag[2] != base_url[0:-1]:
+    print "Detected " + `tag[2]`
+    css_list.append(`tag[2]`)
+    url_list.append(tag[2])
+    if tag[2].startswith("http") or tag[2].startswith("https"): # Enlace absoluto
+     url_mod_list.append(tag[2])
+    else: # Enlace relativo. ¡Cabe reconstruir el link!
+     url_mod_list = rebuild_link(original_url, tag[2], url_mod_list)
+ return page, url_list, url_mod_list, css_list
+
+def retrieve_needed_content(url_mod_list):
+ """Retrieves the content chosen from the filter content (if not present already)."""
+ url_mod_list = set(url_mod_list) # Remove duplicates
+ for url in url_mod_list:
+  # Get file name to save
+  filename = get_filename(url)
+  if not os.path.exists(full_path + filename):
+   print "Retrieving " + url + "..."
+   try:
+    web_file = urlopen(url)
+    # Chunk filename if it is too large!
+    if len(filename) > 256:
+     m = re.search('[^?=&]+', filename)
+     filename = m.group(0)
+    local_file = open(full_path + filename, 'w')
+    local_file.write(web_file.read())
+    local_file.close()
+    web_file.close()
+    print "Done!"
+    # TODO: Guardado en bd.
+   except:
+    print "Oops!"
+  else:
+   print "Skipping " + full_path + filename + "..."
+ return url_mod_list
+
+def translate_document(page, url_list, f):
+ """# Translate html document for local viewing."""
+ url_list = set(url_list) # Remove duplicates
+ for url in url_list:
+  # Get file name to replace
+  filename = get_filename(url)
+  if url != filename:
+   print "Reemplazamos '" + url + "' por '" + filename + "'."
+   page = page.replace(url, filename)
+  else:
+   print "No hace falta reemplazar, skipping!"
+ local_file = open(full_path + f, 'w')
+ local_file.write(page)
  local_file.close()
- web_file.close()
 
+########
+# MAIN #
+########
+
+full_path = "/home/jors/sources/proyectos/naufrago/samples/test/url_fetcher/"
+original_url = "http://perezmeyer.blogspot.com/2011/04/entradas-de-nfs-en-fstab-que-no-montan.html"
+
+try:
+ # Filter needed content
+ page, url_list, url_mod_list, css_list = filter_needed_content(original_url, True)
+except:
+ page, url_list, url_mod_list, css_list = filter_needed_content(original_url, False)
+
+print "Links to download: " + `url_mod_list`
+sys.exit(1)
+
+# Retrieve needed content (if not present already)
+url_mod_list = retrieve_needed_content(url_mod_list)
 # Translate html document for local viewing
-local_file = open(full_path + '1.html', 'r')
-page = local_file.read()
-local_file.close()
-url_list = set(url_list) # Remove duplicates
-for url in url_list:
- # Get file name to save
- i = -1
- filename = url.split("/")[i]
- while filename == '':
-  i -= 1
-  filename = url.split("/")[i]
- print "Reemplazamos '" + url + "' por '" + filename + "'."
- page = page.replace(url, filename)
-local_file = open(full_path + '1.html', 'w')
-local_file.write(page)
-local_file.close()
+translate_document(page, url_list, '1.html')
+
+#for f in os.listdir(full_path):
+# if f.endswith(".css"): # --> PROBLEMA! Hay css de otros articulos! Mejor tomarlos del html y guardarlos en un array.
+#  page, url_list, url_mod_list = filter_needed_content(original_url, False)
+#  url_mod_list = retrieve_needed_content(url_mod_list)
+#  translate_document(page, url_list, f)
+
+for f in css_list:
+ page, url_list, url_mod_list = filter_needed_content(original_url, False)
+ url_mod_list = retrieve_needed_content(url_mod_list)
+ translate_document(page, url_list, f)
 

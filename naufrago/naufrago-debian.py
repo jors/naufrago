@@ -39,7 +39,7 @@ try:
  import threading
  import webbrowser
  import pango
- from urllib2 import urlopen
+ import urllib2
  import re
  from xml.etree import ElementTree
  from xml.sax import saxutils
@@ -49,7 +49,7 @@ try:
  import gettext
  from socket import socket
  import pynotify
- import subprocess
+# import subprocess
 except ImportError:
  print _('Error importing modules: ') + `sys.exc_info()[1]`
  sys.exit(1)
@@ -86,7 +86,6 @@ if distro_package: # We're running on 'Distro-mode' (intended for distribution p
  favicon_path = os.getenv("HOME") + '/.config/naufrago/favicons'
  images_path = os.getenv("HOME") + '/.config/naufrago/imagenes'
  content_path = os.getenv("HOME") + '/.config/naufrago/contenido'
- tmp_cache_path = os.getenv("HOME") + '/.config/naufrago/tmp_cache'
  if "es" in locale:
   index_path = app_path + 'content/index_es.html'
   puf_path = app_path + 'content/puf_es.html'
@@ -113,7 +112,6 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
  favicon_path = current_path + '/favicons'
  images_path = current_path + '/imagenes'
  content_path = current_path + '/contenido'
- tmp_cache_path = current_path + '/tmp_cache'
  if "es" in locale:
   index_path = current_path + '/content/index_es.html'
   puf_path = current_path + '/content/puf_es.html'
@@ -1318,8 +1316,7 @@ class Naufrago:
   global APP_VERSION
   try:
    gtk.gdk.threads_enter()
-   #web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
-   web_file = urlopen('http://enchufado.com/proyectos/naufrago/app_version')
+   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
    read = web_file.read().rstrip()
    web_file.close()
    gtk.gdk.threads_leave()
@@ -1516,9 +1513,6 @@ class Naufrago:
 
   if not os.path.exists(content_path):
    os.makedirs(content_path)
-
-  if not os.path.exists(tmp_cache_path):
-   os.makedirs(tmp_cache_path)
 
  def get_config(self):
   """Retrieves the app configuration"""
@@ -3441,8 +3435,7 @@ class Naufrago:
     self.conn.commit()
     self.lock.release()
     try:
-     #web_file = urllib2.urlopen(i, timeout=10)
-     web_file = urlopen(i, timeout=10)
+     web_file = urllib2.urlopen(i, timeout=10)
      image = images_path + '/' + `id_entry_max`
      local_file = open(image, 'w')
      local_file.write(web_file.read())
@@ -3469,60 +3462,220 @@ class Naufrago:
     self.lock.release()
   cursor.close()
 
-# def get_filename_from_url(self, url):
-#  filename = url.split("/")[-1]
-#  if filename == '':
-#   filename = "index.html"
+# def get_filename(self, url):
+#  """Returns filename slicing the url reveiced as parameter."""
+#  i = -1
+#  filename = url.split("/")[i]
+#  while filename == '':
+#   i -= 1
+#   filename = url.split("/")[i]
+#  #return filename.split("&")[0].split("?")[0] # NO quitamos los caracteres especiales (&, ?) porque wget conserva ese nombre
 #  return filename
+#
+# def retrieve_full_content(self, id_feed, id_articulo, url):
+#  """Download complete posts."""
+#  #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
+#  full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
+#  if not os.path.exists(full_path):
+#   os.makedirs(full_path)
+#  # Con esto, el nombre del html de un artículo será:
+#  # - O bien el nombre del archivo html original (final del path de la url).
+#  # - O bien index.html en su ausencia.
+#  wget = "wget --default-page=index.html -T 20 -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
+#  print wget
+#
+#  p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+#  output, errors = p.communicate()
+#  rgxp = '''(Saving to:) `([^']*?)[']'''
+#  m = re.findall(rgxp, errors)
+#  if m is not None:
+#   print m
+#   i = 0
+#   q = ''
+#   for f in m:
+#    filepath = f[1]
+#    filename = self.get_filename(filepath)
+#    print "File saved to: " + filepath + " (filename: " + filename + ")"
+#    symlink_path = full_path + "/" + `id_articulo` + ".html"
+#    if i == 0 and not os.path.exists(symlink_path):
+#     # TODO: EN LUGAR DEL SYMLINK (esto de aqui abajo), CAMBIARLE EL NOMBRE AL id_articulo.html
+#     print "symlink " + symlink_path
+#     os.symlink(full_path + "/" + filename, symlink_path) # Saving some bandwidth & space!
+#    q += "INSERT INTO contenido_offline VALUES(null, '" + filename + "', " + `id_articulo` + ");"
+#    i += 1
+#   if q != '':
+#    cursor = self.conn.cursor()
+#    self.lock.acquire()
+#    cursor.executescript(q)
+#    self.conn.commit()
+#    self.lock.release()
+#    cursor.close()
+
+ ##### START OFFLINE FULL URL RETRIEVING #####
 
  def get_filename(self, url):
-  """Returns filename slicing the url reveiced as parameter."""
+  """Obtains filename from a given link."""
   i = -1
   filename = url.split("/")[i]
   while filename == '':
    i -= 1
    filename = url.split("/")[i]
-  #return filename.split("&")[0].split("?")[0] # NO quitamos los caracteres especiales (&, ?) porque wget conserva ese nombre
   return filename
 
- def retrieve_full_content(self, id_feed, id_articulo, url):
-  """Download complete posts."""
-  #full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` # Los posts no comparten recursos
-  full_path = content_path + "/" + `id_feed` # Los posts comparten recursos
-  if not os.path.exists(full_path):
-   os.makedirs(full_path)
-  # Con esto, el nombre del html de un artículo será:
-  # - O bien el nombre del archivo html original (final del path de la url).
-  # - O bien index.html en su ausencia.
-  wget = "wget --default-page=index.html -T 20 -p -nc -nd -k -P '" + full_path + "' '" + url + "'"
-  print wget
-
-  p = subprocess.Popen("wget --default-page=index.html -T 20 -p -nc -nd -k -P "+full_path+" "+url,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-  output, errors = p.communicate()
-  rgxp = '''(Saving to:) `([^']*?)[']'''
-  m = re.findall(rgxp, errors)
+ def get_base_url(self, original_url):
+  """Obtains base url from a given link."""
+  rgxp = '''(http|https)://+[^/]*?/'''
+  m = re.search(rgxp, original_url)
   if m is not None:
-   print m
-   i = 0
-   q = ''
-   for f in m:
-    filepath = f[1]
-    filename = self.get_filename(filepath)
-    print "File saved to: " + filepath + " (filename: " + filename + ")"
-    symlink_path = full_path + "/" + `id_articulo` + ".html"
-    if i == 0 and not os.path.exists(symlink_path):
-     # TODO: EN LUGAR DEL SYMLINK (esto de aqui abajo), CAMBIARLE EL NOMBRE AL id_articulo.html
-     print "symlink " + symlink_path
-     os.symlink(full_path + "/" + filename, symlink_path) # Saving some bandwidth & space!
-    q += "INSERT INTO contenido_offline VALUES(null, '" + filename + "', " + `id_articulo` + ");"
-    i += 1
-   if q != '':
-    cursor = self.conn.cursor()
-    self.lock.acquire()
-    cursor.executescript(q)
-    self.conn.commit()
-    self.lock.release()
-    cursor.close()
+   base_url = m.group(0)
+  else:
+   base_url = original_url
+  return base_url
+
+ def translate_document(self, page, url_list, f):
+  """ Translate html document for local viewing."""
+  url_list = set(url_list) # Remove duplicates
+  for url in url_list:
+   # Get file name to replace
+   filename = self.get_filename(url)
+   if url != filename:
+    print "Reemplazamos '" + url + "' por '" + filename + "'."
+    page = page.replace(url, filename)
+   else:
+    print "No hace falta reemplazar, skipping!"
+  local_file = open(f, 'w')
+  local_file.write(page)
+  local_file.close()
+
+ def retrieve_needed_content(self, url_mod_list, feed_content_path):
+  """Retrieves the content chosen from the filter content (if not present already)."""
+  url_mod_set = set(url_mod_list) # Remove duplicates
+  print "Links to download: " + `url_mod_set`
+  for url in url_mod_set:
+   # Get file name to save
+   filename = self.get_filename(url)
+   if not os.path.exists(feed_content_path + "/" + filename):
+    print "Retrieving " + url + "..."
+    try:
+     web_file = urllib2.urlopen(url)
+     # Chunk filename if it is too large!
+     if len(filename) > 256:
+      m = re.search('[^?=&]+', filename)
+      filename = m.group(0)
+     local_file = open(feed_content_path + "/" + filename, 'w')
+     local_file.write(web_file.read())
+     local_file.close()
+     web_file.close()
+     print "Done!"
+     # TODO: Guardado en bd.
+    except urllib2.HTTPError, e:
+     print "Oops! The error was: " + `e.code` + " - " + `e.msg`
+    except urllib2.URLError, e:
+     print "Other error: " + `e`
+   else:
+    print "Skipping " + feed_content_path + "/" + filename + "..."
+  return url_mod_list
+
+ def rebuild_link(self, original_url, relative_link, url_mod_list):
+  """Builds an absolute link from a relative one."""
+  original_url2 = original_url.split("http://")[1] # http://blog.liw.fi/posts/obnam-0.16/ => blog.liw.fi/posts/obnam-0.16/
+  original_url_split = original_url2.split("/") # blog.liw.fi/posts/obnam-0.16/ => ('blog.liw.fi', 'posts', 'obnam-0.16', '')
+  copy_of_clean_original_url_split = clean_original_url_split = filter(None, original_url_split)
+  relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
+  clean_relative_link_split = filter(None, relative_link_split)
+
+  if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
+   a = self.get_base_url(original_url)
+   b = "/".join(clean_relative_link_split)
+   if a.endswith("/") or b.startswith("/"):
+    final_url = a + b
+   else:
+    final_url = a + "/" + b
+   url_mod_list.append(final_url)
+   print 'Rebuilt_link (A): ' + final_url
+  else:
+   for elem in clean_relative_link_split:
+    if elem == ".": # ./archivo.html
+     clean_relative_link_split.remove(elem)
+    elif elem == "..": # ../archivo.html
+     clean_relative_link_split.remove(elem)
+     copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
+
+   a = "http://" + "/".join(copy_of_clean_original_url_split)
+   b = "/".join(clean_relative_link_split)
+   if a.endswith("/") or b.startswith("/"):
+    final_url = a + b
+   else:
+    final_url = a + "/" + b
+   url_mod_list.append(final_url)
+   print 'Rebuilt_link (B): ' + final_url
+
+  base_url = self.get_base_url(original_url)
+  alt_final_url = base_url + b
+  url_mod_list.append(alt_final_url)
+  print 'Rebuilt_link (C): ' + alt_final_url
+
+  return url_mod_list
+
+ def filter_needed_content(self, original_url, url_list, url_mod_list, f):
+  """Obtains the needed content to correctly show a page offline."""
+  # Retrieve &save main html document if needed (read it otherwise)
+  if not os.path.exists(f):
+   web_file = urllib2.urlopen(original_url)
+   local_file = open(f, 'w')
+   page = web_file.read()
+   web_file.close()
+   local_file.write(page)
+   local_file.close()
+  else:
+   local_file = open(f, 'r')
+   page = local_file.read()
+   local_file.close()
+
+  # Obtain base url
+  base_url = self.get_base_url(original_url)
+  regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["']?([^"'>\s]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''')
+  css_list = [] # Dict for css files
+  for rgxp in regexps:
+   tags = re.findall(rgxp, page, re.I)
+   for tag in tags:
+    clean_tag = tag[2].strip().strip("'")
+    #if tag[2] != base_url and tag[2] != base_url[0:-1]:
+    if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
+     print "Detected " + clean_tag
+     if ".css" in clean_tag:
+      css_list.append(clean_tag)
+     url_list.append(clean_tag)
+     #if tag[2].startswith("http") or tag[2].startswith("https"): # Enlace absoluto
+     if clean_tag.startswith("http") or clean_tag.startswith("https"): # Enlace absoluto
+      url_mod_list.append(clean_tag)
+     else: # Enlace relativo. ¡Hay que reconstruir el link!
+      url_mod_list = self.rebuild_link(original_url, clean_tag, url_mod_list)
+  return page, url_list, url_mod_list, css_list
+
+ def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f):
+  """Calls all the intermediate functions in order to retrieve the full offline content."""
+  page, url_list, url_mod_list, css_list = self.filter_needed_content(original_url, url_list, url_mod_list, f)
+  url_mod_list = self.retrieve_needed_content(url_mod_list, feed_content_path)
+  self.translate_document(page, url_list, f)
+  return url_mod_list, css_list
+
+ def retrieve_full_content(self, id_feed, id_articulo, original_url):
+  """Calls all the intermediate functions in order to retrieve the full offline content."""
+  url_list = [] # Dict for original urls
+  url_mod_list = [] # Dict for modified (adapted for local view) urls
+  feed_content_path = content_path + "/" + `id_feed`
+  f = feed_content_path + "/" + `id_articulo` + ".html"
+  if not os.path.exists(feed_content_path):
+   os.makedirs(feed_content_path)
+  url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+
+  for f in css_list:
+   filename = self.get_filename(f)
+   print "Scrapping css file " + filename + "..."
+   url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+
+ #####  END OFFLINE FULL URL RETRIEVING  #####
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
@@ -4223,8 +4376,7 @@ class Naufrago:
   try:
    split = url.split("/")
    favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
-   #web_file = urllib2.urlopen(favicon_url, timeout=10)
-   web_file = urlopen(favicon_url, timeout=10)
+   web_file = urllib2.urlopen(favicon_url, timeout=10)
    favicon = favicon_path + '/' + `id_feed`
    local_file = open(favicon, 'w')
    local_file.write(web_file.read())
