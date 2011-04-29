@@ -3532,7 +3532,7 @@ class Naufrago:
    base_url = original_url
   return base_url
 
- def translate_document(self, page, url_list, f):
+ def translate_document(self, page, url_list, feed_content_path, f):
   """ Translate html document for local viewing."""
   url_list = set(url_list) # Remove duplicates
   for url in url_list:
@@ -3543,12 +3543,17 @@ class Naufrago:
     page = page.replace(url, filename)
    else:
     print "No hace falta reemplazar, skipping!"
+
+  #if f.startswith("http://") or f.startswith("https://"):
+  f = feed_content_path + "/" + self.get_filename(f)
+
   local_file = open(f, 'w')
   local_file.write(page)
   local_file.close()
 
- def retrieve_needed_content(self, url_mod_list, feed_content_path):
+ def retrieve_needed_content(self, url_mod_list, feed_content_path, id_articulo):
   """Retrieves the content chosen from the filter content (if not present already)."""
+  store_values = {} # Dict to store possible values to register into the DB
   url_mod_set = set(url_mod_list) # Remove duplicates
   print "Links to download: " + `url_mod_set`
   for url in url_mod_set:
@@ -3556,6 +3561,7 @@ class Naufrago:
    filename = self.get_filename(url)
    if not os.path.exists(feed_content_path + "/" + filename):
     print "Retrieving " + url + "..."
+    self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
     try:
      web_file = urllib2.urlopen(url)
      # Chunk filename if it is too large!
@@ -3567,13 +3573,29 @@ class Naufrago:
      local_file.close()
      web_file.close()
      print "Done!"
-     # TODO: Guardado en bd.
     except urllib2.HTTPError, e:
      print "Oops! The error was: " + `e.code` + " - " + `e.msg`
     except urllib2.URLError, e:
      print "Other error: " + `e`
    else:
     print "Skipping " + feed_content_path + "/" + filename + "..."
+   store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
+
+  # Insertion into the database of the retrieved contents
+  if len(store_values)>0:
+   cursor = self.conn.cursor()
+   for k,v in store_values.items():
+    self.lock.acquire()
+    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ? AND id_articulo = ?', [k, v])
+    num_contenido_offline = cursor.fetchone()
+    self.lock.release()
+    if (num_contenido_offline is None) or (num_contenido_offline[0]<=0):
+     self.lock.acquire()
+     cursor.execute('INSERT INTO contenido_offline VALUES(null, ?, ?)', [k, v]) # Discard dupes, insert uniques
+     self.conn.commit()
+     self.lock.release()
+   cursor.close()
+
   return url_mod_list
 
  def rebuild_link(self, original_url, relative_link, url_mod_list):
@@ -3584,53 +3606,63 @@ class Naufrago:
   relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
   clean_relative_link_split = filter(None, relative_link_split)
 
-  if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
-   a = self.get_base_url(original_url)
-   b = "/".join(clean_relative_link_split)
-   if a.endswith("/") or b.startswith("/"):
-    final_url = a + b
+  if (clean_relative_link_split is not None) and (len(clean_relative_link_split)>0):
+   if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
+    m = re.search('''[^\W]''', clean_relative_link_split[0]) # Buscamos cosas "no raras" (caracteres alfanumericos)
+    if m is not None:
+     a = self.get_base_url(original_url)
+     b = "/".join(clean_relative_link_split)
+     if a.endswith("/") or b.startswith("/"):
+      final_url = a + b
+     else:
+      final_url = a + "/" + b
+     url_mod_list.append(final_url)
+     print 'Rebuilt_link (A): ' + final_url
    else:
-    final_url = a + "/" + b
-   url_mod_list.append(final_url)
-   print 'Rebuilt_link (A): ' + final_url
-  else:
-   for elem in clean_relative_link_split:
-    if elem == ".": # ./archivo.html
-     clean_relative_link_split.remove(elem)
-    elif elem == "..": # ../archivo.html
-     clean_relative_link_split.remove(elem)
-     copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
+    for elem in clean_relative_link_split:
+     if elem == ".": # ./archivo.html
+      clean_relative_link_split.remove(elem)
+     elif elem == "..": # ../archivo.html
+      clean_relative_link_split.remove(elem)
+      copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
 
-   a = "http://" + "/".join(copy_of_clean_original_url_split)
-   b = "/".join(clean_relative_link_split)
-   if a.endswith("/") or b.startswith("/"):
-    final_url = a + b
-   else:
-    final_url = a + "/" + b
-   url_mod_list.append(final_url)
-   print 'Rebuilt_link (B): ' + final_url
+    a = "http://" + "/".join(copy_of_clean_original_url_split)
+    b = "/".join(clean_relative_link_split)
+    if a.endswith("/") or b.startswith("/"):
+     final_url = a + b
+    else:
+     final_url = a + "/" + b
+    url_mod_list.append(final_url)
+    print 'Rebuilt_link (B): ' + final_url
 
-  base_url = self.get_base_url(original_url)
-  alt_final_url = base_url + b
-  url_mod_list.append(alt_final_url)
-  print 'Rebuilt_link (C): ' + alt_final_url
+   base_url = self.get_base_url(original_url)
+   alt_final_url = base_url + b
+   url_mod_list.append(alt_final_url)
+   print 'Rebuilt_link (C): ' + alt_final_url
 
   return url_mod_list
 
- def filter_needed_content(self, original_url, url_list, url_mod_list, f):
+ def filter_needed_content(self, original_url, url_list, url_mod_list, feed_content_path, f):
   """Obtains the needed content to correctly show a page offline."""
-  # Retrieve &save main html document if needed (read it otherwise)
-  if not os.path.exists(f):
-   web_file = urllib2.urlopen(original_url)
-   local_file = open(f, 'w')
-   page = web_file.read()
-   web_file.close()
-   local_file.write(page)
-   local_file.close()
-  else:
-   local_file = open(f, 'r')
-   page = local_file.read()
-   local_file.close()
+  # Retrieve & save main html document if needed (read it otherwise)
+  #if f.startswith("http://") or f.startswith("https://"):
+  f = feed_content_path + "/" + self.get_filename(f)
+  print "On file: " + `f`
+
+  try:
+   if not os.path.exists(f):
+    web_file = urllib2.urlopen(original_url)
+    local_file = open(f, 'w')
+    page = web_file.read()
+    web_file.close()
+    local_file.write(page)
+    local_file.close()
+   else:
+    local_file = open(f, 'r')
+    page = local_file.read()
+    local_file.close()
+  except:
+   return None, url_list, url_mod_list, None, False
 
   # Obtain base url
   base_url = self.get_base_url(original_url)
@@ -3640,40 +3672,49 @@ class Naufrago:
    tags = re.findall(rgxp, page, re.I)
    for tag in tags:
     clean_tag = tag[2].strip().strip("'")
-    #if tag[2] != base_url and tag[2] != base_url[0:-1]:
-    if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
-     print "Detected " + clean_tag
-     if ".css" in clean_tag:
-      css_list.append(clean_tag)
-     url_list.append(clean_tag)
-     #if tag[2].startswith("http") or tag[2].startswith("https"): # Enlace absoluto
-     if clean_tag.startswith("http") or clean_tag.startswith("https"): # Enlace absoluto
-      url_mod_list.append(clean_tag)
-     else: # Enlace relativo. ¡Hay que reconstruir el link!
-      url_mod_list = self.rebuild_link(original_url, clean_tag, url_mod_list)
-  return page, url_list, url_mod_list, css_list
+    m = re.search('''[^\W]''', clean_tag) # Buscamos cosas "no raras" (caracteres alfanumericos)
+    if m is not None:
+     if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
+      print "Detected " + clean_tag
+      if ".css" in clean_tag:
+       css_list.append(clean_tag)
+      url_list.append(clean_tag)
+      if clean_tag.startswith("http://") or clean_tag.startswith("https://"): # Enlace absoluto
+       url_mod_list.append(clean_tag)
+      else: # Enlace relativo. ¡Hay que reconstruir el link!
+       url_mod_list = self.rebuild_link(original_url, clean_tag, url_mod_list)
+
+  return page, url_list, url_mod_list, css_list, True
 
  def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
-  page, url_list, url_mod_list, css_list = self.filter_needed_content(original_url, url_list, url_mod_list, f)
-  url_mod_list = self.retrieve_needed_content(url_mod_list, feed_content_path)
-  self.translate_document(page, url_list, f)
-  return url_mod_list, css_list
+  self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8"))
+  page, url_list, url_mod_list, css_list, ok = self.filter_needed_content(original_url, url_list, url_mod_list, feed_content_path, f)
+  if ok:
+   url_mod_list = self.retrieve_needed_content(url_mod_list, feed_content_path, id_articulo)
+   self.translate_document(page, url_list, feed_content_path, f)
+   return url_mod_list, css_list
+  else:
+   return url_mod_list, None
 
- def retrieve_full_content(self, id_feed, id_articulo, original_url):
+ def retrieve_full_content(self, id_feed, id_articulo, original_url, nombre_feed):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
   url_list = [] # Dict for original urls
-  url_mod_list = [] # Dict for modified (adapted for local view) urls
+  url_mod_list = [] # Dict for modified urls (some adapted from relative -> absolute)
   feed_content_path = content_path + "/" + `id_feed`
   f = feed_content_path + "/" + `id_articulo` + ".html"
   if not os.path.exists(feed_content_path):
    os.makedirs(feed_content_path)
   url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
 
-  for f in css_list:
-   filename = self.get_filename(f)
-   print "Scrapping css file " + filename + "..."
-   url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+  if css_list is not None:
+   print 'CSS_LIST1: ' + `css_list`
+   for f in css_list:
+    filename = self.get_filename(f)
+    print "Scrapping css file " + filename + "..."
+    url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+
+  self.statusbar.set_text('')
 
  #####  END OFFLINE FULL URL RETRIEVING  #####
 
@@ -3775,7 +3816,7 @@ class Naufrago:
    self.lock.release()
   # Lo mismo con el contenido offline del filesystem, si procede
   self.lock.acquire()
-  cursor.execute('SELECT id FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+  cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
   contenido_offline = cursor.fetchall()
   self.lock.release()
   for i in contenido_offline:
@@ -3791,8 +3832,8 @@ class Naufrago:
    cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    self.conn.commit()
    self.lock.release()
-  if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
-   os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
+  #if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
+  # os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
   # Y finalmente borramos el articulo, propiamente
   self.lock.acquire()
   cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
