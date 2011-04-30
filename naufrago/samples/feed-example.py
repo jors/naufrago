@@ -5,7 +5,7 @@ import time
 import datetime
 import sys
 
-feed = "http://feeds.feedburner.com/VistoEnFacebook"
+feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
 d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)

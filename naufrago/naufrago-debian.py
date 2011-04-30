@@ -3944,10 +3944,14 @@ class Naufrago:
       self.lock.release()
       if images_present is None:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
+     # START Deep offline mode
+     if (self.deep_offline_mode == 1):
+      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
+     # END Deep offline mode
     # END Offline mode image retrieving
     # START Deep offline mode
-    if (self.deep_offline_mode == 1):
-     self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
+    #if (self.deep_offline_mode == 1):
+    # self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
     # END Deep offline mode
     # Accounting...
     if i < limit:
@@ -3969,10 +3973,14 @@ class Naufrago:
        self.lock.release()
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
+     # START Deep offline mode
+     if (self.deep_offline_mode == 1):
+      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
+     # END Deep offline mode
     # END Offline mode image retrieving
     # START Deep offline mode
-    if (self.deep_offline_mode == 1):
-     self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
+    #if (self.deep_offline_mode == 1):
+    # self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
     # END Deep offline mode
     #else:
     # self.lock.acquire()
