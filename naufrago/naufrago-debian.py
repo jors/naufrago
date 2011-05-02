@@ -3551,7 +3551,7 @@ class Naufrago:
   local_file.write(page)
   local_file.close()
 
- def retrieve_needed_content(self, url_mod_list, feed_content_path, id_articulo):
+ def retrieve_needed_content(self, url_mod_list, url_trashed, feed_content_path, id_articulo):
   """Retrieves the content chosen from the filter content (if not present already)."""
   store_values = {} # Dict to store possible values to register into the DB
   url_mod_set = set(url_mod_list) # Remove duplicates
@@ -3559,11 +3559,11 @@ class Naufrago:
   for url in url_mod_set:
    # Get file name to save
    filename = self.get_filename(url)
-   if not os.path.exists(feed_content_path + "/" + filename):
+   if not os.path.exists(feed_content_path + "/" + filename) and (url not in url_trashed):
     print "Retrieving " + url + "..."
-    self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
     try:
      web_file = urllib2.urlopen(url)
+     self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
      # Chunk filename if it is too large!
      if len(filename) > 256:
       m = re.search('[^?=&]+', filename)
@@ -3575,6 +3575,7 @@ class Naufrago:
      print "Done!"
     except urllib2.HTTPError, e:
      print "Oops! The error was: " + `e.code` + " - " + `e.msg`
+     url_trashed.append(url)
     except urllib2.URLError, e:
      print "Other error: " + `e`
    else:
@@ -3596,7 +3597,7 @@ class Naufrago:
      self.lock.release()
    cursor.close()
 
-  return url_mod_list
+  return url_mod_list, url_trashed
 
  def rebuild_link(self, original_url, relative_link, url_mod_list):
   """Builds an absolute link from a relative one."""
@@ -3610,14 +3611,21 @@ class Naufrago:
    if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
     m = re.search('''[^\W]''', clean_relative_link_split[0]) # Buscamos cosas "no raras" (caracteres alfanumericos)
     if m is not None:
-     a = self.get_base_url(original_url)
-     b = "/".join(clean_relative_link_split)
-     if a.endswith("/") or b.startswith("/"):
-      final_url = a + b
+     # Si empieza por //...
+     if relative_link.startswith("//"):
+      final_url = "http:" + relative_link
+      print 'Rebuilt_link (A1): ' + final_url
+     # Sino, construimos lo que podría ser el enlace...
      else:
-      final_url = a + "/" + b
+      a = self.get_base_url(original_url)
+      b = "/".join(clean_relative_link_split)
+      if a.endswith("/") or b.startswith("/"):
+       final_url = a + b
+      else:
+       final_url = a + "/" + b
+      #url_mod_list.append(final_url)
+      print 'Rebuilt_link (A3): ' + final_url
      url_mod_list.append(final_url)
-     print 'Rebuilt_link (A): ' + final_url
    else:
     for elem in clean_relative_link_split:
      if elem == ".": # ./archivo.html
@@ -3635,7 +3643,8 @@ class Naufrago:
     url_mod_list.append(final_url)
     print 'Rebuilt_link (B): ' + final_url
 
-   base_url = self.get_base_url(original_url)
+   a = base_url = self.get_base_url(original_url)
+   b = "/".join(clean_relative_link_split)
    alt_final_url = base_url + b
    url_mod_list.append(alt_final_url)
    print 'Rebuilt_link (C): ' + alt_final_url
@@ -3667,7 +3676,7 @@ class Naufrago:
   # Obtain base url
   base_url = self.get_base_url(original_url)
   regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["']?([^"'>\s]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''')
-  css_list = [] # Dict for css files
+  css_list = [] # List for css files
   for rgxp in regexps:
    tags = re.findall(rgxp, page, re.I)
    for tag in tags:
@@ -3686,33 +3695,34 @@ class Naufrago:
 
   return page, url_list, url_mod_list, css_list, True
 
- def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f):
+ def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
   self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8"))
   page, url_list, url_mod_list, css_list, ok = self.filter_needed_content(original_url, url_list, url_mod_list, feed_content_path, f)
   if ok:
-   url_mod_list = self.retrieve_needed_content(url_mod_list, feed_content_path, id_articulo)
+   url_mod_list, url_trashed = self.retrieve_needed_content(url_mod_list, url_trashed, feed_content_path, id_articulo)
    self.translate_document(page, url_list, feed_content_path, f)
-   return url_mod_list, css_list
+   return url_mod_list, url_trashed, css_list
   else:
-   return url_mod_list, None
+   return url_mod_list, url_trashed, None
 
  def retrieve_full_content(self, id_feed, id_articulo, original_url, nombre_feed):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
-  url_list = [] # Dict for original urls
-  url_mod_list = [] # Dict for modified urls (some adapted from relative -> absolute)
+  url_list = [] # List for original urls
+  url_mod_list = [] # List for modified urls (some adapted from relative -> absolute)
+  url_trashed = [] # List for invalid url's
   feed_content_path = content_path + "/" + `id_feed`
   f = feed_content_path + "/" + `id_articulo` + ".html"
   if not os.path.exists(feed_content_path):
    os.makedirs(feed_content_path)
-  url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+  url_mod_list, css_list, url_trashed = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   if css_list is not None:
    print 'CSS_LIST1: ' + `css_list`
    for f in css_list:
     filename = self.get_filename(f)
     print "Scrapping css file " + filename + "..."
-    url_mod_list, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, feed_content_path, f)
+    url_mod_list, css_list, url_trashed = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   self.statusbar.set_text('')
 
@@ -3946,7 +3956,7 @@ class Naufrago:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
      # START Deep offline mode
      if (self.deep_offline_mode == 1):
-      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
+      self.retrieve_full_content(id_feed, recently_inserted_entry[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
     # START Deep offline mode
@@ -3975,7 +3985,7 @@ class Naufrago:
         self.retrieve_entry_images(unique[0], imagenes[0])
      # START Deep offline mode
      if (self.deep_offline_mode == 1):
-      self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
+      self.retrieve_full_content(id_feed, unique[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
     # START Deep offline mode
