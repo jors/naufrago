@@ -3559,7 +3559,9 @@ class Naufrago:
   for url in url_mod_set:
    # Get file name to save
    filename = self.get_filename(url)
-   if not os.path.exists(feed_content_path + "/" + filename) and (url not in url_trashed):
+   #print "url_trashed: " + `url_trashed`
+   #print "url: " + `url`
+   if not os.path.exists(feed_content_path + "/" + filename) and (len(url_trashed)>0) and (url not in url_trashed):
     print "Retrieving " + url + "..."
     try:
      web_file = urllib2.urlopen(url)
@@ -3578,6 +3580,7 @@ class Naufrago:
      url_trashed.append(url)
     except urllib2.URLError, e:
      print "Other error: " + `e`
+     url_trashed.append(url)
    else:
     print "Skipping " + feed_content_path + "/" + filename + "..."
    store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
@@ -3586,13 +3589,16 @@ class Naufrago:
   if len(store_values)>0:
    cursor = self.conn.cursor()
    for k,v in store_values.items():
+    #print 'k: ' + k
+    #print 'v: ' + v
+    k = unicode(k, errors='replace') # This prevents encodings that cannot be handled by simply encoding/decoding to utf-8
     self.lock.acquire()
-    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ? AND id_articulo = ?', [k, v])
+    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ? AND id_articulo = ?', [k.decode("utf-8"),v.decode("utf-8")])
     num_contenido_offline = cursor.fetchone()
     self.lock.release()
     if (num_contenido_offline is None) or (num_contenido_offline[0]<=0):
      self.lock.acquire()
-     cursor.execute('INSERT INTO contenido_offline VALUES(null, ?, ?)', [k, v]) # Discard dupes, insert uniques
+     cursor.execute('INSERT INTO contenido_offline VALUES(null, ?, ?)', [k.decode("utf-8"),v.decode("utf-8")]) # Discard dupes, insert uniques
      self.conn.commit()
      self.lock.release()
    cursor.close()
