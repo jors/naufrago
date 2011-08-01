@@ -228,7 +228,7 @@ ROADMAP 0.4:
 - NEW: toolbar button to mark EVERYTHING as read ('Read all'). DONE
 - NEW: 'follow feed link' available per-feed basis. Queda:
   * Opción en las Preferencias.
-  * Avisar de la descarga de contenido offline en la statusbar.
+  * Avisar de la descarga de contenido offline en la statusbar. DONE
   * Cambiar la operativa para que cada artículo registre todos sus archivos en bd. DONE
   * Tener en cuenta el borrado en delete_feed y delete_category. DONE (tests pending on delete feed/category)
 

@@ -1316,7 +1316,7 @@ class Naufrago:
   global APP_VERSION
   try:
    gtk.gdk.threads_enter()
-   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version')
+   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version', timeout=10)
    read = web_file.read().rstrip()
    web_file.close()
    gtk.gdk.threads_leave()
@@ -3559,12 +3559,13 @@ class Naufrago:
   for url in url_mod_set:
    # Get file name to save
    filename = self.get_filename(url)
-   #print "url_trashed: " + `url_trashed`
-   #print "url: " + `url`
-   if not os.path.exists(feed_content_path + "/" + filename) and (len(url_trashed)>0) and (url not in url_trashed):
+   if (url_trashed is not None) and len(url_trashed)>0 and (url in url_trashed):
+    print "Skipping " + feed_content_path + "/" + filename + " (trash detected)..."
+    continue
+   if not os.path.exists(feed_content_path + "/" + filename):
     print "Retrieving " + url + "..."
     try:
-     web_file = urllib2.urlopen(url)
+     web_file = urllib2.urlopen(url, timeout=10)
      self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
      # Chunk filename if it is too large!
      if len(filename) > 256:
@@ -3574,6 +3575,7 @@ class Naufrago:
      local_file.write(web_file.read())
      local_file.close()
      web_file.close()
+     store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
      print "Done!"
     except urllib2.HTTPError, e:
      print "Oops! The error was: " + `e.code` + " - " + `e.msg`
@@ -3581,16 +3583,16 @@ class Naufrago:
     except urllib2.URLError, e:
      print "Other error: " + `e`
      url_trashed.append(url)
+    except urllib2.httplib.BadStatusLine, e: # We need this because it does not seem to be handled by urllib2 :(
+     print "BadStatusLine error: " + `e`
    else:
     print "Skipping " + feed_content_path + "/" + filename + "..."
-   store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
+    store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
 
   # Insertion into the database of the retrieved contents
   if len(store_values)>0:
    cursor = self.conn.cursor()
    for k,v in store_values.items():
-    #print 'k: ' + k
-    #print 'v: ' + v
     k = unicode(k, errors='replace') # This prevents encodings that cannot be handled by simply encoding/decoding to utf-8
     self.lock.acquire()
     cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ? AND id_articulo = ?', [k.decode("utf-8"),v.decode("utf-8")])
@@ -3638,6 +3640,8 @@ class Naufrago:
       clean_relative_link_split.remove(elem)
      elif elem == "..": # ../archivo.html
       clean_relative_link_split.remove(elem)
+      type(copy_of_clean_original_url_split)
+      print 'copy_of_clean_original_url_split: ' + `copy_of_clean_original_url_split`
       copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
 
     a = "http://" + "/".join(copy_of_clean_original_url_split)
@@ -3666,7 +3670,7 @@ class Naufrago:
 
   try:
    if not os.path.exists(f):
-    web_file = urllib2.urlopen(original_url)
+    web_file = urllib2.urlopen(original_url, timeout=10)
     local_file = open(f, 'w')
     page = web_file.read()
     web_file.close()
@@ -3681,7 +3685,7 @@ class Naufrago:
 
   # Obtain base url
   base_url = self.get_base_url(original_url)
-  regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["']?([^"'>\s]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''')
+  regexps = ('''<(link|script|img|iframe)\s+[^>]*?(href|src)=["']?([^"'>\s]+)[^>]*?>''', '''(url)\(('|")*([^\)]*?)('|")*\)''', '''<(a)\s+(href)=["']?([^"'>\s]+)[^>]*?><img\s+[^>]*?>''')
   css_list = [] # List for css files
   for rgxp in regexps:
    tags = re.findall(rgxp, page, re.I)
@@ -3691,7 +3695,8 @@ class Naufrago:
     if m is not None:
      if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
       print "Detected " + clean_tag
-      if ".css" in clean_tag:
+      if clean_tag.endswith(".css"):
+       print "Storing CSS file " + clean_tag + "!"
        css_list.append(clean_tag)
       url_list.append(clean_tag)
       if clean_tag.startswith("http://") or clean_tag.startswith("https://"): # Enlace absoluto
@@ -3721,14 +3726,14 @@ class Naufrago:
   f = feed_content_path + "/" + `id_articulo` + ".html"
   if not os.path.exists(feed_content_path):
    os.makedirs(feed_content_path)
-  url_mod_list, css_list, url_trashed = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
+  url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   if css_list is not None:
    print 'CSS_LIST1: ' + `css_list`
    for f in css_list:
     filename = self.get_filename(f)
     print "Scrapping css file " + filename + "..."
-    url_mod_list, css_list, url_trashed = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
+    url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   self.statusbar.set_text('')
 
@@ -3812,7 +3817,7 @@ class Naufrago:
 
  def content_cache_cleanup(self, cursor, id_articulo, id_feed):
   """Deletes images & offline contents when needed."""
-  #i = 0
+  self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
   # Borramos las imagenes del filesystem, si procede
   self.lock.acquire()
   cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
@@ -3965,10 +3970,6 @@ class Naufrago:
       self.retrieve_full_content(id_feed, recently_inserted_entry[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
-    # START Deep offline mode
-    #if (self.deep_offline_mode == 1):
-    # self.retrieve_full_content(id_feed, recently_inserted_entry[0], link) # ALPHA, BETA & GAMMA!!!
-    # END Deep offline mode
     # Accounting...
     if i < limit:
     # new_posts = True
@@ -3990,14 +3991,10 @@ class Naufrago:
        if images_present is None:
         self.retrieve_entry_images(unique[0], imagenes[0])
      # START Deep offline mode
-     if (self.deep_offline_mode == 1):
-      self.retrieve_full_content(id_feed, unique[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
+     ###if (self.deep_offline_mode == 1):
+     ### self.retrieve_full_content(id_feed, unique[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
-    # START Deep offline mode
-    #if (self.deep_offline_mode == 1):
-    # self.retrieve_full_content(id_feed, unique[0], link) # ALPHA, BETA & GAMMA!!!
-    # END Deep offline mode
     #else:
     # self.lock.acquire()
     # cursor.execute('UPDATE articulo SET ghost = 1 WHERE id = ? AND importante = 0', [unique[0]])
