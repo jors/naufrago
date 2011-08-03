@@ -3815,7 +3815,7 @@ class Naufrago:
   else:
    return False
 
- def content_cache_cleanup(self, cursor, id_articulo, id_feed):
+ def content_cache_cleanup(self, cursor, id_articulo, id_feed, full_cleanup=True):
   """Deletes images & offline contents when needed."""
   self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
   # Borramos las imagenes del filesystem, si procede
@@ -3835,24 +3835,27 @@ class Naufrago:
    cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
    self.conn.commit()
    self.lock.release()
-  # Lo mismo con el contenido offline del filesystem, si procede
-  self.lock.acquire()
-  cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
-  contenido_offline = cursor.fetchall()
-  self.lock.release()
-  for i in contenido_offline:
+
+  if (full_cleanup is True) or (self.deep_offline_mode == 1):
+   # Lo mismo con el contenido offline del filesystem, si procede
    self.lock.acquire()
-   cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
-   num_contenido_offline = cursor.fetchone()
+   cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   contenido_offline = cursor.fetchall()
    self.lock.release()
-   if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
-    full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
-    if os.path.exists(full_path):
-     os.unlink(full_path)
-   self.lock.acquire()
-   cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
-   self.conn.commit()
-   self.lock.release()
+   for i in contenido_offline:
+    self.lock.acquire()
+    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+    num_contenido_offline = cursor.fetchone()
+    self.lock.release()
+    if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
+     full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+     if os.path.exists(full_path):
+      os.unlink(full_path)
+    self.lock.acquire()
+    cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+    self.conn.commit()
+    self.lock.release()
+
   #if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
   # os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
   # Y finalmente borramos el articulo, propiamente
@@ -4020,7 +4023,7 @@ class Naufrago:
     row  = cursor.fetchall()
     self.lock.release()
     for id_articulo in row:
-     self.content_cache_cleanup(cursor, id_articulo[0], id_feed) # NEW
+     self.content_cache_cleanup(cursor, id_articulo[0], id_feed, False) # NEW
      ## Ahora borramos las imagenes del filesystem, si procede
      #self.lock.acquire()
      #cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo[0]])
