@@ -4206,9 +4206,9 @@ class Naufrago:
    (model, iter) = self.treeselection.get_selected() # We only want the model here...
    iter = model.get_iter_root() # Magic
    cursor = self.conn.cursor()
-   while (iter is not None) and (not self.stop_feed_update_lock):
+   while (iter is not None or self.clear_mode == 1) and (not self.stop_feed_update_lock):
     # OLD: if(model.iter_depth(iter) == 0): # Si es padre
-    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es padre
+    if (self.clear_mode == 0) and (model.iter_depth(iter) == 0): # Si es padre
      id_category = model.get_value(iter, 2)
      new_posts = False # Reset
      aux_num_new_posts_total = num_new_posts_total
