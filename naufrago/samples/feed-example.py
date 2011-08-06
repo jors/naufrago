@@ -5,7 +5,8 @@ import time
 import datetime
 import sys
 
-feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
+#feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
+feed = "http://psychcentral.com/ask-the-therapist/feed/atom/"
 d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)
@@ -40,8 +41,16 @@ for i in range(0, count):
  else: print 'Sin titulo'
  if(hasattr(d.entries[i],'link')): print 'Entry link: '+d.entries[i].link.encode('utf-8')
  else: print 'Sin link'
- if(hasattr(d.entries[i],'description')): print 'Entry description: '+d.entries[i].description.encode('utf-8')
- else: print 'Sin description'
+ #if(hasattr(d.entries[i],'description')): print 'Entry description: '+d.entries[i].description.encode('utf-8')
+ #else: print 'Sin description'
+
+ if(hasattr(d.entries[i],'content')):
+  print 'Entry content: '+d.entries[i].content[0].value.encode('utf-8')
+ elif(hasattr(d.entries[i],'description')):
+  print 'Entry description: '+d.entries[i].description.encode('utf-8')
+ else:
+  print 'Sin content & description'
+
  if(hasattr(d.entries[i],'date')): print 'Entry date: '+str(d.entries[i].date.encode('iso8859-1'))
  else: print 'Sin date'
  if(hasattr(d.entries[i],'date_parsed')):
