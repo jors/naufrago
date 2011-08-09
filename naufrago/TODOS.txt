@@ -252,3 +252,6 @@ Offline mode (¡más lento!)  ->	Image caching mode (¡más lento!)
 N/A			    ->  Offline mode (¡aún más lento!)
 ---------------------------------------------------------------
 
+Added:
+- FIX: Items of some feeds were shown as an exceptr, now show complete. DONE
+

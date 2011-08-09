@@ -6,7 +6,8 @@ import datetime
 import sys
 
 #feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
-feed = "http://psychcentral.com/ask-the-therapist/feed/atom/"
+#feed = "http://psychcentral.com/ask-the-therapist/feed/atom/"
+feed = "http://blog.48bits.com/?feed=rss2"
 d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)
