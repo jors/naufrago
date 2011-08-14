@@ -3365,15 +3365,16 @@ class Naufrago:
   else: title = _('Without title')
 
   if hasattr(dentry,'content'):
-   if dentry.content[0].value.encode('utf-8') is not None: description = dentry.content[0].value.encode('utf-8')
+   if dentry.content[0].value is not None: description = dentry.content[0].value
    elif hasattr(dentry,'description'):
-    if dentry.description is not None: description = dentry.description.encode("utf-8")
+    if dentry.description is not None: description = dentry.description
     else: description = ''
    else: description = ''
   elif hasattr(dentry,'description'):
-   if dentry.description is not None: description = dentry.description.encode("utf-8")
+   if dentry.description is not None: description = dentry.description
    else: description = ''
   else: description = ''
+  ###print 'description: ' + description
 
   if hasattr(dentry,'link'):
    if dentry.link is not None: link = dentry.link.encode("utf-8")
@@ -3957,7 +3958,17 @@ class Naufrago:
     if i >= limit:
      ghost = 1
     self.lock.acquire()
+    #print 'Antes del INSERT...'
+    #print 'title.decode("utf-8"): '+ title.decode("utf-8")
+    #print 'description.decode("utf-8"): ' + description.decode("utf-8")
+    #print 'secs: ' + `secs`
+    #print 'link.decode("utf-8"): ' + link.decode("utf-8")
+    #print 'images: ' + images
+    #print 'id_feed: ' + `id_feed`
+    #print 'id.decode("utf-8"): ' + id.decode("utf-8")
+    #print 'ghost: ' + `ghost`
     cursor.execute('INSERT INTO articulo VALUES(null, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)', [title.decode("utf-8"),description.decode("utf-8"),secs,link.decode("utf-8"),images,id_feed,id.decode("utf-8"),ghost])
+    #print 'Despues del INSERT...'
     self.conn.commit()
     self.lock.release()
     self.lock.acquire()
@@ -4279,7 +4290,10 @@ class Naufrago:
     were_added_txt = _(' entry/s were added')
     n = pynotify.Notification(new_entries_txt, `num_new_posts_total` + were_added_txt, self.imageURI)
     #n.attach_to_status_icon(self.statusicon) # <-- This fucks up the whole thing!!!
-    n.show()
+    try:
+     n.show()
+    except:
+     pass
 
   self.statusbar.set_text('')
   # Fires tray icon blinking

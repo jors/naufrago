@@ -7,7 +7,8 @@ import sys
 
 #feed = "http://www.elperiodico.com/es/rss/rss_portada.xml"
 #feed = "http://psychcentral.com/ask-the-therapist/feed/atom/"
-feed = "http://blog.48bits.com/?feed=rss2"
+#feed = "http://blog.48bits.com/?feed=rss2"
+feed = "http://alt1040.com/feed"
 d = feedparser.parse(feed)
 #print type(d)
 #print type(d.feed)
