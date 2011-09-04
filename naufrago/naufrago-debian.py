@@ -2965,24 +2965,31 @@ class Naufrago:
   vbox5 = gtk.VBox(homogeneous=True)
   align4 = gtk.Alignment()
   align4.set_padding(10, 0, 15, 0)
-  checkbox0 = gtk.CheckButton(_("Offline mode (slower!)"))
+
+  checkbox0 = gtk.CheckButton(_("Offline mode (slow)"))
   if(self.offline_mode == 1): checkbox0.set_active(True)
   else: checkbox0.set_active(False)
   vbox5.pack_start(checkbox0, True, True, 5)
+  # START NEW
+  checkbox11 = gtk.CheckButton(_("Deep offline mode (slower!)"))
+  if(self.deep_offline_mode == 1): checkbox11.set_active(True)
+  else: checkbox11.set_active(False)
+  vbox5.pack_start(checkbox11, True, True, 5)
+  # END NEW
   aux_driven_mode = self.driven_mode
   if(self.driven_mode == 1) and (self.clear_mode == 0) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
   else: checkbox8.set_active(False)
   hbox_throbber2 = self.progress_factory()
   checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox10, 2, hbox_throbber2)
   vbox5.pack_start(checkbox8, True, True, 5)
-  # NEW
+  # START NEW
   aux_clear_mode = self.clear_mode
   if(self.clear_mode == 1) and (self.driven_mode == 0) and (self.init_unfolded_tree == 0): checkbox10.set_active(True)
   else: checkbox10.set_active(False)
   checkbox10.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox8, 3, hbox_throbber2)
   vbox5.pack_start(checkbox10, True, True, 5)
   vbox5.pack_start(hbox_throbber2, False, False, 5)
-  # NEW
+  # END NEW
   align4.add(vbox5)
   notebook.append_page(align4, gtk.Label(_("Modes")))
 
@@ -3023,6 +3030,8 @@ class Naufrago:
    else: self.driven_mode = 0
    if(checkbox9.get_active()): self.init_check_app_updates = 1
    else: self.init_check_app_updates = 0
+   if(checkbox11.get_active()): self.deep_offline_mode = 1
+   else: self.deep_offline_mode = 0
 
    if checkbox1.get_active() and self.show_trayicon == 0:
     self.show_trayicon = 1
@@ -3572,7 +3581,7 @@ class Naufrago:
    if not os.path.exists(feed_content_path + "/" + filename):
     print "Retrieving " + url + "..."
     try:
-     web_file = urllib2.urlopen(url, timeout=10)
+     web_file = urllib2.urlopen(url, timeout=5)
      self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
      # Chunk filename if it is too large!
      if len(filename) > 256:

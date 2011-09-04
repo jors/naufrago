@@ -245,13 +245,13 @@ ROADMAP 0.4:
   paso, con esto nos quitamos de encima el tema del symlink) y moverlo posteriormente a su directorio 
   (.config/contenido/id_feed). DISCARDED (prescindiendo de wget y creando fetcher propio)
 
----------------------------------------------------------------
-Presente			Futuro
----------------------------------------------------------------
-Offline mode (¡más lento!)  ->	Image caching mode (¡más lento!)
-N/A			    ->  Offline mode (¡aún más lento!)
----------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+Presente(UI)			Futuro(UI)				Config name
+-------------------------------------------------------------------------------------------
+Offline mode (¡más lento!)  ->	Offline mode (¡lento!)			offline_mode
+N/A			    ->  Deep offline mode (¡más lento!)		deep_offline_mode
+-------------------------------------------------------------------------------------------
 
 Added:
-- FIX: Items of some feeds were shown as an exceptr, now show complete. DONE
+- FIX: Items of some feeds were shown as an exceprt, now show complete. DONE
 
