@@ -28,8 +28,8 @@ case $1 in
   svn export $svn_path/naufrago-deb $desktop_deb_path
   cd $desktop_deb_path
   chown -R root.root *
-  dpkg-deb -z9 -b debian naufrago-0.3-1_all.deb
-  lintian -i naufrago-0.3-1_all.deb
+  dpkg-deb -z9 -b debian naufrago-0.4-1_all.deb
+  lintian -i naufrago-0.4-1_all.deb
  ;;
 
  tar)
@@ -51,7 +51,7 @@ case $1 in
   cd $desktop_tar_path
   chown -R root.root *
   chmod o+rwx ../naufrago-tar
-  # Y el tar a manija, que es tiene que cambiar:
+  # Y el tar a manija, que se tiene que cambiar:
   # - el valor del package = False!
   # - el script de update de la bd.
  ;;
