@@ -24,7 +24,7 @@ msgstr "Errore durante límportazione dei moduli"
 
 #: naufrago.py:293
 msgid "Are you sure you want to <b>mark it ALL as READ</b>?"
-msgstr ""
+msgstr "Sei sicuro di voler <b>marcare TUTTO coe LETTO</b>?"
 
 #: naufrago.py:378 naufrago.py:579 naufrago.py:598 naufrago.py:661
 #: naufrago.py:686 naufrago.py:774 naufrago.py:818 naufrago.py:851
@@ -361,7 +361,7 @@ msgstr "Nessun risultato trovato per <b>"
 
 #: naufrago.py:2743
 msgid "Applying changes..."
-msgstr ""
+msgstr "Aggiornando..."
 
 #: naufrago.py:2752
 msgid "Preferences"
@@ -534,7 +534,7 @@ msgstr "Ottenendo feed "
 
 #: naufrago.py:3697
 msgid "Doing cleanup"
-msgstr ""
+msgstr "Facendo pulizia"
 
 #: naufrago.py:3757
 msgid "Obtaining feed "
@@ -547,7 +547,7 @@ msgstr "Nuova categoria"
 
 #: naufrago.py:4053
 msgid " entry/s were added"
-msgstr ""
+msgstr "ingressi aggiunti"
 
 #: naufrago.py:4072 naufrago.py:4146
 msgid "Open.."

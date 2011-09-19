@@ -22,7 +22,7 @@ msgstr "Importation des modules impossible: "
 
 #: naufrago.py:293
 msgid "Are you sure you want to <b>mark it ALL as READ</b>?"
-msgstr ""
+msgstr "Êtes vous sûr de vouloir <b>TOUT marquer comme LU</b> ?"
 
 #: naufrago.py:378 naufrago.py:579 naufrago.py:598 naufrago.py:661
 #: naufrago.py:686 naufrago.py:774 naufrago.py:818 naufrago.py:851
@@ -39,7 +39,6 @@ msgid "Important"
 msgstr "Important"
 
 #: naufrago.py:460 naufrago.py:940
-#, fuzzy
 msgid "Feed"
 msgstr "Flux"
 
@@ -161,12 +160,11 @@ msgstr "Recherche un terme dans les flux"
 
 #: naufrago.py:1433
 msgid "Read all"
-msgstr ""
+msgstr "Tout lire"
 
 #: naufrago.py:1433
-#, fuzzy
 msgid "Mark all feed items as read"
-msgstr "Marquer comme Tous Lus"
+msgstr "Marquer tous les flux comme lus"
 
 #: naufrago.py:1434
 msgid "_Preferences"
@@ -360,7 +358,7 @@ msgstr "Aucun résultat pour <b>"
 
 #: naufrago.py:2743
 msgid "Applying changes..."
-msgstr ""
+msgstr "Appliquer les changements..."
 
 #: naufrago.py:2752
 msgid "Preferences"
@@ -379,9 +377,8 @@ msgid "Driven mode"
 msgstr "Affichage amélioré"
 
 #: naufrago.py:2773
-#, fuzzy
 msgid "Clear mode"
-msgstr "Barre d'outils"
+msgstr "Mode nettoyage"
 
 #: naufrago.py:2777
 msgid "Start in Tray Icon"
@@ -460,14 +457,12 @@ msgid "Interface"
 msgstr "Interface"
 
 #: naufrago.py:2879
-#, fuzzy
 msgid "Offline mode (slow)"
-msgstr "Mode Hors-Ligne (plus lent!)"
+msgstr "Mode Hors-Ligne (lent!)"
 
 #: naufrago.py:2884
-#, fuzzy
 msgid "Deep offline mode (slower!)"
-msgstr "Mode Hors-Ligne (plus lent!)"
+msgstr "Mode Hors-Ligne Profond (plus lent!)"
 
 #: naufrago.py:2904
 msgid "Modes"
@@ -522,31 +517,28 @@ msgid "Obtaining image "
 msgstr "Importation de l'image "
 
 #: naufrago.py:3446
-#, fuzzy
 msgid "Obtaining offline content "
-msgstr "Importation du flux "
+msgstr "Récupération du contenu hors-ligne "
 
 #: naufrago.py:3588
-#, fuzzy
 msgid "Obtaining offline content from "
-msgstr "Importation du flux "
+msgstr "Récupération du contenu hors-ligne à partir de "
 
 #: naufrago.py:3697
 msgid "Doing cleanup"
-msgstr ""
+msgstr "Faire un nettoyage"
 
 #: naufrago.py:3757
 msgid "Obtaining feed "
 msgstr "Importation du flux "
 
 #: naufrago.py:4052
-#, fuzzy
 msgid "New entry/s"
-msgstr "Nouvelle catégorie"
+msgstr "Nouvelle(s) catégorie(s)"
 
 #: naufrago.py:4053
 msgid " entry/s were added"
-msgstr ""
+msgstr " catégorie(s) ajoutée(s)"
 
 #: naufrago.py:4072 naufrago.py:4146
 msgid "Open.."

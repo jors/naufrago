@@ -965,7 +965,7 @@ class Naufrago:
     self.lock.release()
     cursor.close()
    full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` + ".html"
-   print 'full_path: ' + full_path
+   #print 'full_path: ' + full_path
    if (self.deep_offline_mode == 1) and os.path.exists(full_path):
     link = "file://" + full_path
    else:
@@ -2151,7 +2151,7 @@ class Naufrago:
  def alphabetical_node_ordering(self, iter_del_nodo_a_insertar):
   """Orders a node in the feed list alphabetically. Oriented ONLY to feeds."""
   if self.clear_mode == 1:
-   print 'En alphabetical_node_ordering, clear_mode == 1'
+   #print 'En alphabetical_node_ordering, clear_mode == 1'
    iter = self.treestore.get_iter_root() # Magic
    if iter is not None:
     nodo_a_insertar = self.treestore.get_value(iter_del_nodo_a_insertar, 0)
@@ -2159,7 +2159,7 @@ class Naufrago:
    self.treestore.move_before(iter_del_nodo_a_insertar, iter)
 
   else: #self.clear_mode == 0
-   print 'En alphabetical_node_ordering, clear_mode == 0'
+   #print 'En alphabetical_node_ordering, clear_mode == 0'
    (model, iter) = self.treeselection.get_selected()
    iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
    if iter_parent is None:
@@ -3416,10 +3416,10 @@ class Naufrago:
    # Get file name to replace
    filename = self.get_filename(url)
    if url != filename:
-    print "Reemplazamos '" + url + "' por '" + filename + "'."
+    #print "Reemplazamos '" + url + "' por '" + filename + "'."
     page = page.replace(url, filename)
-   else:
-    print "No hace falta reemplazar, skipping!"
+   #else:
+   # print "No hace falta reemplazar, skipping!"
 
   #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
@@ -3432,15 +3432,15 @@ class Naufrago:
   """Retrieves the content chosen from the filter content (if not present already)."""
   store_values = {} # Dict to store possible values to register into the DB
   url_mod_set = set(url_mod_list) # Remove duplicates
-  print "Links to download: " + `url_mod_set`
+  #print "Links to download: " + `url_mod_set`
   for url in url_mod_set:
    # Get file name to save
    filename = self.get_filename(url)
    if (url_trashed is not None) and len(url_trashed)>0 and (url in url_trashed):
-    print "Skipping " + feed_content_path + "/" + filename + " (trash detected)..."
+    #print "Skipping " + feed_content_path + "/" + filename + " (trash detected)..."
     continue
    if not os.path.exists(feed_content_path + "/" + filename):
-    print "Retrieving " + url + "..."
+    #print "Retrieving " + url + "..."
     try:
      web_file = urllib2.urlopen(url, timeout=5)
      self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
@@ -3453,19 +3453,20 @@ class Naufrago:
      local_file.close()
      web_file.close()
      store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
-     print "Done!"
+     #print "Done!"
     except urllib2.HTTPError, e:
-     print "Oops! The error was: " + `e.code` + " - " + `e.msg`
+     #print "Oops! The error was: " + `e.code` + " - " + `e.msg`
      url_trashed.append(url)
     except urllib2.URLError, e:
-     print "Other error: " + `e`
+     #print "Other error: " + `e`
      url_trashed.append(url)
-    except urllib2.httplib.BadStatusLine, e: # We need this because it does not seem to be handled by urllib2 :(
-     print "BadStatusLine error: " + `e`
+    #except urllib2.httplib.BadStatusLine, e: # We need this because it does not seem to be handled by urllib2 :(
+    # print "BadStatusLine error: " + `e`
     except:
-     print "Unknown error:" + exc_info()[0]
+     #print "Unknown error:" + exc_info()[0]
+     pass
    else:
-    print "Skipping " + feed_content_path + "/" + filename + "..."
+    #print "Skipping " + feed_content_path + "/" + filename + "..."
     store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
 
   # Insertion into the database of the retrieved contents
@@ -3501,7 +3502,7 @@ class Naufrago:
      # Si empieza por //...
      if relative_link.startswith("//"):
       final_url = "http:" + relative_link
-      print 'Rebuilt_link (A1): ' + final_url
+      #print 'Rebuilt_link (A1): ' + final_url
      # Sino, construimos lo que podría ser el enlace...
      else:
       a = self.get_base_url(original_url)
@@ -3511,7 +3512,7 @@ class Naufrago:
       else:
        final_url = a + "/" + b
       #url_mod_list.append(final_url)
-      print 'Rebuilt_link (A3): ' + final_url
+      #print 'Rebuilt_link (A3): ' + final_url
      url_mod_list.append(final_url)
    else:
     for elem in clean_relative_link_split:
@@ -3519,9 +3520,9 @@ class Naufrago:
       clean_relative_link_split.remove(elem)
      elif elem == "..": # ../archivo.html
       clean_relative_link_split.remove(elem)
-      type(copy_of_clean_original_url_split)
-      print 'copy_of_clean_original_url_split: ' + `copy_of_clean_original_url_split`
-      copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
+      if type(copy_of_clean_original_url_split) is list:
+       #print 'copy_of_clean_original_url_split: ' + `copy_of_clean_original_url_split`
+       copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
 
     a = "http://" + "/".join(copy_of_clean_original_url_split)
     b = "/".join(clean_relative_link_split)
@@ -3530,13 +3531,13 @@ class Naufrago:
     else:
      final_url = a + "/" + b
     url_mod_list.append(final_url)
-    print 'Rebuilt_link (B): ' + final_url
+    #print 'Rebuilt_link (B): ' + final_url
 
    a = base_url = self.get_base_url(original_url)
    b = "/".join(clean_relative_link_split)
    alt_final_url = base_url + b
    url_mod_list.append(alt_final_url)
-   print 'Rebuilt_link (C): ' + alt_final_url
+   #print 'Rebuilt_link (C): ' + alt_final_url
 
   return url_mod_list
 
@@ -3545,7 +3546,7 @@ class Naufrago:
   # Retrieve & save main html document if needed (read it otherwise)
   #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
-  print "On file: " + `f`
+  #print "On file: " + `f`
 
   try:
    if not os.path.exists(f):
@@ -3573,9 +3574,9 @@ class Naufrago:
     m = re.search('''[^\W]''', clean_tag) # Buscamos cosas "no raras" (caracteres alfanumericos)
     if m is not None:
      if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
-      print "Detected " + clean_tag
+      #print "Detected " + clean_tag
       if clean_tag.endswith(".css"):
-       print "Storing CSS file " + clean_tag + "!"
+       #print "Storing CSS file " + clean_tag + "!"
        css_list.append(clean_tag)
       url_list.append(clean_tag)
       if clean_tag.startswith("http://") or clean_tag.startswith("https://"): # Enlace absoluto
@@ -3608,10 +3609,10 @@ class Naufrago:
   url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   if css_list is not None:
-   print 'CSS_LIST1: ' + `css_list`
+   #print 'CSS_LIST1: ' + `css_list`
    for f in css_list:
     filename = self.get_filename(f)
-    print "Scrapping css file " + filename + "..."
+    #print "Scrapping css file " + filename + "..."
     url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   self.statusbar.set_text('')
@@ -3698,6 +3699,7 @@ class Naufrago:
   """Deletes images & offline contents when needed."""
   self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
   # Borramos las imagenes del filesystem, si procede
+  print "Borrando imagenes..."
   self.lock.acquire()
   cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
   images = cursor.fetchall()
@@ -3717,19 +3719,26 @@ class Naufrago:
 
   if (full_cleanup is True) or (self.deep_offline_mode == 1):
    # Lo mismo con el contenido offline del filesystem, si procede
+   print "Borrando contenido offline..."
    self.lock.acquire()
    cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    contenido_offline = cursor.fetchall()
    self.lock.release()
+   #print "contenido_offline: " + contenido_offline[0]
    for i in contenido_offline:
     self.lock.acquire()
     cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
     num_contenido_offline = cursor.fetchone()
     self.lock.release()
+    #print "num_contenido_offline: " + num_contenido_offline[0]
     if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
-     full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+     full_path = content_path + "/" + `id_feed` + "/" + i[0].encode("utf-8")
+     print "full_path: " + full_path
      if os.path.exists(full_path):
+      print "path exists: " + full_path
       os.unlink(full_path)
+     else:
+      print "path does NOT exist!"
     self.lock.acquire()
     cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
     self.conn.commit()
@@ -3874,7 +3883,8 @@ class Naufrago:
     row  = cursor.fetchall()
     self.lock.release()
     for id_articulo in row:
-     self.content_cache_cleanup(cursor, id_articulo[0], id_feed, False) # NEW
+     ###self.content_cache_cleanup(cursor, id_articulo[0], id_feed, False) # NEW
+     self.content_cache_cleanup(cursor, id_articulo[0], id_feed, True) # NEW
      # Accounting...
      if len(new_entries) > 0:
       if id_articulo[0] in new_entries:
