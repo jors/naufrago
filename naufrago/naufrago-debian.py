@@ -1353,7 +1353,7 @@ class Naufrago:
   about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
-  about.set_website("http://www.enchufado.com/")
+  about.set_website("http://naufrago.sourceforge.net/")
   about.set_logo(gtk.gdk.pixbuf_new_from_file(media_path + 'Viking_Longship.svg'))
   about.run()
   about.destroy()
@@ -1520,6 +1520,7 @@ class Naufrago:
   self.init_check_app_updates = int(row[17])
   self.clear_mode = int(row[18])
   self.deep_offline_mode = int(row[19])
+  self.postpone_feedentries_refresh = 0
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -2227,6 +2228,8 @@ class Naufrago:
        self.lock.release()
        for art in articles:
         self.content_cache_cleanup(self, cursor, art[0], feed[0]) # NEW
+       if os.path.exists(content_path + "/" + feed[0]):
+        os.rmdir(content_path + "/" + feed[0])
        self.lock.acquire()
        cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
        self.conn.commit()
@@ -2434,13 +2437,15 @@ class Naufrago:
      for art in articles:
       self.content_cache_cleanup(cursor, art[0], id_feed) # NEW
      self.lock.acquire()
-     cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
+     #cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
      cursor.execute('DELETE FROM feed WHERE id = ?', [id_feed])
      self.conn.commit()
      self.lock.release()
      cursor.close()
      if os.path.exists(favicon_path + '/'+ `id_feed`):
       os.unlink(favicon_path + '/'+ `id_feed`)
+     if os.path.exists(content_path + "/" + `id_feed`):
+      os.rmdir(content_path + "/" + `id_feed`)
 
      if self.clear_mode == 0: # NEW
       # Unbold category if needed.
@@ -3171,6 +3176,15 @@ class Naufrago:
   """Toggles fullscreen mode for the browser."""
   if event.button == 1:
    if self.fullscreen:
+    # START: Actualización postpuesta de las entries de un feed (porque teníamos la fullscreen activada)
+    if self.postpone_feedentries_refresh:
+     (model, iter) = self.treeselection.get_selected()
+     if(iter is not None): # Si hay algún nodo seleccionado...
+      if(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
+       id_selected_feed = self.treestore.get_value(iter, 2)
+       self.populate_entries(id_selected_feed)
+     self.postpone_feedentries_refresh = 0
+    # END
     self.scrolled_window1.set_size_request(self.a, self.b)
     self.scrolled_window1.show()
     self.scrolled_window2.set_size_request(300,150)
@@ -3448,6 +3462,7 @@ class Naufrago:
      if len(filename) > 256:
       m = re.search('[^?=&]+', filename)
       filename = m.group(0)
+     print '(Harddisk) Saving file to: ' + filename
      local_file = open(feed_content_path + "/" + filename, 'w')
      local_file.write(web_file.read())
      local_file.close()
@@ -3469,11 +3484,13 @@ class Naufrago:
     #print "Skipping " + feed_content_path + "/" + filename + "..."
     store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
 
+  store_values[`id_articulo` + '.html'] = `id_articulo` # We also need to register the main offline file! (in instance, 1.html)
   # Insertion into the database of the retrieved contents
   if len(store_values)>0:
    cursor = self.conn.cursor()
    for k,v in store_values.items():
     k = unicode(k, errors='replace') # This prevents encodings that cannot be handled by simply encoding/decoding to utf-8
+    print '(Database) Saving file as: ' + k
     self.lock.acquire()
     cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ? AND id_articulo = ?', [k.decode("utf-8"),v.decode("utf-8")])
     num_contenido_offline = cursor.fetchone()
@@ -3484,6 +3501,8 @@ class Naufrago:
      self.conn.commit()
      self.lock.release()
    cursor.close()
+
+  print '--------------------'
 
   return url_mod_list, url_trashed
 
@@ -3511,8 +3530,7 @@ class Naufrago:
        final_url = a + b
       else:
        final_url = a + "/" + b
-      #url_mod_list.append(final_url)
-      #print 'Rebuilt_link (A3): ' + final_url
+      #print 'Rebuilt_link (A2): ' + final_url
      url_mod_list.append(final_url)
    else:
     for elem in clean_relative_link_split:
@@ -3546,7 +3564,7 @@ class Naufrago:
   # Retrieve & save main html document if needed (read it otherwise)
   #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
-  #print "On file: " + `f`
+  print "On file: " + `f`
 
   try:
    if not os.path.exists(f):
@@ -3571,11 +3589,13 @@ class Naufrago:
    tags = re.findall(rgxp, page, re.I)
    for tag in tags:
     clean_tag = tag[2].strip().strip("'")
+    #print "clean_tag is: " + clean_tag
     m = re.search('''[^\W]''', clean_tag) # Buscamos cosas "no raras" (caracteres alfanumericos)
     if m is not None:
      if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
-      #print "Detected " + clean_tag
-      if clean_tag.endswith(".css"):
+      #print "Detected clean_tag: " + clean_tag
+      #if clean_tag.endswith(".css"):
+      if clean_tag.find('.css') != -1:
        #print "Storing CSS file " + clean_tag + "!"
        css_list.append(clean_tag)
       url_list.append(clean_tag)
@@ -3696,7 +3716,7 @@ class Naufrago:
    return False
 
  def content_cache_cleanup(self, cursor, id_articulo, id_feed, full_cleanup=True):
-  """Deletes images & offline contents when needed."""
+  """Deletes images & offline contents of a given article/entry when called."""
   self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
   # Borramos las imagenes del filesystem, si procede
   print "Borrando imagenes..."
@@ -3706,10 +3726,11 @@ class Naufrago:
   self.lock.release()
   for i in images:
    self.lock.acquire()
-   cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
+   #cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
+   cursor.execute('SELECT count(imagen.id) FROM imagen,articulo WHERE imagen.nombre = ? AND imagen.id_articulo = articulo.id AND articulo.id_feed = ?', [i[0],id_feed])
    num_images = cursor.fetchone()
    self.lock.release()
-   if (num_images is not None) and (num_images[0] == 1):
+   if (num_images is not None) and (num_images[0] <= 1):
     if os.path.exists(images_path + '/' + `i[0]`):
      os.unlink(images_path + '/' + `i[0]`)
    self.lock.acquire()
@@ -3717,40 +3738,48 @@ class Naufrago:
    self.conn.commit()
    self.lock.release()
 
-  if (full_cleanup is True) or (self.deep_offline_mode == 1):
+  #if (full_cleanup is True) or (self.deep_offline_mode == 1):
+  if full_cleanup is True:
    # Lo mismo con el contenido offline del filesystem, si procede
    print "Borrando contenido offline..."
    self.lock.acquire()
    cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    contenido_offline = cursor.fetchall()
    self.lock.release()
-   #print "contenido_offline: " + contenido_offline[0]
+   print 'Potenciales archivos a borrar: ' + `contenido_offline`
    for i in contenido_offline:
     self.lock.acquire()
-    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+    #cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+    cursor.execute('SELECT count(contenido_offline.id) FROM contenido_offline,articulo WHERE contenido_offline.nombre = ? AND contenido_offline.id_articulo = articulo.id AND articulo.id_feed = ?', [i[0],id_feed])
     num_contenido_offline = cursor.fetchone()
+    print 'Archivo: ' + i[0].decode("utf-8") + ' repetido ' + `num_contenido_offline[0]` + ' veces.'
     self.lock.release()
-    #print "num_contenido_offline: " + num_contenido_offline[0]
-    if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
+    if (num_contenido_offline is not None) and (num_contenido_offline[0] <= 1):
      full_path = content_path + "/" + `id_feed` + "/" + i[0].encode("utf-8")
-     print "full_path: " + full_path
      if os.path.exists(full_path):
-      print "path exists: " + full_path
+      #print "path exists: " + full_path
+      print 'Borramos (disco) el archivo.'
       os.unlink(full_path)
      else:
-      print "path does NOT exist!"
-    self.lock.acquire()
-    cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
-    self.conn.commit()
-    self.lock.release()
+      #print "path does NOT exist!"
+      print 'El archivo NO puede ser borrado (disco) porque NO EXISTE!'
+     print '----------'
 
-  #if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
-  # os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
+   self.lock.acquire()
+   print 'También borramos (bd) el contenido_offline para el id_artículo \'' + `id_articulo` + '\'.'
+   cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   ###cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ? AND nombre IN (?)', [id_articulo,",".join(files_to_delete)])
+   self.conn.commit()
+   self.lock.release()
+   print '----------'
+
   # Y finalmente borramos el articulo, propiamente
   self.lock.acquire()
+  print 'Y también borramos (bd) el id_artículo \'' + `id_articulo` + '\', propiamente.'
   cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
   self.conn.commit()
   self.lock.release()
+  print '----------'
 
  def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
@@ -3869,15 +3898,17 @@ class Naufrago:
   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
   total = cursor.fetchone()
   self.lock.release()
-  if (total is not None):
+  if total is not None:
    # Si lo que recibimos del feed es menor que self.num_entries,
    # count pasará a valer lo mismo que self.num_entries.
-   if count < self.num_entries:
-    count = self.num_entries
+   ###if count < self.num_entries:
+   ### count = self.num_entries
    # Si el total (sin importantes) supera lo que recibimos del feed
    # (o self.num_entries si count es menor), entramos a hacer LIMPIEZA.
-   if (total[0]>count):
-    exceed = total[0] - count
+   ###if total[0] > count:
+   if total[0] > self.num_entries:
+    ###exceed = total[0] - count
+    exceed = total[0] - self.num_entries
     self.lock.acquire()
     cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante=0 ORDER BY fecha ASC LIMIT ?', [id_feed,exceed])
     row  = cursor.fetchall()
@@ -3906,8 +3937,11 @@ class Naufrago:
     # OLD: if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
     if(model2.iter_depth(iter2) == 1) or (model2.iter_depth(iter2) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
      id_selected_feed = self.treestore.get_value(iter2, 2)
-     if id_selected_feed == id_feed:
-      self.populate_entries(id_feed)
+     if id_selected_feed == id_feed: # Si el feed seleccionado es el actualizado...
+      if not self.fullscreen: # ...y no estamos en fullscreen...
+       self.populate_entries(id_feed)
+      else:
+       self.postpone_feedentries_refresh = 1
 
    # Luego el recuento del feed
    self.lock.acquire()
@@ -4003,45 +4037,80 @@ class Naufrago:
 
   if(data is None): # Iterarlo todo
 
-   (model, iter) = self.treeselection.get_selected() # We only want the model here...
-   iter = model.get_iter_root() # Magic
+   # START NEW 2
    cursor = self.conn.cursor()
-   while (iter is not None) and (not self.stop_feed_update_lock):
-    # OLD: if(model.iter_depth(iter) == 0): # Si es padre
-    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es padre
-     id_category = model.get_value(iter, 2)
-     new_posts = False # Reset
-     aux_num_new_posts_total = num_new_posts_total
-     for i in range(model.iter_n_children(iter)):
-      child = model.iter_nth_child(iter, i)
-      id_feed = model.get_value(child, 2)
-      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
-      if break_flag:
-       break
-    # NEW
-    else:
-     self.lock.acquire()
-     cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
-     rows = cursor.fetchall()
-     self.lock.release()
-     for row in rows:
+   (model, iter) = self.treeselection.get_selected() # We only want the model here...
+   if self.clear_mode == 0:
+    iter = model.get_iter_root() # Magic
+    while (iter is not None) and (not self.stop_feed_update_lock):
+     if model.iter_depth(iter) == 0: # Si es padre
+      id_category = model.get_value(iter, 2)
       new_posts = False # Reset
       aux_num_new_posts_total = num_new_posts_total
-      id_feed = row[0]
-      #feed_label = row[1]
-      if not self.treeindex.has_key(id_feed):
-       #print 'Feed id "' + `id_feed` + '" NO encontrado, insertando en el árbol...'
-       #iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, 'normal'])
-       #self.treeindex[id_feed] = iter
-       iter = None
-      else:
-       iter = self.treeindex[id_feed]
-      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
-      if break_flag:
-       break
-     break # <--- break para salir del while!
-    # NEW
-    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
+      for i in range(model.iter_n_children(iter)):
+       child = model.iter_nth_child(iter, i)
+       id_feed = model.get_value(child, 2)
+       (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
+       if break_flag:
+        break
+     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
+   else:
+    self.lock.acquire()
+    cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
+    rows = cursor.fetchall()
+    self.lock.release()
+    for row in rows:
+     new_posts = False # Reset
+     aux_num_new_posts_total = num_new_posts_total
+     id_feed = row[0]
+     if not self.treeindex.has_key(id_feed):
+      iter = None
+     else:
+      iter = self.treeindex[id_feed]
+     (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+     if break_flag:
+      break
+   # END NEW 2
+
+   #(model, iter) = self.treeselection.get_selected() # We only want the model here...
+   #iter = model.get_iter_root() # Magic
+   #cursor = self.conn.cursor()
+   #while (iter is not None) and (not self.stop_feed_update_lock):
+    ## OLD: if(model.iter_depth(iter) == 0): # Si es padre
+    #if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es padre
+     #id_category = model.get_value(iter, 2)
+     #new_posts = False # Reset
+     #aux_num_new_posts_total = num_new_posts_total
+     #for i in range(model.iter_n_children(iter)):
+      #child = model.iter_nth_child(iter, i)
+      #id_feed = model.get_value(child, 2)
+      #(new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
+      #if break_flag:
+       #break
+    ## NEW
+    #else:
+     #self.lock.acquire()
+     #cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
+     #rows = cursor.fetchall()
+     #self.lock.release()
+     #for row in rows:
+      #new_posts = False # Reset
+      #aux_num_new_posts_total = num_new_posts_total
+      #id_feed = row[0]
+      ##feed_label = row[1]
+      #if not self.treeindex.has_key(id_feed):
+       ##print 'Feed id "' + `id_feed` + '" NO encontrado, insertando en el árbol...'
+       ##iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, 'normal'])
+       ##self.treeindex[id_feed] = iter
+       #iter = None
+      #else:
+       #iter = self.treeindex[id_feed]
+      #(new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+      #if break_flag:
+       #break
+     #break # <--- break para salir del while!
+    ## NEW
+    #iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
    cursor.close()
 
   else: # Iterar sobre los elementos del diccionario recibido como data.
