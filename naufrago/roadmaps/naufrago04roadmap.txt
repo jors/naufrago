@@ -1,0 +1,16 @@
+Naufrago! 0.4 roadmap
+---------------------
+
+Here we go again!
+
+- Application identifyer (its own User-Agent) + version (improvement).
+- Code cleaning process courtesy of pychecker and pylint (improvement).
+- Instant hiding of the read entries/articles when the "hide read entries" option is enabled (improvement).
+- Fix for the problem that caused uncategorized feeds (in an .opml) not being imported.
+- Fix for the notification message (pynotify) not being localizado/gettexted.
+- Fix for the images that could not be downloaded in a round, to retry in the next one.
+- Clear mode: new visualization and operating mode that only shows feeds with pending unread items/entries (new).
+- Toolbar button to mark EVERYTHING as read (new).
+- Download of the contents where entries/articles point to. That's a step forward in the offline field (new).
+
+Here I have to agree Horia/Vladi for letting me know the clear mode (taken from Liferea and adapted to Naufrago!). This will make feed navigation/reading clearer and smoother :)
