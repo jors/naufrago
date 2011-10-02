@@ -1568,7 +1568,7 @@ class Naufrago:
  def get_proxy_handler(self):
   """Gets the specified proxy, if any."""
   proxies = {}
-  if (self.use_proxy) and (self.http_proxy is not None):
+  if (self.use_proxy == 1) and (self.http_proxy is not None):
    proxies['http'] = self.http_proxy
   return urllib2.ProxyHandler(proxies)
 
@@ -3615,12 +3615,12 @@ class Naufrago:
   # Retrieve & save main html document if needed (read it otherwise)
   #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
-  print "On file: " + `f`
+  #print "On file: " + `f`
 
   try:
    if not os.path.exists(f):
     #web_file = urllib2.urlopen(original_url, timeout=10)
-    opener = urllib2-build_opener(self.get_proxy_handler())
+    opener = urllib2.build_opener(self.get_proxy_handler())
     web_file = opener.open(original_url, timeout=10)
     local_file = open(f, 'w')
     page = web_file.read()
@@ -3917,7 +3917,9 @@ class Naufrago:
      new_entries.append(recently_inserted_entry[0]) # Lista de control de nuevas entries (validas/non-ghost) insertadas
     # START Offline mode image retrieving
     if i < limit:
+     print 'i < limit'
      if (self.offline_mode == 1) and (images != ''):
+      print '(self.offline_mode == 1) and (images != '')'
       self.lock.acquire()
       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [recently_inserted_entry[0]]) # No dupes
       images_present = cursor.fetchone()
@@ -3926,6 +3928,7 @@ class Naufrago:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
      # START Deep offline mode
      if (self.deep_offline_mode == 1):
+      print 'self.deep_offline_mode == 1'
       self.retrieve_full_content(id_feed, recently_inserted_entry[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
@@ -4196,8 +4199,8 @@ class Naufrago:
   self.stop_feed_update_lock = False
   self.on_a_feed_update = False
 
-  print 'new_posts: ' + `new_posts`
-  print 'num_new_posts_total: ' + `num_new_posts_total`
+  #print 'new_posts: ' + `new_posts`
+  #print 'num_new_posts_total: ' + `num_new_posts_total`
 
   # Notificación de mensajes nuevos 
   if self.show_newentries_notification:
