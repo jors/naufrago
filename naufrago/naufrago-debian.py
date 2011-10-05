@@ -2231,20 +2231,18 @@ class Naufrago:
       self.lock.release()
       for feed in feeds:
        del self.treeindex[feed[0]] # Update feeds dict
-       if os.path.exists(favicon_path + '/'+ `feed[0]`):
-        os.unlink(favicon_path + '/'+ `feed[0]`)
+       #if os.path.exists(favicon_path + '/'+ `feed[0]`):
+       # os.unlink(favicon_path + '/'+ `feed[0]`)
        self.lock.acquire()
        cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [feed[0]])
        articles = cursor.fetchall()
        self.lock.release()
        for art in articles:
         self.content_cache_cleanup(self, cursor, art[0], feed[0]) # NEW
+       if os.path.exists(favicon_path + '/'+ `feed[0]`):
+        os.unlink(favicon_path + '/'+ `feed[0]`)
        if os.path.exists(content_path + "/" + feed[0]):
         os.rmdir(content_path + "/" + feed[0])
-       self.lock.acquire()
-       cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
-       self.conn.commit()
-       self.lock.release()
       self.lock.acquire()
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
@@ -2252,8 +2250,9 @@ class Naufrago:
       self.lock.release()
 
       # Actualizamos No-leidos e Importantes
-      self.update_special_folder(9999)
-      self.update_special_folder(9998)
+      if self.clear_mode == 0: # NEW
+       self.update_special_folder(9999)
+       self.update_special_folder(9998)
 
       # Finalmente ponemos las cosas en su sitio
       self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
@@ -2439,7 +2438,6 @@ class Naufrago:
 
     if(response == gtk.RESPONSE_OK):
      id_feed = self.treestore.get_value(iter, 2)
-
      cursor = self.conn.cursor()
      self.lock.acquire()
      cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [id_feed])
@@ -2448,7 +2446,6 @@ class Naufrago:
      for art in articles:
       self.content_cache_cleanup(cursor, art[0], id_feed) # NEW
      self.lock.acquire()
-     #cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
      cursor.execute('DELETE FROM feed WHERE id = ?', [id_feed])
      self.conn.commit()
      self.lock.release()
@@ -3028,14 +3025,27 @@ class Naufrago:
   # new = model.insert_before(parent=None, sibling=target, row=source_row)
   #elif drop_position == gtk.TREE_VIEW_DROP_AFTER:
   # new = model.insert_after(parent=None, sibling=target, row=source_row)
-  parent_value = `model.get_value(target, 0)`
-  row_value = `model.get_value(source_row.iter, 0)`
-  row_value = self.simple_name_parsing(row_value)
-  self.lock.acquire()
-  cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value.decode("utf-8")])
-  self.conn.commit()
-  self.lock.release()
-  cursor.close()
+  parent_value = model.get_value(target, 0) # categoria destino
+  row_value = model.get_value(source_row.iter, 0) # feed a mover
+  row_value_clean = self.simple_name_parsing(row_value)
+
+  # Averiguamos el padre origen del nodo del feed movido
+  # para ver si le quedan feeds con entries sin leer. Caso afirmativo,
+  # cabrá actualizar tanto el nodo padre origen como el nodo padre destino.
+  iter = model.iter_parent(source_row.iter) # categoria origen
+  id_categoria = self.treestore.get_value(iter, 2)
+  bold_or_not = self.treestore.get_value(iter, 3)
+  if bold_or_not == 'bold':
+   self.lock.acquire()
+   cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value_clean.decode("utf-8")])
+   self.conn.commit()
+   cursor.execute('SELECT count(articulo.id) FROM articulo,feed WHERE articulo.leido = 0 AND articulo.id_feed = feed.id AND feed.id_categoria = ?', [id_categoria])
+   row_cat_origen = cursor.fetchone()
+   self.lock.release()
+   cursor.close()
+   if row_cat_origen[0] == 0:
+    model.set_value(iter, 3, 'normal')
+  model.set_value(target, 3, 'bold')
 
   # If the source row is expanded, expand the newly copied row
   # also.  We must add at least one child before we can expand,
@@ -3261,7 +3271,9 @@ class Naufrago:
    link = cursor.fetchone()[0]
    self.lock.release()
    cursor.close()
-   self.statusbar.set_text(link.encode("utf8"))
+   if link is not None:
+    link_text = link[0]
+    self.statusbar.set_text(link.encode("utf8"))
 
  def headerlink_mouse_leave(self, widget, event):
   """Hides the link the headerlink points to in the statusbar."""
@@ -3917,9 +3929,9 @@ class Naufrago:
      new_entries.append(recently_inserted_entry[0]) # Lista de control de nuevas entries (validas/non-ghost) insertadas
     # START Offline mode image retrieving
     if i < limit:
-     print 'i < limit'
+     #print 'i < limit'
      if (self.offline_mode == 1) and (images != ''):
-      print '(self.offline_mode == 1) and (images != '')'
+      #print '(self.offline_mode == 1) and (images != '')'
       self.lock.acquire()
       cursor.execute('SELECT id from imagen WHERE id_articulo = ?', [recently_inserted_entry[0]]) # No dupes
       images_present = cursor.fetchone()
@@ -3928,7 +3940,7 @@ class Naufrago:
        self.retrieve_entry_images(recently_inserted_entry[0], images)
      # START Deep offline mode
      if (self.deep_offline_mode == 1):
-      print 'self.deep_offline_mode == 1'
+      #print 'self.deep_offline_mode == 1'
       self.retrieve_full_content(id_feed, recently_inserted_entry[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
