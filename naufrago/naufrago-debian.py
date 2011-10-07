@@ -1092,7 +1092,7 @@ class Naufrago:
     cursor.execute('UPDATE articulo SET leido=1 WHERE id = ?', [id_articulo])
     self.conn.commit()
     self.lock.release()
-   cursor.close()
+   ###cursor.close()
 
    # Y actualizar el modelo de datos.
    (model, iter) = self.treeselection.get_selected()
@@ -1175,6 +1175,8 @@ class Naufrago:
      # END NAME PARSING (nodo destino) #
      # Unbold category if needed.
      self.toggle_category_bold()
+
+   cursor.close()
 
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
@@ -2238,11 +2240,11 @@ class Naufrago:
        articles = cursor.fetchall()
        self.lock.release()
        for art in articles:
-        self.content_cache_cleanup(self, cursor, art[0], feed[0]) # NEW
+        self.content_cache_cleanup(cursor, art[0], feed[0]) # NEW
        if os.path.exists(favicon_path + '/'+ `feed[0]`):
         os.unlink(favicon_path + '/'+ `feed[0]`)
-       if os.path.exists(content_path + "/" + feed[0]):
-        os.rmdir(content_path + "/" + feed[0])
+       if os.path.exists(content_path + "/" + `feed[0]`):
+        os.rmdir(content_path + "/" + `feed[0]`)
       self.lock.acquire()
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
@@ -3789,19 +3791,27 @@ class Naufrago:
   cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
   images = cursor.fetchall()
   self.lock.release()
+  images_to_delete = ''
   for i in images:
+   print 'Imagen: ' + `i`
    self.lock.acquire()
    #cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
    cursor.execute('SELECT count(imagen.id) FROM imagen,articulo WHERE imagen.nombre = ? AND imagen.id_articulo = articulo.id AND articulo.id_feed = ?', [i[0],id_feed])
    num_images = cursor.fetchone()
+   print 'Tiene ' + `num_images[0]` + ' entradas en la BD.'
    self.lock.release()
    if (num_images is not None) and (num_images[0] <= 1):
     if os.path.exists(images_path + '/' + `i[0]`):
+     print 'Borrando del HD.'
+     images_to_delete += `i[0]` + ','
      os.unlink(images_path + '/' + `i[0]`)
-   self.lock.acquire()
-   cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
-   self.conn.commit()
-   self.lock.release()
+
+  images_to_delete = images_to_delete[0:-1]
+  print 'Borrando de la BD: ' + images_to_delete
+  self.lock.acquire()
+  cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+') AND id_articulo = ?', [id_articulo])
+  self.conn.commit()
+  self.lock.release()
 
   #if (full_cleanup is True) or (self.deep_offline_mode == 1):
   if full_cleanup is True:
