@@ -3801,17 +3801,19 @@ class Naufrago:
    print 'Tiene ' + `num_images[0]` + ' entradas en la BD.'
    self.lock.release()
    if (num_images is not None) and (num_images[0] <= 1):
+    images_to_delete += `i[0]` + ','
     if os.path.exists(images_path + '/' + `i[0]`):
      print 'Borrando del HD.'
-     images_to_delete += `i[0]` + ','
+     #images_to_delete += `i[0]` + ','
      os.unlink(images_path + '/' + `i[0]`)
 
-  images_to_delete = images_to_delete[0:-1]
-  print 'Borrando de la BD: ' + images_to_delete
-  self.lock.acquire()
-  cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+') AND id_articulo = ?', [id_articulo])
-  self.conn.commit()
-  self.lock.release()
+  if images_to_delete != '':
+   images_to_delete = images_to_delete[0:-1]
+   print 'Borrando de la BD: ' + images_to_delete
+   self.lock.acquire()
+   cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+') AND id_articulo = ?', [id_articulo])
+   self.conn.commit()
+   self.lock.release()
 
   #if (full_cleanup is True) or (self.deep_offline_mode == 1):
   if full_cleanup is True:
@@ -3879,7 +3881,11 @@ class Naufrago:
   #d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')
   opener = urllib2.build_opener(self.get_proxy_handler())
   opener.addheaders = [('User-agent', 'Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')]
-  content = opener.open(url)
+  try:
+   content = opener.open(url)
+  except: # urllib2 is giving trouble!
+   gtk.gdk.threads_leave()
+   return (new_posts, num_new_posts_total, False)
   d = feedparser.parse(content.read())
 
   dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
