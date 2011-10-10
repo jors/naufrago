@@ -49,6 +49,7 @@ try:
  import gettext
  from socket import socket
  import pynotify
+ import urlparse
 except ImportError:
  print _('Error importing modules: ') + `exc_info()[1]`
  sys.exit(1)
@@ -1196,14 +1197,16 @@ class Naufrago:
     cursor = self.conn.cursor()
     self.lock.acquire()
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
-    url = cursor.fetchone()[0]
+    url = cursor.fetchone()
     self.lock.release()
     cursor.close()
     # START NAME PARSING #
     row_name = self.simple_name_parsing(row_name)
     # END NAME PARSING #
-    FEED_PAGE = "<h2>Feed: " + row_name + "</h2><p>" + _("Source") + ": <a href='" + url + "'>" + url + "</a></p>"
-    self.webview.load_string(FEED_PAGE, "text/html", "utf-8", "valid_link")
+    if url is not None:
+     url = url[0]
+     FEED_PAGE = "<h2>Feed: " + row_name + "</h2><p>" + _("Source") + ": <a href='" + url + "'>" + url + "</a></p>"
+     self.webview.load_string(FEED_PAGE, "text/html", "utf-8", "valid_link")
    # OLD: elif(model.iter_depth(iter) == 0): # Si es padre, limpliar 
    elif(model.iter_depth(iter) == 0 and self.clear_mode == 0): # Si es padre, limpliar
     self.liststore.clear() # Limpieza de tabla de entries/articulos
@@ -3478,13 +3481,11 @@ class Naufrago:
 
  def get_base_url(self, original_url):
   """Obtains base url from a given link."""
-  rgxp = '''(http|https)://+[^/]*?/'''
-  m = re.search(rgxp, original_url)
-  if m is not None:
-   base_url = m.group(0)
+  parsed = urlparse.urlsplit(original_url)
+  if not len(parsed.netloc):
+   return original_url
   else:
-   base_url = original_url
-  return base_url
+   return parsed.scheme + '://' + parsed.netloc + '/'
 
  def translate_document(self, page, url_list, feed_content_path, f):
   """ Translate html document for local viewing."""
@@ -3573,54 +3574,10 @@ class Naufrago:
 
  def rebuild_link(self, original_url, relative_link, url_mod_list):
   """Builds an absolute link from a relative one."""
-  original_url2 = original_url.split("http://")[1] # http://blog.liw.fi/posts/obnam-0.16/ => blog.liw.fi/posts/obnam-0.16/
-  original_url_split = original_url2.split("/") # blog.liw.fi/posts/obnam-0.16/ => ('blog.liw.fi', 'posts', 'obnam-0.16', '')
-  copy_of_clean_original_url_split = clean_original_url_split = filter(None, original_url_split)
-  relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
-  clean_relative_link_split = filter(None, relative_link_split)
-
-  if (clean_relative_link_split is not None) and (len(clean_relative_link_split)>0):
-   if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
-    m = re.search('''[^\W]''', clean_relative_link_split[0]) # Buscamos cosas "no raras" (caracteres alfanumericos)
-    if m is not None:
-     # Si empieza por //...
-     if relative_link.startswith("//"):
-      final_url = "http:" + relative_link
-      #print 'Rebuilt_link (A1): ' + final_url
-     # Sino, construimos lo que podría ser el enlace...
-     else:
-      a = self.get_base_url(original_url)
-      b = "/".join(clean_relative_link_split)
-      if a.endswith("/") or b.startswith("/"):
-       final_url = a + b
-      else:
-       final_url = a + "/" + b
-      #print 'Rebuilt_link (A2): ' + final_url
-     url_mod_list.append(final_url)
-   else:
-    for elem in clean_relative_link_split:
-     if elem == ".": # ./archivo.html
-      clean_relative_link_split.remove(elem)
-     elif elem == "..": # ../archivo.html
-      clean_relative_link_split.remove(elem)
-      if type(copy_of_clean_original_url_split) is list:
-       #print 'copy_of_clean_original_url_split: ' + `copy_of_clean_original_url_split`
-       copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
-
-    a = "http://" + "/".join(copy_of_clean_original_url_split)
-    b = "/".join(clean_relative_link_split)
-    if a.endswith("/") or b.startswith("/"):
-     final_url = a + b
-    else:
-     final_url = a + "/" + b
-    url_mod_list.append(final_url)
-    #print 'Rebuilt_link (B): ' + final_url
-
-   a = base_url = self.get_base_url(original_url)
-   b = "/".join(clean_relative_link_split)
-   alt_final_url = base_url + b
-   url_mod_list.append(alt_final_url)
-   #print 'Rebuilt_link (C): ' + alt_final_url
+  parsed_url = urlparse.urlsplit(original_url)
+  if not len(parsed_url.scheme):
+   parsed_url = urlparse.urlsplit('http://' + original_url)
+  url_mod_list.append(urlparse.urljoin(parsed_url.scheme + '://' + parsed_url.netloc + parsed_url.path, relative_link))
 
   return url_mod_list
 
@@ -4343,14 +4300,13 @@ class Naufrago:
   response = dialog.run()
 
   if response == gtk.RESPONSE_OK:
-   f = open(dialog.get_filename()+'.opml', 'w')
+   f = open(dialog.get_filename(), 'w')
    out = '<?xml version="1.0"?>\n<opml version="1.0">\n<head>\n<title>Naufrago! Feed List Export</title>\n</head>\n<body>\n'
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.execute('SELECT id,nombre FROM categoria')
    categorias = cursor.fetchall()
    self.lock.release()
-   cursor.close()
    for row in categorias:
     out += '<outline title="'+row[1]+'" text="'+row[1]+'" description="'+row[1]+'" type="folder">\n'
     self.lock.acquire()
@@ -4363,6 +4319,7 @@ class Naufrago:
      out += '<outline title="'+nombre+'" text="'+nombre+'" type="rss" xmlUrl="'+url+'"/>\n'
     out += '</outline>'
    out += '</body>\n</opml>'
+   cursor.close()
    f.write(out)
    f.close()
   dialog.destroy()
