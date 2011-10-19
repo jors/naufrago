@@ -51,7 +51,7 @@ try:
  import pynotify
  import urlparse
 except ImportError:
- print _('Error importing modules: ') + `exc_info()[1]`
+ print 'Error importing modules: ' + `exc_info()[1]`
  sys.exit(1)
 
 APP_VERSION = '0.3'
