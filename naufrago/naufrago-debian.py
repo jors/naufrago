@@ -980,7 +980,7 @@ class Naufrago:
      link = cursor.fetchone()[0]
      self.lock.release()
      cursor.close()
-   webbrowser.open_new(link) # New win!
+   webbrowser.open(link, 0, True) # New win!
 
  def copiar_al_portapapeles(self, event=None, data=None):
   """Copies the entry's URL to the system clipboard."""
