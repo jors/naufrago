@@ -3879,6 +3879,11 @@ class Naufrago:
   # Check for article existence...
   for i in range(0, count):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
+   # START NEW
+   favicon = favicon_path + '/' + `id_feed`
+   if not os.path.exists(favicon):
+    self.get_favicon_desperate(id_feed, link)
+   # END NEW
    self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    unique = cursor.fetchone()
@@ -4348,6 +4353,7 @@ class Naufrago:
     factory.add_default()
    except: # Si casca, queremos el icono por defecto!
     if os.path.exists(filename):
+     print 'Borramos icono!'
      os.unlink(filename)
     factory = gtk.IconFactory()
     pixbuf = gtk.gdk.pixbuf_new_from_file(media_path + 'SRD_RSS_Logo_mini.png')
@@ -4358,13 +4364,15 @@ class Naufrago:
  def get_favicon(self, id_feed, url):
   """Obtains the favicon from a web and stores it on the filesystem. It should be
      called only once at feed entry creation OR on feed import process."""
-  #if not os.path.exists(favicon_path):
-  # os.makedirs(favicon_path)
-
   gtk.gdk.threads_enter()
   try:
-   split = url.split("/")
-   favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
+   ###split = url.split("/")
+   ###favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
+   parsed = urlparse.urlsplit(url)
+   if len(parsed.netloc):
+    favicon_url = parsed.scheme + '://' + parsed.netloc + '/favicon.ico'
+   else:
+    favicon_url = url + '/favicon.ico'
    #web_file = urllib2.urlopen(favicon_url, timeout=10)
    opener = urllib2.build_opener(self.get_proxy_handler())
    web_file = opener.open(favicon_url, timeout=10)
@@ -4378,6 +4386,32 @@ class Naufrago:
   except:
    self.add_icon_to_factory(None, id_feed)
   gtk.gdk.threads_leave()
+
+ def get_favicon_desperate(self, id_feed, url):
+  """A desperate try to obtain the favicon when the feed url does not match
+     with the base url of the web."""
+  try:
+   opener = urllib2.build_opener(self.get_proxy_handler())
+   web_file = opener.open(url, timeout=10)
+   page = web_file.read()
+   web_file.close()
+   # Scrap en busca del favicon.
+   rgxp = ('''<(link)\s+[^>]*?(src|href)=["']?([^"'>\s]+favicon.ico)[^>]*?>''')
+   tags = re.findall(rgxp, page, re.I)
+   for tag in tags:
+    favicon_url = tag[2]
+    #web_file = urllib2.urlopen(favicon_url, timeout=10)
+    opener = urllib2.build_opener(self.get_proxy_handler())
+    web_file = opener.open(favicon_url, timeout=10)
+    favicon = favicon_path + '/' + `id_feed`
+    local_file = open(favicon, 'w')
+    local_file.write(web_file.read())
+    local_file.close()
+    web_file.close()
+    # Registrar el favicon...
+    self.add_icon_to_factory(favicon, id_feed)
+  except:
+   self.add_icon_to_factory(None, id_feed)
 
  def populate_favicons(self):
   """Iterates 'favicons' directory to load existent favicons in a bunch."""
