@@ -135,6 +135,21 @@ class Naufrago:
 
  def delete_event(self, event=None, data=None):
   """Closes the app through window manager signal"""
+  if self.show_trayicon == 1:
+   self.statusicon_activate()
+   return True
+  else:
+   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
+   if self.on_a_feed_update:
+    self.stop_feed_update()
+    self.t.join()
+   # Finalmente, salida efectiva
+   self.save_config()
+   gtk.main_quit()
+   return False
+
+ def delete_tray_event(self, event=None, data=None):
+  """Closes the app through window manager signal (from tray icon)"""
   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
   if self.on_a_feed_update:
    self.stop_feed_update()
@@ -1900,7 +1915,8 @@ class Naufrago:
   # Attach the callback functions to the activate signal
   self.update_item.connect("activate", self.update_all_feeds)
   self.stop_item.connect("activate", self.stop_feed_update)
-  self.quit_item.connect("activate", self.delete_event)
+  ###self.quit_item.connect("activate", self.delete_event)
+  self.quit_item.connect("activate", self.delete_tray_event)
   # Should we enable stop function when showing popup menu? It depends...
   if self.stop_feed_update_lock:
    self.stop_item.set_sensitive(True)
