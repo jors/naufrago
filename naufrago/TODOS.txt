@@ -254,4 +254,7 @@ N/A			    ->  Deep offline mode (¡más lento!)		deep_offline_mode
 
 Added:
 - FIX: Items of some feeds were shown as an exceprt, now show complete. DONE
+- NEW: Proxy funcionality integrated (thanks Niels). DONE
+- FIX: Added an alternative way to retrieve feed favicons. DONE
+- IMPROVED: X button minimizes to tray instead of quitting. DONE
 

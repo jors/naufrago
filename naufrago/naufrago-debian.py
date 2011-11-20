@@ -1045,11 +1045,15 @@ class Naufrago:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB"))
 
    # This prevents htmlentities from doing weird things to the headerlink!
+   gtk.gdk.threads_leave()
    self.headerlink.set_markup('<b><u><span foreground="blue">'+saxutils.escape(self.htmlentitydecode(titulo))+'</span></u></b>')
+   ###self.headerlink.set_text(saxutils.escape(self.htmlentitydecode(titulo)))
+   ###self.headerlink.modify_text(state, gtk.gdk.Color(blue=1.0))
    self.headerlink.set_justify(gtk.JUSTIFY_CENTER)
    self.headerlink.set_ellipsize(pango.ELLIPSIZE_END)
    self.eb.show()
    self.eb_image_zoom.show()
+   gtk.gdk.threads_enter()
 
    cursor = self.conn.cursor()
    self.lock.acquire()
@@ -1749,7 +1753,7 @@ class Naufrago:
   self.hbox.pack_start(self.eb_image_zoom, expand=False, fill=False, padding=5)
 
   self.headerlink = gtk.Label("")
-  self.headerlink.set_tooltip_text(_("Clic to open in browser"))
+  self.headerlink.set_tooltip_text(_("Click to open in browser"))
   self.eb = gtk.EventBox() # Wrapper for the label to be able to catch 'button_press_event'
   self.eb.add(self.headerlink)
   self.eb.connect("button_press_event", self.headerlink_button_press_event)
@@ -1772,12 +1776,20 @@ class Naufrago:
   self.throbber = gtk.Image()
   self.throbber.set_from_file(app_path + 'media/throbber.gif')
   self.hbox2.pack_start(self.throbber, expand=False, fill=False, padding=0)
-  self.statusbar = gtk.Label("")
+  self.statusbar = gtk.Label('')
   self.statusbar.set_justify(gtk.JUSTIFY_LEFT)
-  self.statusbar.set_ellipsize(pango.ELLIPSIZE_END)
+  ###self.statusbar.set_ellipsize(pango.ELLIPSIZE_END) # Pango doesn't seem thread friendly :(
+  #self.statusbar.set_line_wrap(True)
+  #self.statusbar.set_single_line_mode(True)
   self.statusbar.set_alignment(xalign=0.01, yalign=0)
   self.hbox2.pack_start(self.statusbar, expand=True, fill=True, padding=0)
   self.vbox.pack_start(self.hbox2, False, False, 0)
+
+  # Trick at startup to limit statusbar string width. Future redimensioning
+  # is handled by the window_resize_event() callback function.
+  (a, b) = self.statusbar.get_size_request()
+  self.statusbar.set_size_request(self.w-40, b)
+  self.window.connect("configure_event", self.window_resize_event)
 
   self.window.add(self.vbox)
 
@@ -1800,6 +1812,17 @@ class Naufrago:
 
   # Finally, check init options!
   self.check_init_options()
+
+ def window_resize_event(self, widget, event):
+  """Resizes statusbar width when the main window is also resized. And
+     before you ask, yes, this is a workaround for not using Pango.ellipsize
+     that should avoid threading issues."""
+  (v, w, self.w, self.h) = self.window.get_allocation()
+  (x, y, a, b) = self.statusbar.get_allocation()
+  self.statusbar.set_size_request(self.w-40, b)
+
+  #(x, y, a, b) = self.headerlink.get_allocation()
+  #self.headerlink.set_size_request(self.w-40, b)
 
  def create_webview_popup(self, view, menu):
   """Creates the webview (browser item) popup menu."""
@@ -1840,9 +1863,11 @@ class Naufrago:
  def hover_link(self, title, uri, data=None):
   """Shows hovered link in Statusbar."""
   if data is not None:
-   self.statusbar.set_text(data.encode("utf8"))
+   self.statusbar.set_text(data.encode("utf8")) # THREADAUDIT
+   pass
   else:
-   self.statusbar.set_text('')
+   self.statusbar.set_text('') # THREADAUDIT
+   pass
 
  def check_init_options(self):
   """Checks & applies init options."""
@@ -3125,9 +3150,12 @@ class Naufrago:
      new_feed_item = gtk.ImageMenuItem(_("New feed"))
      icon = new_feed_item.render_icon(gtk.STOCK_FILE, gtk.ICON_SIZE_BUTTON)
      new_feed_item.set_image(gtk.image_new_from_pixbuf(icon))
+     if self.ui_lock: new_feed_item.set_sensitive(False)
+
      new_category_item = gtk.ImageMenuItem(_("New category"))
      icon = new_category_item.render_icon(gtk.STOCK_DIRECTORY, gtk.ICON_SIZE_BUTTON)
      new_category_item.set_image(gtk.image_new_from_pixbuf(icon))
+     if self.ui_lock: new_category_item.set_sensitive(False)
 
     # Add them to the menu
     tree_menu.append(toggle_todos_leido_item)
@@ -3233,16 +3261,16 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
-   link = cursor.fetchone()[0]
+   link = cursor.fetchone()
    self.lock.release()
    cursor.close()
    if link is not None:
-    link_text = link[0]
-    self.statusbar.set_text(link.encode("utf8"))
+    link = link[0]
+    self.statusbar.set_text(link.encode("utf8")) # THREADAUDIT
 
  def headerlink_mouse_leave(self, widget, event):
   """Hides the link the headerlink points to in the statusbar."""
-  self.statusbar.set_text("")
+  self.statusbar.set_text('') # THREADAUDIT
 
  def update_feed(self, data=None, new_feed=False):
   """Updates a single (selected) feed or the ones from a (selected) category, if any."""
@@ -3377,7 +3405,7 @@ class Naufrago:
    self.lock.release()
    if(row is None):
     # a) Si no existe, guarda entrada en tabla imagen y descarga físicamente la imagen a /imagenes.
-    self.statusbar.set_text(_('Obtaining image ') + i + '...'.encode("utf8"))
+    self.statusbar.set_text(_('Obtaining image ') + i + '...'.encode("utf8")) # THREADAUDIT
     self.lock.acquire()
     cursor.execute('SELECT MAX(id) FROM imagen')
     id_entry_max = cursor.fetchone()[0]
@@ -3405,7 +3433,7 @@ class Naufrago:
      self.lock.release()
      if os.path.exists(images_path + '/' + `id_entry_max`):
       os.unlink(images_path + '/' + `id_entry_max`)
-    self.statusbar.set_text('')
+    self.statusbar.set_text('') # THREADAUDIT
    else:
     # b) Si existe, no la descargamos, solo la referenciamos en la bd
     self.lock.acquire()
@@ -3461,7 +3489,7 @@ class Naufrago:
     try:
      opener = urllib2.build_opener(self.get_proxy_handler())
      web_file = opener.open(url, timeout=5)
-     self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
+     self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8")) # THREADAUDIT
      # Chunk filename if it is too large!
      if len(filename) > 256:
       m = re.search('[^?=&]+', filename)
@@ -3554,7 +3582,7 @@ class Naufrago:
 
  def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
-  self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8"))
+  self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8")) # THREADAUDIT
   page, url_list, url_mod_list, css_list, ok = self.filter_needed_content(original_url, url_list, url_mod_list, feed_content_path, f)
   if ok:
    url_mod_list, url_trashed = self.retrieve_needed_content(url_mod_list, url_trashed, feed_content_path, id_articulo)
@@ -3579,19 +3607,21 @@ class Naufrago:
     filename = self.get_filename(f)
     url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
-  self.statusbar.set_text('')
+  self.statusbar.set_text('') # THREADAUDIT
 
  #####  END OFFLINE FULL URL RETRIEVING  #####
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
      multiple instances running or race conditions."""
-  item_list = ["/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
+  item_list = ["/Menubar/ArchiveMenu/New feed", "/Menubar/ArchiveMenu/New category",
+               "/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
                "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
                "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
                "/Menubar/EditMenu/Read all", "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
                "/Menubar/NetworkMenu/Update all", "/Menubar/HelpMenu/Check updates",
-               "/Toolbar/Update all", "/Toolbar/Read all", "/Toolbar/Search", "/Toolbar/Preferences"]
+               "/Toolbar/New feed", "/Toolbar/New category", "/Toolbar/Update all",
+               "/Toolbar/Read all", "/Toolbar/Search", "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
@@ -3661,7 +3691,7 @@ class Naufrago:
 
  def content_cache_cleanup(self, cursor, id_articulo, id_feed, full_cleanup=True):
   """Deletes images & offline contents of a given article/entry when called."""
-  self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
+  self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8")) # THREADAUDIT
   # Borramos las imagenes del filesystem, si procede
   self.lock.acquire()
   cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
@@ -3669,30 +3699,30 @@ class Naufrago:
   self.lock.release()
   images_to_delete = ''
   for i in images:
-   print 'Imagen: ' + `i`
+   #print 'Imagen: ' + `i`
    self.lock.acquire()
-   cursor.execute('SELECT count(imagen.id) FROM imagen,articulo WHERE imagen.nombre = ? AND imagen.id_articulo = articulo.id AND articulo.id_feed = ?', [i[0],id_feed])
+   cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
    num_images = cursor.fetchone()
-   print 'Tiene ' + `num_images[0]` + ' entradas en la BD.'
+   #print 'Tiene ' + `num_images[0]` + ' entradas en la BD.'
    self.lock.release()
    if (num_images is not None) and (num_images[0] <= 1):
     images_to_delete += `i[0]` + ','
     if os.path.exists(images_path + '/' + `i[0]`):
-     print 'Borrando del HD.'
+     #print 'Borrando del HD.'
      os.unlink(images_path + '/' + `i[0]`)
 
   if images_to_delete != '':
    images_to_delete = images_to_delete[0:-1]
-   print 'Borrando de la BD: ' + images_to_delete
+   #print 'Borrando de la BD: ' + images_to_delete
    self.lock.acquire()
-   cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+') AND id_articulo = ?', [id_articulo])
+   cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+')')
    self.conn.commit()
    self.lock.release()
 
   if full_cleanup is True:
    # Lo mismo con el contenido offline del filesystem, si procede
    self.lock.acquire()
-   cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   cursor.execute('SELECT nombre,id FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    contenido_offline = cursor.fetchall()
    self.lock.release()
    for i in contenido_offline:
@@ -3705,6 +3735,7 @@ class Naufrago:
      if os.path.exists(full_path):
       os.unlink(full_path)
 
+   # Borramos el contenido_offline del articulo
    self.lock.acquire()
    cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    self.conn.commit()
@@ -3715,6 +3746,8 @@ class Naufrago:
   cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
   self.conn.commit()
   self.lock.release()
+
+  self.statusbar.set_text('') # THREADAUDIT
 
  def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
@@ -3732,7 +3765,7 @@ class Naufrago:
   statusbar_text = _('Obtaining feed ') + nombre_feed
   if self.use_proxy == 1: statusbar_text += ' (with proxy)...'
   else: statusbar_text += '...'
-  self.statusbar.set_text(statusbar_text.encode("utf8"))
+  self.statusbar.set_text(statusbar_text.encode("utf8")) # THREADAUDIT
 
   gtk.gdk.threads_enter()
   #d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')
@@ -3780,7 +3813,9 @@ class Naufrago:
    # START NEW
    favicon = favicon_path + '/' + `id_feed`
    if not os.path.exists(favicon):
+    gtk.gdk.threads_leave()
     self.get_favicon_desperate(id_feed, link)
+    gtk.gdk.threads_enter()
    # END NEW
    self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
@@ -4037,7 +4072,7 @@ class Naufrago:
     except:
      pass
 
-  self.statusbar.set_text('')
+  self.statusbar.set_text('') # THREADAUDIT
   # Fires tray icon blinking
   if((num_new_posts_total > 0) and (window_visible is False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
@@ -4186,7 +4221,6 @@ class Naufrago:
     factory.add_default()
    except: # Si casca, queremos el icono por defecto!
     if os.path.exists(filename):
-     print 'Borramos icono!'
      os.unlink(filename)
     factory = gtk.IconFactory()
     pixbuf = gtk.gdk.pixbuf_new_from_file(media_path + 'SRD_RSS_Logo_mini.png')
