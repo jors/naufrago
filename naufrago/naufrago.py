@@ -5,7 +5,7 @@
 #                                                                           #
 # Naufrago! RSS Reader                                                      #
 #                                                                           #
-# Copyright (C) 2010-2011 Jordi Oliveras Palacios (worbynet at gmail.com)   #
+# Copyright (C) 2010-2012 Jordi Oliveras Palacios (worbynet at gmail.com)   #
 #                                                                           #
 # This program is free software; you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
@@ -49,11 +49,12 @@ try:
  import gettext
  from socket import socket
  import pynotify
+ import urlparse
 except ImportError:
- print _('Error importing modules: ') + `sys.exc_info()[1]`
+ print 'Error importing modules: ' + `exc_info()[1]`
  sys.exit(1)
 
-APP_VERSION = '0.3'
+APP_VERSION = '0.4'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -131,9 +132,25 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
   puf_path = current_path + '/content/puf.html'
 
 class Naufrago:
+ """Simply, 'the class'."""
 
  def delete_event(self, event=None, data=None):
   """Closes the app through window manager signal"""
+  if self.show_trayicon == 1:
+   self.statusicon_activate()
+   return True
+  else:
+   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
+   if self.on_a_feed_update:
+    self.stop_feed_update()
+    self.t.join()
+   # Finalmente, salida efectiva
+   self.save_config()
+   gtk.main_quit()
+   return False
+
+ def delete_tray_event(self, event=None, data=None):
+  """Closes the app through window manager signal (from tray icon)"""
   # Si estamos en un proceso de update, no salir de la app hasta alcanzar un estado estable.
   if self.on_a_feed_update:
    self.stop_feed_update()
@@ -181,7 +198,7 @@ class Naufrago:
   model[path][1] = not model[path][1]
   if model[path][1]:
    self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("pink")) # Entry title bg glow
-   if self.clear_mode == 0: # NEW
+   if self.clear_mode == 0:
     if model[path][3] == 'bold':
      if no_leidos is not None:
       no_leidos = int(no_leidos) + 1
@@ -191,7 +208,7 @@ class Naufrago:
      model2.set(dest_iter, 0, feed_label, 3, font_style)
   else:
    self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB")) # Entry title bg normalize
-   if self.clear_mode == 0: # NEW
+   if self.clear_mode == 0:
     if model[path][3] == 'bold':
      if no_leidos is not None:
       no_leidos = int(no_leidos) - 1
@@ -341,12 +358,10 @@ class Naufrago:
     # Si es HOJA...
     if(model.iter_depth(iter) == 1) or (id_feed == 9998) or (id_feed == 9999) or (model.iter_depth(iter) == 0 and self.clear_mode == 1):
 
-     # NEW
      if self.clear_mode == 1 and self.treeindex.has_key(id_feed):
       self.treestore.remove(iter)
       del self.treeindex[id_feed] # Update feeds dict
      else:
-     # NEW
       # 1º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
       nombre_feed = model.get_value(iter, 0)
@@ -561,7 +576,6 @@ class Naufrago:
        feed_label = nombre_feed + ' [' + `no_leidos` + ']'
       else:
        feed_label = nombre_feed + ' [1]'
-      # NEW
       if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
        if os.path.exists(favicon_path + '/' + `id_feed`):
         useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, 'bold'], 'feed')
@@ -569,7 +583,6 @@ class Naufrago:
         useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, 'bold'], 'feed')
        self.treeindex[id_feed] = feed_iter
       else:
-      # NEW
        iter = self.treeindex[id_feed]
        model.set(iter, 0, feed_label, 3, 'bold')
       # END NAME PARSING (nodo origen) #
@@ -623,10 +636,6 @@ class Naufrago:
       # 3º vamos a por el label del feed...
       # START NAME PARSING (nodo origen) #
       # Little hack for being able to mark read/unread the entries found on a search.
-      #try: # Feed seleccionado en el tree
-      # nombre_feed = model.get_value(iter, 0)
-      # id_feed = model.get_value(iter, 2)
-      #except: # Busqueda
       q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
       self.lock.acquire()
       cursor.execute(q)
@@ -647,12 +656,10 @@ class Naufrago:
       else:
        feed_label = nombre_feed
        font_style = 'normal'
-      # NEW
       if self.clear_mode == 1 and self.treeindex.has_key(id_feed) and ('[' not in feed_label and ']' not in feed_label):
        self.treestore.remove(iter)
        del self.treeindex[id_feed] # Update feeds dict
       else:
-      # NEW
        model.set(iter, 0, feed_label, 3, font_style)
       # END NAME PARSING (nodo origen) #
 
@@ -726,49 +733,41 @@ class Naufrago:
      # Little hack -slightly different- for being able to mark read/unread the entries found on a search.
      nombre_feeds = []
      id_feeds = []
-     ###on_a_search = False
      try: # Feed seleccionado en el tree
       nombre_feeds.append(model.get_value(iter, 0))
       id_feeds.append(model.get_value(iter, 2))
       id_feed = id_feeds[0]
      except: # Busqueda o clear_mode?
-      ###on_a_search = True # OLD
       q = 'SELECT DISTINCT id_feed FROM articulo WHERE id IN (' + entry_ids + ')'
       self.lock.acquire()
       cursor.execute(q)
       id_feeds = cursor.fetchall()
       self.lock.release()
       id_feed = id_feeds[0][0]
-      ###if len(id_feeds) > 1: # NEW (Dirty hack!!! Puede fallar con busquedas con 1 solo feed como resultado!)
-      ### on_a_search = True # NEW
       for id_feed_tmp in id_feeds:
-       try: # NEW
+       try:
         iter = self.treeindex[id_feed_tmp[0]]
         nombre_feeds.append(model.get_value(iter, 0))
-       except: # NEW
-        self.lock.acquire() # NEW
-        cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed_tmp[0]`) # NEW
-        nombre_feed = cursor.fetchone()[0] # NEW
-        nombre_feeds.append(nombre_feed) # NEW
-        self.lock.release() # NEW
+       except:
+        self.lock.acquire()
+        cursor.execute('SELECT nombre FROM feed WHERE id = ' + `id_feed_tmp[0]`)
+        nombre_feed = cursor.fetchone()[0]
+        nombre_feeds.append(nombre_feed)
+        self.lock.release()
 
-     ###id_feed = id_feeds[0]
      nombre_feed = nombre_feeds[0]
-     ###if not on_a_search:
      if self.on_a_search == False:
       font_style = ''
       if liststore_font_style == 'bold': # Si antes era bold...
        nombre_feed = self.simple_name_parsing(nombre_feed)
        feed_label = nombre_feed
        font_style = 'normal'
-       # NEW
        # Borrar el feed de la lista #
        if self.clear_mode == 1 and self.treeindex.has_key(id_feed):
         self.treestore.remove(iter) # <-- es el iter que queremos u otro? xD
         del self.treeindex[id_feed]
        else:
         model.set(iter, 0, feed_label, 3, font_style)
-       # NEW
       elif liststore_font_style == 'normal': # Si antes era normal...
        nombre_feed = self.simple_name_parsing(nombre_feed)
        if nombre_feed == _("Important") or nombre_feed == _("Unread"):
@@ -792,7 +791,6 @@ class Naufrago:
        else:
         feed_label = nombre_feed
         font_style = 'normal'
-       # NEW
        # Añadir el feed a la lista #
        if font_style == 'bold':
         if self.clear_mode == 1 and self.treeindex.has_key(id_feed) is False:
@@ -810,7 +808,6 @@ class Naufrago:
          del self.treeindex[id_feed]
         else:
          model.set(iter, 0, feed_label, 3, font_style)
-       # NEW
      # END NAME PARSING (nodo origen) #
 
      if self.clear_mode == 0: # NEW
@@ -893,7 +890,6 @@ class Naufrago:
        # Destino: Importantes
        self.update_special_folder(9998)
 
-       ###if on_a_search:
        if self.on_a_search:
         # Actualizar todos los feeds!!!
         i = 0
@@ -951,8 +947,6 @@ class Naufrago:
   """Opens a given url in the user sensible web browser."""
   (model, iter) = self.treeselection2.get_selected()
   if(iter is not None): # Hay alguna fila de la lista seleccionada
-   # START NEW
-   links = {} # Diccionario de paginas html...
    (model_tmp, iter_tmp) = self.treeselection.get_selected()
    id_articulo = self.liststore.get_value(iter, 4)
    try:
@@ -965,11 +959,9 @@ class Naufrago:
     self.lock.release()
     cursor.close()
    full_path = content_path + "/" + `id_feed` + "/" + `id_articulo` + ".html"
-   print 'full_path: ' + full_path
    if (self.deep_offline_mode == 1) and os.path.exists(full_path):
     link = "file://" + full_path
    else:
-   # END NEW
     if data is not None:
      link = data
     else:
@@ -979,7 +971,7 @@ class Naufrago:
      link = cursor.fetchone()[0]
      self.lock.release()
      cursor.close()
-   webbrowser.open_new(link) # New win!
+   webbrowser.open(link, 0, True) # New win!
 
  def copiar_al_portapapeles(self, event=None, data=None):
   """Copies the entry's URL to the system clipboard."""
@@ -1002,6 +994,7 @@ class Naufrago:
  def htmlentitydecode(self, text):
   """Escapes htmlentities. Thanks to Fredrik Lundh!"""
   def fixup(m):
+   """Fixes up characters."""
    text = m.group(0)
    if text[:2] == "&#": # character reference
     try:
@@ -1053,18 +1046,23 @@ class Naufrago:
     self.eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#EDECEB"))
 
    # This prevents htmlentities from doing weird things to the headerlink!
+   gtk.gdk.threads_leave()
    self.headerlink.set_markup('<b><u><span foreground="blue">'+saxutils.escape(self.htmlentitydecode(titulo))+'</span></u></b>')
+   ###self.headerlink.set_text(saxutils.escape(self.htmlentitydecode(titulo)))
+   ###self.headerlink.modify_text(state, gtk.gdk.Color(blue=1.0))
    self.headerlink.set_justify(gtk.JUSTIFY_CENTER)
    self.headerlink.set_ellipsize(pango.ELLIPSIZE_END)
    self.eb.show()
    self.eb_image_zoom.show()
+   gtk.gdk.threads_enter()
 
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.execute('SELECT leido,contenido FROM articulo WHERE id = ?', [id_articulo])
    row = cursor.fetchone()
    self.lock.release()
-   contenido = row[1]
+   if row is not None:
+    contenido = row[1]
 
    # Offline mode image retrieving
    if self.offline_mode == 1:
@@ -1092,7 +1090,6 @@ class Naufrago:
     cursor.execute('UPDATE articulo SET leido=1 WHERE id = ?', [id_articulo])
     self.conn.commit()
     self.lock.release()
-   cursor.close()
 
    # Y actualizar el modelo de datos.
    (model, iter) = self.treeselection.get_selected()
@@ -1100,16 +1097,16 @@ class Naufrago:
    if liststore_font_style == 'bold': # Si la entry era bold, cabe actualizar el nodo del feed
     feed_label = ''
     # Little hack for being able to mark read/unread the entries found on a search.
-    #try:
-    # nombre_feed = model.get_value(iter, 0)
-    # id_feed = model.get_value(iter, 2)
-    #except:
     q = 'SELECT id_feed FROM articulo WHERE id = ' + `id_articulo`
     self.lock.acquire()
     cursor.execute(q)
     id_feed = cursor.fetchone()[0]
     self.lock.release()
-    iter = self.treeindex[id_feed]
+    try:
+     iter = self.treeindex[id_feed]
+    except KeyError:
+     cursor.close()
+     return
     nombre_feed = model.get_value(iter, 0)
 
     (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
@@ -1124,12 +1121,10 @@ class Naufrago:
     else:
      feed_label = nombre_feed
      font_style = 'normal'
-    # NEW
     if self.clear_mode == 1 and self.treeindex.has_key(id_feed) and ('[' not in feed_label and ']' not in feed_label):
      self.treestore.remove(iter)
      del self.treeindex[id_feed] # Update feeds dict
     else:
-    # NEW
      model.set(iter, 0, feed_label, 3, font_style)
    # END NAME PARSING (nodo origen) #
     if self.clear_mode == 0: # NEW
@@ -1176,6 +1171,8 @@ class Naufrago:
      # Unbold category if needed.
      self.toggle_category_bold()
 
+   cursor.close()
+
  def tree_row_selection(self, event):
   """Feed row change detector; triggers entry visualization on the list."""
   (model, iter) = self.treeselection.get_selected()
@@ -1187,22 +1184,22 @@ class Naufrago:
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     nombre_feed = self.simple_name_parsing(row_name)
     self.webview.load_string("<h2>" + _("Special folder") + ": "+nombre_feed+"</h2>", "text/html", "utf-8", "valid_link")
-   # OLD: elif(model.iter_depth(iter) == 1): # Si es hoja, presentar entradas
    elif(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # Si es hoja, presentar entradas
     self.populate_entries(id_feed)
     self.treeview2.scroll_to_point(0,0) # Reposition entry list at the top.
     cursor = self.conn.cursor()
     self.lock.acquire()
     cursor.execute('SELECT url FROM feed WHERE id = ?', [id_feed])
-    url = cursor.fetchone()[0]
+    url = cursor.fetchone()
     self.lock.release()
     cursor.close()
     # START NAME PARSING #
     row_name = self.simple_name_parsing(row_name)
     # END NAME PARSING #
-    FEED_PAGE = "<h2>Feed: " + row_name + "</h2><p>" + _("Source") + ": <a href='" + url + "'>" + url + "</a></p>"
-    self.webview.load_string(FEED_PAGE, "text/html", "utf-8", "valid_link")
-   # OLD: elif(model.iter_depth(iter) == 0): # Si es padre, limpliar 
+    if url is not None:
+     url = url[0]
+     FEED_PAGE = "<h2>Feed: " + row_name + "</h2><p>" + _("Source") + ": <a href='" + url + "'>" + url + "</a></p>"
+     self.webview.load_string(FEED_PAGE, "text/html", "utf-8", "valid_link")
    elif(model.iter_depth(iter) == 0 and self.clear_mode == 0): # Si es padre, limpliar
     self.liststore.clear() # Limpieza de tabla de entries/articulos
     self.scrolled_window2.set_size_request(0,0)
@@ -1288,7 +1285,8 @@ class Naufrago:
   global APP_VERSION
   try:
    gtk.gdk.threads_enter()
-   web_file = urllib2.urlopen('http://enchufado.com/proyectos/naufrago/app_version', timeout=10)
+   opener = urllib2.build_opener(self.get_proxy_handler())
+   web_file = opener.open('http://enchufado.com/proyectos/naufrago/app_version', timeout=10)
    read = web_file.read().rstrip()
    web_file.close()
    gtk.gdk.threads_leave()
@@ -1350,10 +1348,10 @@ class Naufrago:
   about.set_transient_for(self.window)
   about.set_program_name("Naufrago!")
   about.set_version(APP_VERSION)
-  about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
+  about.set_copyright("(c) 2010-2012 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
-  about.set_website("http://www.enchufado.com/")
+  about.set_website("http://naufrago.sourceforge.net/")
   about.set_logo(gtk.gdk.pixbuf_new_from_file(media_path + 'Viking_Longship.svg'))
   about.run()
   about.destroy()
@@ -1459,20 +1457,18 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.executescript('''
-     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL, deep_offline_mode integer NOT NULL);
+     CREATE TABLE config(window_position varchar(16) NOT NULL, window_size varchar(16) NOT NULL, scroll1_size varchar(16) NOT NULL, scroll2_size varchar(16) NOT NULL, num_entries integer NOT NULL, update_freq integer NOT NULL, init_unfolded_tree integer NOT NULL, init_tray integer NOT NULL, init_update_all integer NOT NULL, offline_mode integer NOT NULL, show_trayicon integer NOT NULL, toolbar_mode integer NOT NULL, show_newentries_notification integer NOT NULL, hide_readentries integer NOT NULL, hide_dates integer NOT NULL, driven_mode integer NOT NULL, update_freq_timemode integer NOT NULL, init_check_app_updates integer NOT NULL, clear_mode integer NOT NULL, deep_offline_mode integer NOT NULL, http_proxy varchar(1024) NOT NULL, use_proxy integer NOT NULL);
      CREATE TABLE categoria(id integer PRIMARY KEY, nombre varchar(32) NOT NULL);
      CREATE TABLE feed(id integer PRIMARY KEY, nombre varchar(32) NOT NULL, url varchar(1024) NOT NULL, id_categoria integer NOT NULL);
      CREATE TABLE articulo(id integer PRIMARY KEY, titulo varchar(256) NOT NULL, contenido text, fecha integer NOT NULL, enlace varchar(1024) NOT NULL, leido INTEGER NOT NULL, importante INTEGER NOT NULL, imagenes TEXT, id_feed integer NOT NULL, entry_unique_id varchar(1024) NOT NULL, ghost integer NOT NULL);
      CREATE TABLE imagen(id integer PRIMARY KEY, nombre integer NOT NULL, url TEXT NOT NULL, id_articulo integer NOT NULL);
      CREATE TABLE contenido_offline(id integer PRIMARY KEY, nombre varchar(256) NOT NULL, id_articulo integer NOT NULL);
-     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0);
+     INSERT INTO config VALUES('0,0', '600x400', '175x50', '300x150', 10, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, '', 0);
      INSERT INTO categoria VALUES(null, 'General');
      INSERT INTO feed VALUES(null, 'enchufado.com', 'http://enchufado.com/rss2.php', 1);''')
    self.conn.commit()
    self.lock.release()
    cursor.close()
-   #os.makedirs(favicon_path)
-   #os.makedirs(images_path)
   else:
    #self.conn = sqlite3.connect(db_path, check_same_thread=False)
    self.conn = connect(db_path, check_same_thread=False)
@@ -1520,6 +1516,9 @@ class Naufrago:
   self.init_check_app_updates = int(row[17])
   self.clear_mode = int(row[18])
   self.deep_offline_mode = int(row[19])
+  self.http_proxy = row[20]
+  self.use_proxy = int(row[21])
+  self.postpone_feedentries_refresh = 0
 
   # Cargamos un par de html's...
   f = open(index_path, 'r')
@@ -1555,10 +1554,17 @@ class Naufrago:
 
   cursor = self.conn.cursor()
   self.lock.acquire()
-  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?, deep_offline_mode = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode,self.deep_offline_mode])
+  cursor.execute('UPDATE config SET window_position = ?, window_size = ?, scroll1_size = ?, scroll2_size = ?, num_entries = ?, update_freq = ?, init_unfolded_tree = ?, init_tray = ?, init_update_all = ?, offline_mode = ?, show_trayicon = ?, toolbar_mode = ?, show_newentries_notification = ?, hide_readentries = ?, hide_dates = ?, driven_mode = ?, update_freq_timemode = ?, init_check_app_updates = ?, clear_mode = ?, deep_offline_mode = ?, http_proxy = ?, use_proxy = ?', [position,size,scroll1,scroll2,self.num_entries,self.update_freq,self.init_unfolded_tree,self.init_tray,self.init_update_all,self.offline_mode,self.show_trayicon,self.toolbar_mode,self.show_newentries_notification,self.hide_readentries,self.hide_dates,self.driven_mode,self.update_freq_timemode,self.init_check_app_updates,self.clear_mode,self.deep_offline_mode,self.http_proxy,self.use_proxy])
   self.conn.commit()
   self.lock.release()
   cursor.close()
+
+ def get_proxy_handler(self):
+  """Gets the specified proxy, if any."""
+  proxies = {}
+  if (self.use_proxy == 1) and (self.http_proxy is not None):
+   proxies['http'] = self.http_proxy
+  return urllib2.ProxyHandler(proxies)
 
  def purge_entries(self):
   """Adequates excedent entries from each feed. This is called from Preferences
@@ -1663,8 +1669,6 @@ class Naufrago:
   else:
      self.tvcolumn.set_attributes(self.cellpb, stock_id=1)
   self.tvcolumn.set_attributes(self.cell, text=0, font=3)
-  # Allow drag and drop reordering of rows
-  ###self.treeview.set_reorderable(True)
   self.treeview_setup_dnd(self.treeview)
   self.scrolled_window1 = gtk.ScrolledWindow()
   self.scrolled_window1.add(self.treeview)
@@ -1753,7 +1757,7 @@ class Naufrago:
   self.hbox.pack_start(self.eb_image_zoom, expand=False, fill=False, padding=5)
 
   self.headerlink = gtk.Label("")
-  self.headerlink.set_tooltip_text(_("Clic to open in browser"))
+  self.headerlink.set_tooltip_text(_("Click to open in browser"))
   self.eb = gtk.EventBox() # Wrapper for the label to be able to catch 'button_press_event'
   self.eb.add(self.headerlink)
   self.eb.connect("button_press_event", self.headerlink_button_press_event)
@@ -1776,12 +1780,20 @@ class Naufrago:
   self.throbber = gtk.Image()
   self.throbber.set_from_file(app_path + 'media/throbber.gif')
   self.hbox2.pack_start(self.throbber, expand=False, fill=False, padding=0)
-  self.statusbar = gtk.Label("")
+  self.statusbar = gtk.Label('')
   self.statusbar.set_justify(gtk.JUSTIFY_LEFT)
-  self.statusbar.set_ellipsize(pango.ELLIPSIZE_END)
+  ###self.statusbar.set_ellipsize(pango.ELLIPSIZE_END) # Pango doesn't seem thread friendly :(
+  #self.statusbar.set_line_wrap(True)
+  #self.statusbar.set_single_line_mode(True)
   self.statusbar.set_alignment(xalign=0.01, yalign=0)
   self.hbox2.pack_start(self.statusbar, expand=True, fill=True, padding=0)
   self.vbox.pack_start(self.hbox2, False, False, 0)
+
+  # Trick at startup to limit statusbar string width. Future redimensioning
+  # is handled by the window_resize_event() callback function.
+  (a, b) = self.statusbar.get_size_request()
+  self.statusbar.set_size_request(self.w-40, b)
+  self.window.connect("configure_event", self.window_resize_event)
 
   self.window.add(self.vbox)
 
@@ -1804,6 +1816,14 @@ class Naufrago:
 
   # Finally, check init options!
   self.check_init_options()
+
+ def window_resize_event(self, widget, event):
+  """Resizes statusbar width when the main window is also resized. And
+     before you ask, yes, this is a workaround for not using Pango.ellipsize
+     that should avoid threading issues."""
+  (v, w, self.w, self.h) = self.window.get_allocation()
+  (x, y, a, b) = self.statusbar.get_allocation()
+  self.statusbar.set_size_request(self.w-40, b)
 
  def create_webview_popup(self, view, menu):
   """Creates the webview (browser item) popup menu."""
@@ -1844,9 +1864,9 @@ class Naufrago:
  def hover_link(self, title, uri, data=None):
   """Shows hovered link in Statusbar."""
   if data is not None:
-   self.statusbar.set_text(data.encode("utf8"))
+   self.statusbar.set_text(data.encode("utf8")) # THREADAUDIT
   else:
-   self.statusbar.set_text('')
+   self.statusbar.set_text('') # THREADAUDIT
 
  def check_init_options(self):
   """Checks & applies init options."""
@@ -1883,7 +1903,8 @@ class Naufrago:
   # Attach the callback functions to the activate signal
   self.update_item.connect("activate", self.update_all_feeds)
   self.stop_item.connect("activate", self.stop_feed_update)
-  self.quit_item.connect("activate", self.delete_event)
+  ###self.quit_item.connect("activate", self.delete_event)
+  self.quit_item.connect("activate", self.delete_tray_event)
   # Should we enable stop function when showing popup menu? It depends...
   if self.stop_feed_update_lock:
    self.stop_item.set_sensitive(True)
@@ -2113,7 +2134,6 @@ class Naufrago:
       cursor.execute('SELECT MAX(id) FROM categoria')
       row = cursor.fetchone()
       self.lock.release()
-      # OLD: dad = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'])
       dad, useless_iter = self.alphabetical_node_insertion(text, [text, gtk.STOCK_DIRECTORY, row[0]+1, 'normal'], 'category') # NEW
       self.treeindex_cat[row[0]+1] = dad # Update category dict
      self.lock.acquire()
@@ -2127,16 +2147,12 @@ class Naufrago:
  def alphabetical_node_insertion(self, nodo_a_insertar, node_data, node_type):
   """Inserts a new node in the feed list alphabetically. Oriented to feeds & categories."""
   if self.clear_mode == 1 or (self.clear_mode == 0 and node_type == 'category'): # Just a security check!
-   #print 'clear_mode = 1 o clear_mode = 0 siendo categoria'
    iter = self.treestore.get_iter_root() # Magic
    if iter is not None:
     iter = self.do_comparison(nodo_a_insertar, iter)
    inserted_iter = self.treestore.insert_before(None, iter, node_data)
    return iter, inserted_iter
-
   else: # if self.clear_mode == 0 and node_type == 'feed':
-   #print 'clear_mode = 0 siendo feed'
-   # START NEW
    (model, iter) = self.treeselection.get_selected()
    iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
    if iter_parent is None:
@@ -2146,20 +2162,16 @@ class Naufrago:
     iter = self.do_comparison(nodo_a_insertar, iter)
    inserted_iter = self.treestore.insert_before(None, iter, node_data)
    return iter, inserted_iter
-   # END NEW
 
  def alphabetical_node_ordering(self, iter_del_nodo_a_insertar):
   """Orders a node in the feed list alphabetically. Oriented ONLY to feeds."""
   if self.clear_mode == 1:
-   print 'En alphabetical_node_ordering, clear_mode == 1'
    iter = self.treestore.get_iter_root() # Magic
    if iter is not None:
     nodo_a_insertar = self.treestore.get_value(iter_del_nodo_a_insertar, 0)
     iter = self.do_comparison(nodo_a_insertar, iter)
    self.treestore.move_before(iter_del_nodo_a_insertar, iter)
-
   else: #self.clear_mode == 0
-   print 'En alphabetical_node_ordering, clear_mode == 0'
    (model, iter) = self.treeselection.get_selected()
    iter_parent = model.iter_parent(iter) # Cogemos al padre para usarlo como categoría destino
    if iter_parent is None:
@@ -2177,12 +2189,10 @@ class Naufrago:
   if (id_node_curr == 9998) or (id_node_curr == 9999):
    return iter_node_curr
 
-  #print 'Comparando "' + nodo_a_insertar + '" con "' + node_curr + '"...'
   res = cmp(nodo_a_insertar, node_curr)
   if res == 0: # Same strings
    return iter_node_curr
   elif res == -1: # 'categoria_a_insertar' goes before
-   #print 'Salimos e insertamos categoria antes que la '+node_curr+'!'
    return iter_node_curr
   elif res == 1: # 'categoria_a_insertar' goes after
    iter = self.treestore.iter_next(iter_node_curr) # Pasamos al siguiente Padre...
@@ -2196,7 +2206,6 @@ class Naufrago:
   """Deletes a category from the user feed tree structure"""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   # OLD: if(model.iter_depth(iter) == 0): # ... y es un nodo padre
    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # ... y es un nodo padre
     id_categoria = self.treestore.get_value(iter, 2)
     if(id_categoria != 1) and (id_categoria != 9998) and (id_categoria != 9999):
@@ -2219,18 +2228,16 @@ class Naufrago:
       self.lock.release()
       for feed in feeds:
        del self.treeindex[feed[0]] # Update feeds dict
-       if os.path.exists(favicon_path + '/'+ `feed[0]`):
-        os.unlink(favicon_path + '/'+ `feed[0]`)
        self.lock.acquire()
        cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [feed[0]])
        articles = cursor.fetchall()
        self.lock.release()
        for art in articles:
-        self.content_cache_cleanup(self, cursor, art[0], feed[0]) # NEW
-       self.lock.acquire()
-       cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [feed[0]])
-       self.conn.commit()
-       self.lock.release()
+        self.content_cache_cleanup(cursor, art[0], feed[0]) # NEW
+       if os.path.exists(favicon_path + '/'+ `feed[0]`):
+        os.unlink(favicon_path + '/'+ `feed[0]`)
+       if os.path.exists(content_path + "/" + `feed[0]`):
+        os.rmdir(content_path + "/" + `feed[0]`)
       self.lock.acquire()
       cursor.execute('DELETE FROM feed WHERE id_categoria = ?', [id_categoria])
       cursor.execute('DELETE FROM categoria WHERE id = ?', [id_categoria])
@@ -2238,8 +2245,9 @@ class Naufrago:
       self.lock.release()
 
       # Actualizamos No-leidos e Importantes
-      self.update_special_folder(9999)
-      self.update_special_folder(9998)
+      if self.clear_mode == 0: # NEW
+       self.update_special_folder(9999)
+       self.update_special_folder(9998)
 
       # Finalmente ponemos las cosas en su sitio
       self.webview.load_string(ABOUT_PAGE, "text/html", "utf-8", "file://"+index_path)
@@ -2339,7 +2347,7 @@ class Naufrago:
     self.lock.release()
     if(row is None):
      id_categoria = 1 # Lo colocamos en la categoría seleccionada, o en 'General' (default) si no la hubiere
-     if self.clear_mode == 0: # NEW
+     if self.clear_mode == 0:
       if(iter is not None): # Si hay algún nodo seleccionado..
        if(model.iter_depth(iter) == 0): # ... y es un nodo padre
         id_categoria = self.treestore.get_value(iter, 2)
@@ -2362,9 +2370,9 @@ class Naufrago:
      if row[0] is not None:
       id_feed = row[0]
      self.get_favicon(id_feed+1, textURL) # Downloads favicon & adds to the icon factory.
-     if self.clear_mode == 0: # NEW
+     if self.clear_mode == 0:
       son = self.treestore.append(iter, [textName, `id_feed+1`, id_feed+1, 'normal'])
-     else: # NEW
+     else:
       son = self.treestore.append(None, [textName, `id_feed+1`, id_feed+1, 'normal']) # NEW
       # En lugar de ordenarlo aquí (erroneamente porque todavia no tenemos el titulo),
       # lo haremos en get_feed_helper una vez tengamos dicho titulo.
@@ -2414,7 +2422,6 @@ class Naufrago:
   """Deletes a feed from the user feed tree structure"""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo
    if(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
     dialog = gtk.MessageDialog(self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), gtk.MESSAGE_QUESTION, gtk.BUTTONS_OK_CANCEL, None)
     dialog.set_title(_('Delete feed'))
@@ -2425,7 +2432,6 @@ class Naufrago:
 
     if(response == gtk.RESPONSE_OK):
      id_feed = self.treestore.get_value(iter, 2)
-
      cursor = self.conn.cursor()
      self.lock.acquire()
      cursor.execute('SELECT id FROM articulo WHERE id_feed = ?', [id_feed])
@@ -2434,13 +2440,14 @@ class Naufrago:
      for art in articles:
       self.content_cache_cleanup(cursor, art[0], id_feed) # NEW
      self.lock.acquire()
-     cursor.execute('DELETE FROM articulo WHERE id_feed = ?', [id_feed])
      cursor.execute('DELETE FROM feed WHERE id = ?', [id_feed])
      self.conn.commit()
      self.lock.release()
      cursor.close()
      if os.path.exists(favicon_path + '/'+ `id_feed`):
       os.unlink(favicon_path + '/'+ `id_feed`)
+     if os.path.exists(content_path + "/" + `id_feed`):
+      os.rmdir(content_path + "/" + `id_feed`)
 
      if self.clear_mode == 0: # NEW
       # Unbold category if needed.
@@ -2468,7 +2475,6 @@ class Naufrago:
   """Summons deleting feed or category, depending on selection."""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   # OLD: if(model.iter_depth(iter) == 0): # Si es un nodo padre...
    if(model.iter_depth(iter) == 0 and self.clear_mode == 0): # Si es un nodo padre...
     self.delete_category()
    else: # ... y es un nodo hijo
@@ -2479,7 +2485,6 @@ class Naufrago:
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
    id_categoria_o_feed = model.get_value(iter, 2)
-   # OLD: if(model.iter_depth(iter) == 0): # ... y es un nodo padre
    if(model.iter_depth(iter) == 0 and self.clear_mode == 0): # ... y es un nodo padre
     if(id_categoria_o_feed != 1) and (id_categoria_o_feed != 9998) and (id_categoria_o_feed != 9999):
      self.add_category(id_categoria_o_feed)
@@ -2592,7 +2597,6 @@ class Naufrago:
   self.hide_readentries = aux_hide_readentries
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
    if model.iter_depth(iter) == 1 or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo (o sea, un feed)
     id_selected_feed = self.treestore.get_value(iter, 2)
     self.populate_entries(id_selected_feed)
@@ -2601,7 +2605,6 @@ class Naufrago:
   """Controlls the read entry hidding of the preferences dialog."""
   (model, iter) = self.treeselection.get_selected()
   if(iter is not None): # Si hay algún nodo seleccionado...
-   # OLD: if(model.iter_depth(iter) == 1): # ... y es un nodo hijo (o sea, un feed)
    if model.iter_depth(iter) == 1 or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo (o sea, un feed)
     if checkbox.get_active(): self.hide_readentries = 1
     else: self.hide_readentries = 0
@@ -2636,7 +2639,6 @@ class Naufrago:
   iter = model.get_iter_root() # Magic
   id_cat = model.get_value(iter, 2)
   while (iter is not None):
-   # OLD: if(model.iter_depth(iter) == 0) and (id_cat != 9998 and id_cat != 9999): # Si es padre
    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0) and (id_cat != 9998 and id_cat != 9999): # Si es padre
     boldornot = model.get_value(iter, 3)
     if boldornot == 'normal':
@@ -2730,6 +2732,22 @@ class Naufrago:
    self.treeview.collapse_all()
   hbox_throbber.hide()
 
+ def use_proxy_toggle_cb(self, use_proxy_button, entry0):
+  """Toggles tue usage of proxy."""
+  if(use_proxy_button.get_active()):
+   self.use_proxy = 1
+   entry0.set_editable(True)
+   entry0.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
+  else:
+   self.use_proxy = 0
+   entry0.set_editable(False)
+   entry0.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("grey"))
+
+ def proxy_entry_leave_focus_cb(self, entry, event, proxy_type):
+  """Controls the focus on the proxy box."""
+  if proxy_type == 'http':
+   self.http_proxy = entry.get_text()
+
  def force_gui_refresh(self):
   """Forces updates to the application windows during a long callback or other internal operation."""
   # Found at: http://faq.pygtk.org/index.py?req=show&file=faq03.007.htp
@@ -2753,7 +2771,7 @@ class Naufrago:
   dialog.add_button(_("Save"), gtk.RESPONSE_ACCEPT)
   dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
 
-  dialog.set_size_request(300,250)
+  dialog.set_size_request(350,250)
   dialog.set_border_width(2)
   dialog.set_resizable(True)
   dialog.set_has_separator(False)
@@ -2875,33 +2893,53 @@ class Naufrago:
   vbox5 = gtk.VBox(homogeneous=True)
   align4 = gtk.Alignment()
   align4.set_padding(10, 0, 15, 0)
-
   checkbox0 = gtk.CheckButton(_("Offline mode (slow)"))
   if(self.offline_mode == 1): checkbox0.set_active(True)
   else: checkbox0.set_active(False)
   vbox5.pack_start(checkbox0, True, True, 5)
-  # START NEW
   checkbox11 = gtk.CheckButton(_("Deep offline mode (slower!)"))
   if(self.deep_offline_mode == 1): checkbox11.set_active(True)
   else: checkbox11.set_active(False)
   vbox5.pack_start(checkbox11, True, True, 5)
-  # END NEW
   aux_driven_mode = self.driven_mode
   if(self.driven_mode == 1) and (self.clear_mode == 0) and (self.init_unfolded_tree == 0): checkbox8.set_active(True)
   else: checkbox8.set_active(False)
   hbox_throbber2 = self.progress_factory()
   checkbox8.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox10, 2, hbox_throbber2)
   vbox5.pack_start(checkbox8, True, True, 5)
-  # START NEW
   aux_clear_mode = self.clear_mode
   if(self.clear_mode == 1) and (self.driven_mode == 0) and (self.init_unfolded_tree == 0): checkbox10.set_active(True)
   else: checkbox10.set_active(False)
   checkbox10.connect('toggled', self.unfolded_or_driven_toggle_cb, checkbox, checkbox8, 3, hbox_throbber2)
   vbox5.pack_start(checkbox10, True, True, 5)
   vbox5.pack_start(hbox_throbber2, False, False, 5)
-  # END NEW
   align4.add(vbox5)
   notebook.append_page(align4, gtk.Label(_("Modes")))
+
+  # Tab 5
+  table0 = gtk.Table(2, 2)
+  align5 = gtk.Alignment()
+  align5.set_padding(10, 0, 15,0)
+  checkbox4 = gtk.CheckButton(_("Use Proxy"))
+  aux_use_proxy = self.use_proxy
+  table0.attach(checkbox4, 0, 2, 0, 1, xpadding=5, ypadding=5)
+  label0 = gtk.Label(_("HTTP Proxy"))
+  table0.attach(label0, 0, 1, 1, 2, xpadding=5, ypadding=5)
+  entry0 = gtk.Entry(1024)
+  entry0.set_width_chars(26)
+  entry0.set_text(self.http_proxy)
+  if(self.use_proxy == 1):
+   checkbox4.set_active(True)
+  else:
+   checkbox4.set_active(False)
+   entry0.set_editable(False)
+   entry0.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("grey"))
+  checkbox4.connect('toggled', self.use_proxy_toggle_cb, entry0)
+  aux_http_proxy = self.http_proxy
+  entry0.connect('focus-out-event', self.proxy_entry_leave_focus_cb, 'http')
+  table0.attach(entry0, 1, 2, 1, 2, xpadding=5, ypadding=5)
+  align5.add(table0)
+  notebook.append_page(align5, gtk.Label(_("Proxy")))
 
   dialog.vbox.pack_start(notebook)
   dialog.show_all()
@@ -2959,6 +2997,8 @@ class Naufrago:
    self.hide_read_entries(aux_hide_readentries)
    self.hide_date_column(aux_hide_dates)
    self.unfolded_or_driven_toggle(aux_init_unfolded_tree, aux_driven_mode, aux_clear_mode, hbox_throbber1, hbox_throbber2)
+   self.use_proxy = aux_use_proxy
+   self.http_proxy = aux_http_proxy
 
  def treeview_copy_row(self, treeview, model, source, target, drop_position):
   """Copy tree model rows from treeiter source into, before or after treeiter target.
@@ -2976,14 +3016,27 @@ class Naufrago:
   # new = model.insert_before(parent=None, sibling=target, row=source_row)
   #elif drop_position == gtk.TREE_VIEW_DROP_AFTER:
   # new = model.insert_after(parent=None, sibling=target, row=source_row)
-  parent_value = `model.get_value(target, 0)`
-  row_value = `model.get_value(source_row.iter, 0)`
-  row_value = self.simple_name_parsing(row_value)
-  self.lock.acquire()
-  cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value.decode("utf-8")])
-  self.conn.commit()
-  self.lock.release()
-  cursor.close()
+  parent_value = model.get_value(target, 0) # categoria destino
+  row_value = model.get_value(source_row.iter, 0) # feed a mover
+  row_value_clean = self.simple_name_parsing(row_value)
+
+  # Averiguamos el padre origen del nodo del feed movido
+  # para ver si le quedan feeds con entries sin leer. Caso afirmativo,
+  # cabrá actualizar tanto el nodo padre origen como el nodo padre destino.
+  iter = model.iter_parent(source_row.iter) # categoria origen
+  id_categoria = self.treestore.get_value(iter, 2)
+  bold_or_not = self.treestore.get_value(iter, 3)
+  if bold_or_not == 'bold':
+   self.lock.acquire()
+   cursor.execute('UPDATE feed SET id_categoria = (SELECT id FROM categoria WHERE nombre = ?) WHERE id = (SELECT id FROM feed WHERE nombre = ?)', [parent_value.decode("utf-8"),row_value_clean.decode("utf-8")])
+   self.conn.commit()
+   cursor.execute('SELECT count(articulo.id) FROM articulo,feed WHERE articulo.leido = 0 AND articulo.id_feed = feed.id AND feed.id_categoria = ?', [id_categoria])
+   row_cat_origen = cursor.fetchone()
+   self.lock.release()
+   cursor.close()
+   if row_cat_origen[0] == 0:
+    model.set_value(iter, 3, 'normal')
+  model.set_value(target, 3, 'bold')
 
   # If the source row is expanded, expand the newly copied row
   # also.  We must add at least one child before we can expand,
@@ -3098,9 +3151,12 @@ class Naufrago:
      new_feed_item = gtk.ImageMenuItem(_("New feed"))
      icon = new_feed_item.render_icon(gtk.STOCK_FILE, gtk.ICON_SIZE_BUTTON)
      new_feed_item.set_image(gtk.image_new_from_pixbuf(icon))
+     if self.ui_lock: new_feed_item.set_sensitive(False)
+
      new_category_item = gtk.ImageMenuItem(_("New category"))
      icon = new_category_item.render_icon(gtk.STOCK_DIRECTORY, gtk.ICON_SIZE_BUTTON)
      new_category_item.set_image(gtk.image_new_from_pixbuf(icon))
+     if self.ui_lock: new_category_item.set_sensitive(False)
 
     # Add them to the menu
     tree_menu.append(toggle_todos_leido_item)
@@ -3171,6 +3227,15 @@ class Naufrago:
   """Toggles fullscreen mode for the browser."""
   if event.button == 1:
    if self.fullscreen:
+    # START: Actualización postpuesta de las entries de un feed (porque teníamos la fullscreen activada)
+    if self.postpone_feedentries_refresh:
+     (model, iter) = self.treeselection.get_selected()
+     if(iter is not None): # Si hay algún nodo seleccionado...
+      if(model.iter_depth(iter) == 1) or (model.iter_depth(iter) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
+       id_selected_feed = self.treestore.get_value(iter, 2)
+       self.populate_entries(id_selected_feed)
+     self.postpone_feedentries_refresh = 0
+    # END
     self.scrolled_window1.set_size_request(self.a, self.b)
     self.scrolled_window1.show()
     self.scrolled_window2.set_size_request(300,150)
@@ -3197,14 +3262,16 @@ class Naufrago:
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.execute('SELECT enlace FROM articulo WHERE id = ?', [id_articulo])
-   link = cursor.fetchone()[0]
+   link = cursor.fetchone()
    self.lock.release()
    cursor.close()
-   self.statusbar.set_text(link.encode("utf8"))
+   if link is not None:
+    link = link[0]
+    self.statusbar.set_text(link.encode("utf8")) # THREADAUDIT
 
  def headerlink_mouse_leave(self, widget, event):
   """Hides the link the headerlink points to in the statusbar."""
-  self.statusbar.set_text("")
+  self.statusbar.set_text('') # THREADAUDIT
 
  def update_feed(self, data=None, new_feed=False):
   """Updates a single (selected) feed or the ones from a (selected) category, if any."""
@@ -3212,7 +3279,6 @@ class Naufrago:
   if(iter is not None): # Si hay algún nodo seleccionado...
    nodes = {} # Dictionary! (key:value pairs containing id_feed:iter)
    id_category = self.treestore.get_value(iter, 2)
-   # OLD: if(model.iter_depth(iter) == 0) and (id_category != 9998) and (id_category != 9999): # Si es un nodo padre...
    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0) and (id_category != 9998 and id_category != 9999): # Si es un nodo padre...
     # Update all feeds of this category
     iter = model.iter_children(iter)
@@ -3220,21 +3286,15 @@ class Naufrago:
      id_feed = self.treestore.get_value(iter, 2)
      nodes[id_feed] = iter # Storing id_feed:iter pairs...
      iter = self.treestore.iter_next(iter)
-    # Old way: self.get_feed(feed_ids)
-   # OLD: elif(model.iter_depth(iter) == 1): # Si es un nodo hijo...
-   else: # NEW: Si es un nodo hijo...
+   else: # Si es un nodo hijo...
     # Update this single feed
     id_feed = self.treestore.get_value(iter, 2)
     nodes[id_feed] = iter # Storing id_feed:iter pairs...
-    # Old way: self.get_feed(id_feed)
-   # New way:
    self.t = threading.Thread(target=self.get_feed, args=(nodes,new_feed, ))
    self.t.start()
 
  def update_all_feeds(self, data=None):
   """Updates all feeds (no complications!)."""
-  # Old way: self.get_feed()
-  # New way:
   if self.ui_lock is False: # This prevents autoupdate from launching if an update is alredy in progress...
    self.t = threading.Thread(target=self.get_feed, args=())
    self.t.start()
@@ -3293,7 +3353,6 @@ class Naufrago:
    if dentry.description is not None: description = dentry.description
    else: description = ''
   else: description = ''
-  ###print 'description: ' + description
 
   if hasattr(dentry,'link'):
    if dentry.link is not None: link = dentry.link.encode("utf-8")
@@ -3337,8 +3396,6 @@ class Naufrago:
  def retrieve_entry_images(self, id_articulo, images):
   """Manages entry images. It discards downloading images that are already on the
      database to save space and bandwidth per URL basis."""
-  #if not os.path.exists(images_path):
-  # os.makedirs(images_path)
 
   cursor = self.conn.cursor()
   # Comprueba que esa URL no exista ya en la BD...
@@ -3349,7 +3406,7 @@ class Naufrago:
    self.lock.release()
    if(row is None):
     # a) Si no existe, guarda entrada en tabla imagen y descarga físicamente la imagen a /imagenes.
-    self.statusbar.set_text(_('Obtaining image ') + i + '...'.encode("utf8"))
+    self.statusbar.set_text(_('Obtaining image ') + i + '...'.encode("utf8")) # THREADAUDIT
     self.lock.acquire()
     cursor.execute('SELECT MAX(id) FROM imagen')
     id_entry_max = cursor.fetchone()[0]
@@ -3361,7 +3418,8 @@ class Naufrago:
     self.conn.commit()
     self.lock.release()
     try:
-     web_file = urllib2.urlopen(i, timeout=10)
+     opener = urllib2.build_opener(self.get_proxy_handler())
+     web_file = opener.open(i, timeout=10)
      image = images_path + '/' + `id_entry_max`
      local_file = open(image, 'w')
      local_file.write(web_file.read())
@@ -3371,15 +3429,12 @@ class Naufrago:
      # Si falla, habria que (1) borrar la referencia de la bd y (2) borrar lo que se haya bajado.
      # De este modo, a la próxima volverá a intentar descargarla!
      self.lock.acquire()
-     #cursor.execute('SELECT MAX(id) FROM imagen')
-     #id_last_inserted_entry = cursor.fetchone()[0]
      cursor.execute('DELETE FROM imagen WHERE id = ?', [id_entry_max])
      self.conn.commit()
      self.lock.release()
      if os.path.exists(images_path + '/' + `id_entry_max`):
       os.unlink(images_path + '/' + `id_entry_max`)
-     #pass
-    self.statusbar.set_text('')
+    self.statusbar.set_text('') # THREADAUDIT
    else:
     # b) Si existe, no la descargamos, solo la referenciamos en la bd
     self.lock.acquire()
@@ -3401,13 +3456,11 @@ class Naufrago:
 
  def get_base_url(self, original_url):
   """Obtains base url from a given link."""
-  rgxp = '''(http|https)://+[^/]*?/'''
-  m = re.search(rgxp, original_url)
-  if m is not None:
-   base_url = m.group(0)
+  parsed = urlparse.urlsplit(original_url)
+  if not len(parsed.netloc):
+   return original_url
   else:
-   base_url = original_url
-  return base_url
+   return parsed.scheme + '://' + parsed.netloc + '/'
 
  def translate_document(self, page, url_list, feed_content_path, f):
   """ Translate html document for local viewing."""
@@ -3416,12 +3469,8 @@ class Naufrago:
    # Get file name to replace
    filename = self.get_filename(url)
    if url != filename:
-    print "Reemplazamos '" + url + "' por '" + filename + "'."
     page = page.replace(url, filename)
-   else:
-    print "No hace falta reemplazar, skipping!"
 
-  #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
 
   local_file = open(f, 'w')
@@ -3432,18 +3481,16 @@ class Naufrago:
   """Retrieves the content chosen from the filter content (if not present already)."""
   store_values = {} # Dict to store possible values to register into the DB
   url_mod_set = set(url_mod_list) # Remove duplicates
-  print "Links to download: " + `url_mod_set`
   for url in url_mod_set:
    # Get file name to save
    filename = self.get_filename(url)
    if (url_trashed is not None) and len(url_trashed)>0 and (url in url_trashed):
-    print "Skipping " + feed_content_path + "/" + filename + " (trash detected)..."
     continue
    if not os.path.exists(feed_content_path + "/" + filename):
-    print "Retrieving " + url + "..."
     try:
-     web_file = urllib2.urlopen(url, timeout=5)
-     self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8"))
+     opener = urllib2.build_opener(self.get_proxy_handler())
+     web_file = opener.open(url, timeout=5)
+     self.statusbar.set_text(_('Obtaining offline content ') + url + '...'.encode("utf8")) # THREADAUDIT
      # Chunk filename if it is too large!
      if len(filename) > 256:
       m = re.search('[^?=&]+', filename)
@@ -3453,19 +3500,20 @@ class Naufrago:
      local_file.close()
      web_file.close()
      store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
-     print "Done!"
     except urllib2.HTTPError, e:
-     print "Oops! The error was: " + `e.code` + " - " + `e.msg`
      url_trashed.append(url)
     except urllib2.URLError, e:
-     print "Other error: " + `e`
      url_trashed.append(url)
-    except urllib2.httplib.BadStatusLine, e: # We need this because it does not seem to be handled by urllib2 :(
-     print "BadStatusLine error: " + `e`
+    #except urllib2.httplib.BadStatusLine, e: # We need this because it does not seem to be handled by urllib2 :(
+    # print "BadStatusLine error: " + `e`
+    except:
+     pass
    else:
-    print "Skipping " + feed_content_path + "/" + filename + "..."
     store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
+   if self.stop_feed_update_lock: # NEW: We allow breaking to avoid long times before closing the app.
+    break
 
+  store_values[`id_articulo` + '.html'] = `id_articulo` # We also need to register the main offline file! (in instance, 1.html)
   # Insertion into the database of the retrieved contents
   if len(store_values)>0:
    cursor = self.conn.cursor()
@@ -3486,68 +3534,22 @@ class Naufrago:
 
  def rebuild_link(self, original_url, relative_link, url_mod_list):
   """Builds an absolute link from a relative one."""
-  original_url2 = original_url.split("http://")[1] # http://blog.liw.fi/posts/obnam-0.16/ => blog.liw.fi/posts/obnam-0.16/
-  original_url_split = original_url2.split("/") # blog.liw.fi/posts/obnam-0.16/ => ('blog.liw.fi', 'posts', 'obnam-0.16', '')
-  copy_of_clean_original_url_split = clean_original_url_split = filter(None, original_url_split)
-  relative_link_split = relative_link.split("/") # ../../favicon.ico => ('..', '..', 'favicon.ico')
-  clean_relative_link_split = filter(None, relative_link_split)
-
-  if (clean_relative_link_split is not None) and (len(clean_relative_link_split)>0):
-   if clean_relative_link_split[0] != "." and clean_relative_link_split[0] != "..":
-    m = re.search('''[^\W]''', clean_relative_link_split[0]) # Buscamos cosas "no raras" (caracteres alfanumericos)
-    if m is not None:
-     # Si empieza por //...
-     if relative_link.startswith("//"):
-      final_url = "http:" + relative_link
-      print 'Rebuilt_link (A1): ' + final_url
-     # Sino, construimos lo que podría ser el enlace...
-     else:
-      a = self.get_base_url(original_url)
-      b = "/".join(clean_relative_link_split)
-      if a.endswith("/") or b.startswith("/"):
-       final_url = a + b
-      else:
-       final_url = a + "/" + b
-      #url_mod_list.append(final_url)
-      print 'Rebuilt_link (A3): ' + final_url
-     url_mod_list.append(final_url)
-   else:
-    for elem in clean_relative_link_split:
-     if elem == ".": # ./archivo.html
-      clean_relative_link_split.remove(elem)
-     elif elem == "..": # ../archivo.html
-      clean_relative_link_split.remove(elem)
-      type(copy_of_clean_original_url_split)
-      print 'copy_of_clean_original_url_split: ' + `copy_of_clean_original_url_split`
-      copy_of_clean_original_url_split = copy_of_clean_original_url_split.pop()
-
-    a = "http://" + "/".join(copy_of_clean_original_url_split)
-    b = "/".join(clean_relative_link_split)
-    if a.endswith("/") or b.startswith("/"):
-     final_url = a + b
-    else:
-     final_url = a + "/" + b
-    url_mod_list.append(final_url)
-    print 'Rebuilt_link (B): ' + final_url
-
-   a = base_url = self.get_base_url(original_url)
-   b = "/".join(clean_relative_link_split)
-   alt_final_url = base_url + b
-   url_mod_list.append(alt_final_url)
-   print 'Rebuilt_link (C): ' + alt_final_url
+  parsed_url = urlparse.urlsplit(original_url)
+  if not len(parsed_url.scheme):
+   parsed_url = urlparse.urlsplit('http://' + original_url)
+  url_mod_list.append(urlparse.urljoin(parsed_url.scheme + '://' + parsed_url.netloc + parsed_url.path, relative_link))
 
   return url_mod_list
 
  def filter_needed_content(self, original_url, url_list, url_mod_list, feed_content_path, f):
   """Obtains the needed content to correctly show a page offline."""
   # Retrieve & save main html document if needed (read it otherwise)
-  #if f.startswith("http://") or f.startswith("https://"):
   f = feed_content_path + "/" + self.get_filename(f)
-  print "On file: " + `f`
 
   try:
    if not os.path.exists(f):
-    web_file = urllib2.urlopen(original_url, timeout=10)
+    opener = urllib2.build_opener(self.get_proxy_handler())
+    web_file = opener.open(original_url, timeout=10)
     local_file = open(f, 'w')
     page = web_file.read()
     web_file.close()
@@ -3571,9 +3573,7 @@ class Naufrago:
     m = re.search('''[^\W]''', clean_tag) # Buscamos cosas "no raras" (caracteres alfanumericos)
     if m is not None:
      if clean_tag != base_url and clean_tag != base_url[0:-1] and clean_tag != '':
-      print "Detected " + clean_tag
-      if clean_tag.endswith(".css"):
-       print "Storing CSS file " + clean_tag + "!"
+      if clean_tag.find('.css') != -1:
        css_list.append(clean_tag)
       url_list.append(clean_tag)
       if clean_tag.startswith("http://") or clean_tag.startswith("https://"): # Enlace absoluto
@@ -3585,7 +3585,7 @@ class Naufrago:
 
  def retrieve_full_content_loop(self, id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed):
   """Calls all the intermediate functions in order to retrieve the full offline content."""
-  self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8"))
+  self.statusbar.set_text(_('Obtaining offline content from ') + nombre_feed + '...'.encode("utf8")) # THREADAUDIT
   page, url_list, url_mod_list, css_list, ok = self.filter_needed_content(original_url, url_list, url_mod_list, feed_content_path, f)
   if ok:
    url_mod_list, url_trashed = self.retrieve_needed_content(url_mod_list, url_trashed, feed_content_path, id_articulo)
@@ -3606,25 +3606,27 @@ class Naufrago:
   url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
   if css_list is not None:
-   print 'CSS_LIST1: ' + `css_list`
    for f in css_list:
+    if self.stop_feed_update_lock: # NEW: We allow breaking to avoid long times before closing the app.
+     break
     filename = self.get_filename(f)
-    print "Scrapping css file " + filename + "..."
     url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
-  self.statusbar.set_text('')
+  self.statusbar.set_text('') # THREADAUDIT
 
  #####  END OFFLINE FULL URL RETRIEVING  #####
 
  def toggle_menuitems_sensitiveness(self, enable):
   """Enables/disables some menuitems while getting feeds to avoid
      multiple instances running or race conditions."""
-  item_list = ["/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
+  item_list = ["/Menubar/ArchiveMenu/New feed", "/Menubar/ArchiveMenu/New category",
+               "/Menubar/ArchiveMenu/Delete feed", "/Menubar/ArchiveMenu/Delete category",
                "/Menubar/ArchiveMenu/Import feeds", "/Menubar/ArchiveMenu/Export feeds",
                "/Menubar/ArchiveMenu/Quit", "/Menubar/EditMenu/Edit", "/Menubar/EditMenu/Search",
                "/Menubar/EditMenu/Read all", "/Menubar/EditMenu/Preferences", "/Menubar/NetworkMenu/Update",
                "/Menubar/NetworkMenu/Update all", "/Menubar/HelpMenu/Check updates",
-               "/Toolbar/Update all", "/Toolbar/Read all", "/Toolbar/Search", "/Toolbar/Preferences"]
+               "/Toolbar/New feed", "/Toolbar/New category", "/Toolbar/Update all",
+               "/Toolbar/Read all", "/Toolbar/Search", "/Toolbar/Preferences"]
 
   for item in item_list:
    widget = self.ui.get_widget(item)
@@ -3693,53 +3695,60 @@ class Naufrago:
    return False
 
  def content_cache_cleanup(self, cursor, id_articulo, id_feed, full_cleanup=True):
-  """Deletes images & offline contents when needed."""
-  self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8"))
+  """Deletes images & offline contents of a given article/entry when called."""
+  self.statusbar.set_text(_('Doing cleanup') + '...'.encode("utf8")) # THREADAUDIT
   # Borramos las imagenes del filesystem, si procede
   self.lock.acquire()
   cursor.execute('SELECT id FROM imagen WHERE id_articulo = ?', [id_articulo])
   images = cursor.fetchall()
   self.lock.release()
+  images_to_delete = ''
   for i in images:
    self.lock.acquire()
    cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
    num_images = cursor.fetchone()
    self.lock.release()
-   if (num_images is not None) and (num_images[0] == 1):
+   if (num_images is not None) and (num_images[0] <= 1):
+    images_to_delete += `i[0]` + ','
     if os.path.exists(images_path + '/' + `i[0]`):
      os.unlink(images_path + '/' + `i[0]`)
+
+  if images_to_delete != '':
+   images_to_delete = images_to_delete[0:-1]
    self.lock.acquire()
-   cursor.execute('DELETE FROM imagen WHERE id_articulo = ?', [id_articulo])
+   cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+')')
    self.conn.commit()
    self.lock.release()
 
-  if (full_cleanup is True) or (self.deep_offline_mode == 1):
+  if full_cleanup is True:
    # Lo mismo con el contenido offline del filesystem, si procede
    self.lock.acquire()
-   cursor.execute('SELECT nombre FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   cursor.execute('SELECT nombre,id FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
    contenido_offline = cursor.fetchall()
    self.lock.release()
    for i in contenido_offline:
     self.lock.acquire()
-    cursor.execute('SELECT count(id) FROM contenido_offline WHERE nombre = ?', [i[0]])
+    cursor.execute('SELECT count(contenido_offline.id) FROM contenido_offline,articulo WHERE contenido_offline.nombre = ? AND contenido_offline.id_articulo = articulo.id AND articulo.id_feed = ?', [i[0],id_feed])
     num_contenido_offline = cursor.fetchone()
     self.lock.release()
-    if (num_contenido_offline is not None) and (num_contenido_offline[0] == 1):
-     full_path = content_path + "/" + `id_feed` + "/" + `i[0]`
+    if (num_contenido_offline is not None) and (num_contenido_offline[0] <= 1):
+     full_path = content_path + "/" + `id_feed` + "/" + i[0].encode("utf-8")
      if os.path.exists(full_path):
       os.unlink(full_path)
-    self.lock.acquire()
-    cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
-    self.conn.commit()
-    self.lock.release()
 
-  #if os.path.exists(content_path + "/" + `id_feed` + "/" + `id_articulo`): # symlink path
-  # os.unlink(content_path + "/" + `id_feed` + "/" + `id_articulo`)
+   # Borramos el contenido_offline del articulo
+   self.lock.acquire()
+   cursor.execute('DELETE FROM contenido_offline WHERE id_articulo = ?', [id_articulo])
+   self.conn.commit()
+   self.lock.release()
+
   # Y finalmente borramos el articulo, propiamente
   self.lock.acquire()
   cursor.execute('DELETE FROM articulo WHERE id = ?', [id_articulo])
   self.conn.commit()
   self.lock.release()
+
+  self.statusbar.set_text('') # THREADAUDIT
 
  def get_feed_helper(self, iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, mode, id_category=None, new_feed=False):
   """Exploits the entry retrieving for both getting all feeds or only the selected
@@ -3754,10 +3763,21 @@ class Naufrago:
   nombre_feed = row[0]
   url = row[1]
   self.lock.release()
-  self.statusbar.set_text(_('Obtaining feed ') + nombre_feed + '...'.encode("utf8"))
+  statusbar_text = _('Obtaining feed ') + nombre_feed
+  if self.use_proxy == 1: statusbar_text += ' (with proxy)...'
+  else: statusbar_text += '...'
+  self.statusbar.set_text(statusbar_text.encode("utf8")) # THREADAUDIT
 
   gtk.gdk.threads_enter()
-  d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')
+  #d = feedparser.parse(url, agent='Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')
+  opener = urllib2.build_opener(self.get_proxy_handler())
+  opener.addheaders = [('User-agent', 'Naufrago!/'+APP_VERSION+'; +http://sourceforge.net/projects/naufrago/')]
+  try:
+   content = opener.open(url)
+  except: # urllib2 is giving trouble!
+   gtk.gdk.threads_leave()
+   return (new_posts, num_new_posts_total, False)
+  d = feedparser.parse(content.read())
 
   dont_parse = self.change_feed_icon(d, model, id_feed, cursor)
   if dont_parse:
@@ -3781,8 +3801,6 @@ class Naufrago:
     self.lock.release()
     # Update feed tree...
     model_tmp.set(iter_tmp, 0, title)
-    #if self.clear_mode == 1:
-    # self.alphabetical_node_ordering(iter_tmp) # OLD
     self.alphabetical_node_ordering(iter_tmp) # NEW
 
   limit = count = len(d.entries)
@@ -3793,6 +3811,13 @@ class Naufrago:
   # Check for article existence...
   for i in range(0, count):
    (secs, title, description, link, id) = self.check_feed_item(d.entries[i])
+   # START NEW
+   favicon = favicon_path + '/' + `id_feed`
+   if not os.path.exists(favicon):
+    gtk.gdk.threads_leave()
+    self.get_favicon_desperate(id_feed, link)
+    gtk.gdk.threads_enter()
+   # END NEW
    self.lock.acquire()
    cursor.execute('SELECT id FROM articulo WHERE entry_unique_id = ? AND id_feed = ?', [id.decode("utf-8"),id_feed])
    unique = cursor.fetchone()
@@ -3812,7 +3837,8 @@ class Naufrago:
     cursor.execute('SELECT MAX(id) FROM articulo')
     recently_inserted_entry = cursor.fetchone()
     self.lock.release()
-    new_entries.append(recently_inserted_entry[0]) # Lista de control de nuevas entries insertadas
+    if ghost == 0:
+     new_entries.append(recently_inserted_entry[0]) # Lista de control de nuevas entries (validas/non-ghost) insertadas
     # START Offline mode image retrieving
     if i < limit:
      if (self.offline_mode == 1) and (images != ''):
@@ -3827,10 +3853,9 @@ class Naufrago:
       self.retrieve_full_content(id_feed, recently_inserted_entry[0], link, nombre_feed) # ALPHA, BETA & GAMMA!!!
      # END Deep offline mode
     # END Offline mode image retrieving
-    # Accounting...
-    if i < limit:
-    # new_posts = True
-     num_new_posts_total += 1
+     # Accounting...
+     if ghost == 0:
+      num_new_posts_total += 1 # Recuento de control de nuevas entries (validas/non-ghost) insertadas
 
    else:
     # START Offline mode image retrieving
@@ -3858,21 +3883,19 @@ class Naufrago:
   cursor.execute('SELECT count(id) FROM articulo WHERE id_feed = ? AND importante = 0', [id_feed])
   total = cursor.fetchone()
   self.lock.release()
-  if (total is not None):
+  if total is not None:
    # Si lo que recibimos del feed es menor que self.num_entries,
    # count pasará a valer lo mismo que self.num_entries.
-   if count < self.num_entries:
-    count = self.num_entries
    # Si el total (sin importantes) supera lo que recibimos del feed
    # (o self.num_entries si count es menor), entramos a hacer LIMPIEZA.
-   if (total[0]>count):
-    exceed = total[0] - count
+   if total[0] > self.num_entries:
+    exceed = total[0] - self.num_entries
     self.lock.acquire()
     cursor.execute('SELECT id FROM articulo WHERE id_feed = ? AND importante=0 ORDER BY fecha ASC LIMIT ?', [id_feed,exceed])
     row  = cursor.fetchall()
     self.lock.release()
     for id_articulo in row:
-     self.content_cache_cleanup(cursor, id_articulo[0], id_feed, False) # NEW
+     self.content_cache_cleanup(cursor, id_articulo[0], id_feed, True) # NEW
      # Accounting...
      if len(new_entries) > 0:
       if id_articulo[0] in new_entries:
@@ -3891,11 +3914,13 @@ class Naufrago:
    # Actualizamos la lista de entries del feed seleccionado
    (model2, iter2) = self.treeselection.get_selected()
    if(iter2 is not None): # Si hay algún nodo seleccionado...
-    # OLD: if(model2.iter_depth(iter2) == 1): # ... y es un nodo hijo
     if(model2.iter_depth(iter2) == 1) or (model2.iter_depth(iter2) == 0 and self.clear_mode == 1): # ... y es un nodo hijo
      id_selected_feed = self.treestore.get_value(iter2, 2)
-     if id_selected_feed == id_feed:
-      self.populate_entries(id_feed)
+     if id_selected_feed == id_feed: # Si el feed seleccionado es el actualizado...
+      if not self.fullscreen: # ...y no estamos en fullscreen...
+       self.populate_entries(id_feed)
+      else:
+       self.postpone_feedentries_refresh = 1
 
    # Luego el recuento del feed
    self.lock.acquire()
@@ -3908,27 +3933,22 @@ class Naufrago:
    else:
     feed_label = nombre_feed + ' [' + `row[0]` + ']'
     font_style = 'bold'
-   #if (count != 0):
    if mode == 'all':
     if self.clear_mode == 0:
      model2.set(child, 0, feed_label, 3, font_style)
     else:
      if not self.treeindex.has_key(id_feed): # Insert feed on the tree if it's not already there!
-      # TEST
       if os.path.exists(favicon_path + '/' + `id_feed`):
        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, `id_feed`, id_feed, font_style], 'feed')
       else:
        useless_iter, feed_iter = self.alphabetical_node_insertion(feed_label, [feed_label, 'rss-image', id_feed, font_style], 'feed')
       self.treeindex[id_feed] = feed_iter
-      # TEST
-      #feed_iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, font_style])
-      #self.treeindex[id_feed] = feed_iter
      else:
       model2.set(child, 0, feed_label, 3, font_style)
    else:
     model.set(child, 0, feed_label, 3, font_style)
 
-   if self.clear_mode == 0: # NEW
+   if self.clear_mode == 0:
     # Y luego el recuento de los No-leidos
     (model3, useless_iter) = self.treeselection.get_selected()
     dest_iter = self.treeindex[9999]
@@ -3952,7 +3972,7 @@ class Naufrago:
      font_style = 'normal'
     model3.set(dest_iter, 0, feed_label, 3, font_style)
 
-  if self.clear_mode == 0: # NEW
+  if self.clear_mode == 0:
    # START: Driven mode, parte 1
    # Cualquier feed con nuevas entradas expanderá la categoria.
    if (self.driven_mode == 1):
@@ -3965,7 +3985,7 @@ class Naufrago:
    #break
    return (new_posts, num_new_posts_total, True)
 
-  if self.clear_mode == 0: # NEW
+  if self.clear_mode == 0:
    # START: Driven mode, parte 2
    # Si no hubo ninguna entrada nueva y no habia ya ninguna previamente,
    # contraeremos la categoria.
@@ -3991,45 +4011,40 @@ class Naufrago:
 
   if(data is None): # Iterarlo todo
 
-   (model, iter) = self.treeselection.get_selected() # We only want the model here...
-   iter = model.get_iter_root() # Magic
+   # START NEW 2
    cursor = self.conn.cursor()
-   while (iter is not None) and (not self.stop_feed_update_lock):
-    # OLD: if(model.iter_depth(iter) == 0): # Si es padre
-    if(model.iter_depth(iter) == 0) and (self.clear_mode == 0): # Si es padre
-     id_category = model.get_value(iter, 2)
-     new_posts = False # Reset
-     aux_num_new_posts_total = num_new_posts_total
-     for i in range(model.iter_n_children(iter)):
-      child = model.iter_nth_child(iter, i)
-      id_feed = model.get_value(child, 2)
-      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
-      if break_flag:
-       break
-    # NEW
-    else:
-     self.lock.acquire()
-     cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
-     rows = cursor.fetchall()
-     self.lock.release()
-     for row in rows:
+   (model, iter) = self.treeselection.get_selected() # We only want the model here...
+   if self.clear_mode == 0:
+    iter = model.get_iter_root() # Magic
+    while (iter is not None) and (not self.stop_feed_update_lock):
+     if model.iter_depth(iter) == 0: # Si es padre
+      id_category = model.get_value(iter, 2)
       new_posts = False # Reset
       aux_num_new_posts_total = num_new_posts_total
-      id_feed = row[0]
-      #feed_label = row[1]
-      if not self.treeindex.has_key(id_feed):
-       #print 'Feed id "' + `id_feed` + '" NO encontrado, insertando en el árbol...'
-       #iter = self.treestore.append(None, [feed_label, `id_feed`, id_feed, 'normal'])
-       #self.treeindex[id_feed] = iter
-       iter = None
-      else:
-       iter = self.treeindex[id_feed]
-      (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
-      if break_flag:
-       break
-     break # <--- break para salir del while!
-    # NEW
-    iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
+      for i in range(model.iter_n_children(iter)):
+       child = model.iter_nth_child(iter, i)
+       id_feed = model.get_value(child, 2)
+       (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, child, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', id_category, new_feed)
+       if break_flag:
+        break
+     iter = self.treestore.iter_next(iter) # Pasamos al siguiente Padre...
+   else:
+    self.lock.acquire()
+    cursor.execute('SELECT id,nombre FROM feed ORDER BY nombre ASC')
+    rows = cursor.fetchall()
+    self.lock.release()
+    for row in rows:
+     new_posts = False # Reset
+     aux_num_new_posts_total = num_new_posts_total
+     id_feed = row[0]
+     if not self.treeindex.has_key(id_feed):
+      iter = None
+     else:
+      iter = self.treeindex[id_feed]
+     (new_posts, num_new_posts_total, break_flag) = self.get_feed_helper(iter, iter, id_feed, cursor, model, new_posts, num_new_posts_total, aux_num_new_posts_total, 'all', None, new_feed)
+     if break_flag:
+      break
+   # END NEW 2
    cursor.close()
 
   else: # Iterar sobre los elementos del diccionario recibido como data.
@@ -4058,7 +4073,7 @@ class Naufrago:
     except:
      pass
 
-  self.statusbar.set_text('')
+  self.statusbar.set_text('') # THREADAUDIT
   # Fires tray icon blinking
   if((num_new_posts_total > 0) and (window_visible is False) and (self.show_trayicon == 1)):
    self.statusicon.set_blinking(True)
@@ -4159,14 +4174,13 @@ class Naufrago:
   response = dialog.run()
 
   if response == gtk.RESPONSE_OK:
-   f = open(dialog.get_filename()+'.opml', 'w')
+   f = open(dialog.get_filename(), 'w')
    out = '<?xml version="1.0"?>\n<opml version="1.0">\n<head>\n<title>Naufrago! Feed List Export</title>\n</head>\n<body>\n'
    cursor = self.conn.cursor()
    self.lock.acquire()
    cursor.execute('SELECT id,nombre FROM categoria')
    categorias = cursor.fetchall()
    self.lock.release()
-   cursor.close()
    for row in categorias:
     out += '<outline title="'+row[1]+'" text="'+row[1]+'" description="'+row[1]+'" type="folder">\n'
     self.lock.acquire()
@@ -4179,6 +4193,7 @@ class Naufrago:
      out += '<outline title="'+nombre+'" text="'+nombre+'" type="rss" xmlUrl="'+url+'"/>\n'
     out += '</outline>'
    out += '</body>\n</opml>'
+   cursor.close()
    f.write(out)
    f.close()
   dialog.destroy()
@@ -4217,14 +4232,17 @@ class Naufrago:
  def get_favicon(self, id_feed, url):
   """Obtains the favicon from a web and stores it on the filesystem. It should be
      called only once at feed entry creation OR on feed import process."""
-  #if not os.path.exists(favicon_path):
-  # os.makedirs(favicon_path)
-
   gtk.gdk.threads_enter()
   try:
-   split = url.split("/")
-   favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
-   web_file = urllib2.urlopen(favicon_url, timeout=10)
+   ###split = url.split("/")
+   ###favicon_url = split[0] + '//' + split[1] + split[2] + '/favicon.ico'
+   parsed = urlparse.urlsplit(url)
+   if len(parsed.netloc):
+    favicon_url = parsed.scheme + '://' + parsed.netloc + '/favicon.ico'
+   else:
+    favicon_url = url + '/favicon.ico'
+   opener = urllib2.build_opener(self.get_proxy_handler())
+   web_file = opener.open(favicon_url, timeout=10)
    favicon = favicon_path + '/' + `id_feed`
    local_file = open(favicon, 'w')
    local_file.write(web_file.read())
@@ -4235,6 +4253,31 @@ class Naufrago:
   except:
    self.add_icon_to_factory(None, id_feed)
   gtk.gdk.threads_leave()
+
+ def get_favicon_desperate(self, id_feed, url):
+  """A desperate try to obtain the favicon when the feed url does not match
+     with the base url of the web."""
+  try:
+   opener = urllib2.build_opener(self.get_proxy_handler())
+   web_file = opener.open(url, timeout=10)
+   page = web_file.read()
+   web_file.close()
+   # Scrap en busca del favicon.
+   rgxp = ('''<(link)\s+[^>]*?(src|href)=["']?([^"'>\s]+favicon.ico)[^>]*?>''')
+   tags = re.findall(rgxp, page, re.I)
+   for tag in tags:
+    favicon_url = tag[2]
+    opener = urllib2.build_opener(self.get_proxy_handler())
+    web_file = opener.open(favicon_url, timeout=10)
+    favicon = favicon_path + '/' + `id_feed`
+    local_file = open(favicon, 'w')
+    local_file.write(web_file.read())
+    local_file.close()
+    web_file.close()
+    # Registrar el favicon...
+    self.add_icon_to_factory(favicon, id_feed)
+  except:
+   self.add_icon_to_factory(None, id_feed)
 
  def populate_favicons(self):
   """Iterates 'favicons' directory to load existent favicons in a bunch."""

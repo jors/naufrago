@@ -24,7 +24,7 @@ case $1 in
   for i in README README.es README.ca; do
    gzip -f -9 $svn_path/naufrago-deb/debian/usr/share/doc/naufrago/${i}
   done
-  rm -rf $desktop_deb_path
+  #rm -rf $desktop_deb_path
   svn export $svn_path/naufrago-deb $desktop_deb_path
   cd $desktop_deb_path
   chown -R root.root *

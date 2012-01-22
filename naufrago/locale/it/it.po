@@ -41,7 +41,6 @@ msgid "Important"
 msgstr "Importante"
 
 #: naufrago.py:460 naufrago.py:940
-#, fuzzy
 msgid "Feed"
 msgstr "Feeds"
 
@@ -166,9 +165,8 @@ msgid "Read all"
 msgstr ""
 
 #: naufrago.py:1433
-#, fuzzy
 msgid "Mark all feed items as read"
-msgstr "Segna tutto como letto"
+msgstr "Segna tutto elemento como letto"
 
 #: naufrago.py:1434
 msgid "_Preferences"
@@ -380,9 +378,8 @@ msgid "Driven mode"
 msgstr "Modo guidato"
 
 #: naufrago.py:2773
-#, fuzzy
 msgid "Clear mode"
-msgstr "Toolbar modalità"
+msgstr "Modo chiaro"
 
 #: naufrago.py:2777
 msgid "Start in Tray Icon"
@@ -461,14 +458,12 @@ msgid "Interface"
 msgstr "Interfaccia"
 
 #: naufrago.py:2879
-#, fuzzy
 msgid "Offline mode (slow)"
-msgstr "Modo offline (più lento!)"
+msgstr "Modalità offline (lento!)"
 
 #: naufrago.py:2884
-#, fuzzy
 msgid "Deep offline mode (slower!)"
-msgstr "Modo offline (più lento!)"
+msgstr "Modalità offline profonda (più lento!)"
 
 #: naufrago.py:2904
 msgid "Modes"
@@ -523,14 +518,12 @@ msgid "Obtaining image "
 msgstr "Ottenendo immagine "
 
 #: naufrago.py:3446
-#, fuzzy
 msgid "Obtaining offline content "
-msgstr "Ottenendo feed "
+msgstr "Ottenendo contenuto non in linea "
 
 #: naufrago.py:3588
-#, fuzzy
 msgid "Obtaining offline content from "
-msgstr "Ottenendo feed "
+msgstr "Ottenendo contenuto non in linea da "
 
 #: naufrago.py:3697
 msgid "Doing cleanup"
@@ -541,9 +534,8 @@ msgid "Obtaining feed "
 msgstr "Ottenendo feed "
 
 #: naufrago.py:4052
-#, fuzzy
 msgid "New entry/s"
-msgstr "Nuova categoria"
+msgstr "Nuova voce"
 
 #: naufrago.py:4053
 msgid " entry/s were added"

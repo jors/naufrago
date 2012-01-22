@@ -5,7 +5,7 @@
 #                                                                           #
 # Naufrago! RSS Reader                                                      #
 #                                                                           #
-# Copyright (C) 2010-2011 Jordi Oliveras Palacios (worbynet at gmail.com)   #
+# Copyright (C) 2010-2012 Jordi Oliveras Palacios (worbynet at gmail.com)   #
 #                                                                           #
 # This program is free software; you can redistribute it and/or modify      #
 # it under the terms of the GNU General Public License as published by      #
@@ -54,7 +54,7 @@ except ImportError:
  print 'Error importing modules: ' + `exc_info()[1]`
  sys.exit(1)
 
-APP_VERSION = '0.3'
+APP_VERSION = '0.4'
 ABOUT_PAGE = ''
 PUF_PAGE = ''
 distro_package = True
@@ -132,6 +132,7 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
   puf_path = current_path + '/content/puf.html'
 
 class Naufrago:
+ """Simply, 'the class'."""
 
  def delete_event(self, event=None, data=None):
   """Closes the app through window manager signal"""
@@ -946,7 +947,6 @@ class Naufrago:
   """Opens a given url in the user sensible web browser."""
   (model, iter) = self.treeselection2.get_selected()
   if(iter is not None): # Hay alguna fila de la lista seleccionada
-   links = {} # Diccionario de paginas html...
    (model_tmp, iter_tmp) = self.treeselection.get_selected()
    id_articulo = self.liststore.get_value(iter, 4)
    try:
@@ -994,6 +994,7 @@ class Naufrago:
  def htmlentitydecode(self, text):
   """Escapes htmlentities. Thanks to Fredrik Lundh!"""
   def fixup(m):
+   """Fixes up characters."""
    text = m.group(0)
    if text[:2] == "&#": # character reference
     try:
@@ -1060,7 +1061,8 @@ class Naufrago:
    cursor.execute('SELECT leido,contenido FROM articulo WHERE id = ?', [id_articulo])
    row = cursor.fetchone()
    self.lock.release()
-   contenido = row[1]
+   if row is not None:
+    contenido = row[1]
 
    # Offline mode image retrieving
    if self.offline_mode == 1:
@@ -1100,7 +1102,11 @@ class Naufrago:
     cursor.execute(q)
     id_feed = cursor.fetchone()[0]
     self.lock.release()
-    iter = self.treeindex[id_feed]
+    try:
+     iter = self.treeindex[id_feed]
+    except KeyError:
+     cursor.close()
+     return
     nombre_feed = model.get_value(iter, 0)
 
     (nombre_feed, no_leidos) = self.less_simple_name_parsing(nombre_feed)
@@ -1342,7 +1348,7 @@ class Naufrago:
   about.set_transient_for(self.window)
   about.set_program_name("Naufrago!")
   about.set_version(APP_VERSION)
-  about.set_copyright("(c) 2010 Jordi Oliveras Palacios")
+  about.set_copyright("(c) 2010-2012 Jordi Oliveras Palacios")
   about.set_license(LICENSE)
   about.set_comments(_("Naufrago! is a simple RSS reader"))
   about.set_website("http://naufrago.sourceforge.net/")
@@ -1663,8 +1669,6 @@ class Naufrago:
   else:
      self.tvcolumn.set_attributes(self.cellpb, stock_id=1)
   self.tvcolumn.set_attributes(self.cell, text=0, font=3)
-  # Allow drag and drop reordering of rows
-  ###self.treeview.set_reorderable(True)
   self.treeview_setup_dnd(self.treeview)
   self.scrolled_window1 = gtk.ScrolledWindow()
   self.scrolled_window1.add(self.treeview)
@@ -1821,9 +1825,6 @@ class Naufrago:
   (x, y, a, b) = self.statusbar.get_allocation()
   self.statusbar.set_size_request(self.w-40, b)
 
-  #(x, y, a, b) = self.headerlink.get_allocation()
-  #self.headerlink.set_size_request(self.w-40, b)
-
  def create_webview_popup(self, view, menu):
   """Creates the webview (browser item) popup menu."""
   zoom_in = gtk.ImageMenuItem(gtk.STOCK_ZOOM_IN)
@@ -1864,10 +1865,8 @@ class Naufrago:
   """Shows hovered link in Statusbar."""
   if data is not None:
    self.statusbar.set_text(data.encode("utf8")) # THREADAUDIT
-   pass
   else:
    self.statusbar.set_text('') # THREADAUDIT
-   pass
 
  def check_init_options(self):
   """Checks & applies init options."""
@@ -2734,6 +2733,7 @@ class Naufrago:
   hbox_throbber.hide()
 
  def use_proxy_toggle_cb(self, use_proxy_button, entry0):
+  """Toggles tue usage of proxy."""
   if(use_proxy_button.get_active()):
    self.use_proxy = 1
    entry0.set_editable(True)
@@ -2744,6 +2744,7 @@ class Naufrago:
    entry0.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("grey"))
 
  def proxy_entry_leave_focus_cb(self, entry, event, proxy_type):
+  """Controls the focus on the proxy box."""
   if proxy_type == 'http':
    self.http_proxy = entry.get_text()
 
@@ -3509,6 +3510,8 @@ class Naufrago:
      pass
    else:
     store_values[filename] = `id_articulo` # Storing all filename, id_articulo pairs
+   if self.stop_feed_update_lock: # NEW: We allow breaking to avoid long times before closing the app.
+    break
 
   store_values[`id_articulo` + '.html'] = `id_articulo` # We also need to register the main offline file! (in instance, 1.html)
   # Insertion into the database of the retrieved contents
@@ -3604,6 +3607,8 @@ class Naufrago:
 
   if css_list is not None:
    for f in css_list:
+    if self.stop_feed_update_lock: # NEW: We allow breaking to avoid long times before closing the app.
+     break
     filename = self.get_filename(f)
     url_mod_list, url_trashed, css_list = self.retrieve_full_content_loop(id_feed, id_articulo, original_url, url_list, url_mod_list, url_trashed, feed_content_path, f, nombre_feed)
 
@@ -3699,21 +3704,17 @@ class Naufrago:
   self.lock.release()
   images_to_delete = ''
   for i in images:
-   #print 'Imagen: ' + `i`
    self.lock.acquire()
    cursor.execute('SELECT count(id) FROM imagen WHERE nombre = ?', [i[0]])
    num_images = cursor.fetchone()
-   #print 'Tiene ' + `num_images[0]` + ' entradas en la BD.'
    self.lock.release()
    if (num_images is not None) and (num_images[0] <= 1):
     images_to_delete += `i[0]` + ','
     if os.path.exists(images_path + '/' + `i[0]`):
-     #print 'Borrando del HD.'
      os.unlink(images_path + '/' + `i[0]`)
 
   if images_to_delete != '':
    images_to_delete = images_to_delete[0:-1]
-   #print 'Borrando de la BD: ' + images_to_delete
    self.lock.acquire()
    cursor.execute('DELETE FROM imagen WHERE id IN ('+images_to_delete+')')
    self.conn.commit()

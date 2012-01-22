@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: 0.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-05 13:00+0200\n"
-"PO-Revision-Date: 2010-12-17 11:47+0100\n"
+"PO-Revision-Date: 2011-09-06 08:12+0100\n"
 "Last-Translator: Michał Ćwikliński <michal@cwiklinski.it>\n"
 "Language-Team: Polish <mcwiklinski@gmail.com>\n"
 "Language: \n"
@@ -26,28 +26,51 @@ msgstr "Błąd importu modułów:"
 
 #: naufrago.py:293
 msgid "Are you sure you want to <b>mark it ALL as READ</b>?"
-msgstr ""
+msgstr "Czy na pewno chcesz <b>oznaczysz WSZYSTKO jako PRZECZYTANE</b>?"
 
-#: naufrago.py:378 naufrago.py:579 naufrago.py:598 naufrago.py:661
-#: naufrago.py:686 naufrago.py:774 naufrago.py:818 naufrago.py:851
-#: naufrago.py:886 naufrago.py:1137 naufrago.py:1159 naufrago.py:1164
-#: naufrago.py:1971 naufrago.py:1973
+#: naufrago.py:378
+#: naufrago.py:579
+#: naufrago.py:598
+#: naufrago.py:661
+#: naufrago.py:686
+#: naufrago.py:774
+#: naufrago.py:818
+#: naufrago.py:851
+#: naufrago.py:886
+#: naufrago.py:1137
+#: naufrago.py:1159
+#: naufrago.py:1164
+#: naufrago.py:1971
+#: naufrago.py:1973
 msgid "Unread"
 msgstr "Nieprzeczytane"
 
-#: naufrago.py:402 naufrago.py:579 naufrago.py:595 naufrago.py:661
-#: naufrago.py:683 naufrago.py:774 naufrago.py:818 naufrago.py:848
-#: naufrago.py:883 naufrago.py:1137 naufrago.py:1156 naufrago.py:1164
-#: naufrago.py:1963 naufrago.py:1965
+#: naufrago.py:402
+#: naufrago.py:579
+#: naufrago.py:595
+#: naufrago.py:661
+#: naufrago.py:683
+#: naufrago.py:774
+#: naufrago.py:818
+#: naufrago.py:848
+#: naufrago.py:883
+#: naufrago.py:1137
+#: naufrago.py:1156
+#: naufrago.py:1164
+#: naufrago.py:1963
+#: naufrago.py:1965
 msgid "Important"
 msgstr "Ważne"
 
-#: naufrago.py:460 naufrago.py:940
-#, fuzzy
+#: naufrago.py:460
+#: naufrago.py:940
 msgid "Feed"
-msgstr "Kanały"
+msgstr "Kanał"
 
-#: naufrago.py:464 naufrago.py:942 naufrago.py:1210 naufrago.py:2657
+#: naufrago.py:464
+#: naufrago.py:942
+#: naufrago.py:1210
+#: naufrago.py:2657
 msgid "Category"
 msgstr "Kategoria"
 
@@ -59,15 +82,20 @@ msgstr "Katalog specjalny"
 msgid "Source"
 msgstr "Źródło"
 
-#: naufrago.py:1255 naufrago.py:1267
+#: naufrago.py:1255
+#: naufrago.py:1267
 msgid "Warning!"
 msgstr "Uwaga!"
 
-#: naufrago.py:1297 naufrago.py:1307 naufrago.py:1322
+#: naufrago.py:1297
+#: naufrago.py:1307
+#: naufrago.py:1322
 msgid "Upgrade checker"
 msgstr "Sprawdzanie aktualizacji programu"
 
-#: naufrago.py:1300 naufrago.py:1310 naufrago.py:1325
+#: naufrago.py:1300
+#: naufrago.py:1310
+#: naufrago.py:1325
 msgid "Close"
 msgstr "Zamknij"
 
@@ -103,7 +131,8 @@ msgstr "Nowa kategoria"
 msgid "Adds a category"
 msgstr "Dodanie kategorii"
 
-#: naufrago.py:1425 naufrago.py:2420
+#: naufrago.py:1425
+#: naufrago.py:2420
 msgid "Delete feed"
 msgstr "Usuń kanał"
 
@@ -111,7 +140,8 @@ msgstr "Usuń kanał"
 msgid "Deletes a feed"
 msgstr "Usunięcie kanału"
 
-#: naufrago.py:1426 naufrago.py:2204
+#: naufrago.py:1426
+#: naufrago.py:2204
 msgid "Delete category"
 msgstr "Usuń kategorię"
 
@@ -155,7 +185,9 @@ msgstr "_Edycja"
 msgid "Edits the selected element"
 msgstr "Edycja zaznaczonego elementu"
 
-#: naufrago.py:1432 naufrago.py:2496 naufrago.py:2499
+#: naufrago.py:1432
+#: naufrago.py:2496
+#: naufrago.py:2499
 msgid "Search"
 msgstr "Szukaj"
 
@@ -165,12 +197,11 @@ msgstr "Szukaj wyrażenia w kanałach"
 
 #: naufrago.py:1433
 msgid "Read all"
-msgstr ""
+msgstr "Przeczytaj wszystko"
 
 #: naufrago.py:1433
-#, fuzzy
 msgid "Mark all feed items as read"
-msgstr "Zaznacz wszystko jako przeczytane"
+msgstr "Zaznacz wszystkie pozycje jako przeczytane"
 
 #: naufrago.py:1434
 msgid "_Preferences"
@@ -192,7 +223,8 @@ msgstr "Akt_ualizacja"
 msgid "Updates the selected feed"
 msgstr "Aktualizacja wybranych kanałów"
 
-#: naufrago.py:1437 naufrago.py:1870
+#: naufrago.py:1437
+#: naufrago.py:1870
 msgid "Update all"
 msgstr "Aktualizuj wszystko"
 
@@ -200,7 +232,8 @@ msgstr "Aktualizuj wszystko"
 msgid "Update all feeds"
 msgstr "Aktualizacja wszystkich kanałów"
 
-#: naufrago.py:1438 naufrago.py:1873
+#: naufrago.py:1438
+#: naufrago.py:1873
 msgid "Stop"
 msgstr "Zatrzymaj"
 
@@ -264,7 +297,9 @@ msgstr "Edytuj kategorię"
 msgid "Change <b>category</b> name to:"
 msgstr "Zmień nazwę <b>kategorii</b> na:"
 
-#: naufrago.py:2073 naufrago.py:2276 naufrago.py:3087
+#: naufrago.py:2073
+#: naufrago.py:2276
+#: naufrago.py:3087
 msgid "Edit"
 msgstr "Edytuj"
 
@@ -290,14 +325,14 @@ msgstr "Usunąć wybraną <b>kategorię</b>?"
 
 #: naufrago.py:2206
 msgid "<b>Atention:</b> all contained RSS will be also deleted. Proceed?"
-msgstr ""
-"<b>Uwaga:</b> wszystkie kanały w kategorii zostaną usunięte. Kontynuować?"
+msgstr "<b>Uwaga:</b> wszystkie kanały w kategorii zostaną usunięte. Kontynuować?"
 
 #: naufrago.py:2250
 msgid "This category <b>cannot be deleted</b>!"
 msgstr "Nie można usunąć <b>tej kategorii</b>!"
 
-#: naufrago.py:2252 naufrago.py:2254
+#: naufrago.py:2252
+#: naufrago.py:2254
 msgid "You <b>must choose a category</b> folder!"
 msgstr "<b>Musisz wybrać</b> katalog kategorii!"
 
@@ -337,7 +372,8 @@ msgstr "Kanał <b>jest już dodany</b>!"
 msgid "Delete selected <b>feed</b>?"
 msgstr "Usunąć zaznaczony <b>kanał</b>?"
 
-#: naufrago.py:2463 naufrago.py:2465
+#: naufrago.py:2463
+#: naufrago.py:2465
 msgid "You <b>must choose a feed</b>!"
 msgstr "<b>Musisz wybrać</b> kanał!"
 
@@ -363,7 +399,7 @@ msgstr "Brak wpisów dla <b>"
 
 #: naufrago.py:2743
 msgid "Applying changes..."
-msgstr ""
+msgstr "Dokonywanie zmian"
 
 #: naufrago.py:2752
 msgid "Preferences"
@@ -382,9 +418,8 @@ msgid "Driven mode"
 msgstr "Tryb sterowany"
 
 #: naufrago.py:2773
-#, fuzzy
 msgid "Clear mode"
-msgstr "Tryb paska narzędzi"
+msgstr "Tryb czysty"
 
 #: naufrago.py:2777
 msgid "Start in Tray Icon"
@@ -463,14 +498,12 @@ msgid "Interface"
 msgstr "Interfejs"
 
 #: naufrago.py:2879
-#, fuzzy
 msgid "Offline mode (slow)"
 msgstr "Tryb offline (wolny!)"
 
 #: naufrago.py:2884
-#, fuzzy
 msgid "Deep offline mode (slower!)"
-msgstr "Tryb offline (wolny!)"
+msgstr "Głęboki tryb offline (wolniejszy!)"
 
 #: naufrago.py:2904
 msgid "Modes"
@@ -512,11 +545,13 @@ msgstr "Przełącz przeczytane/nieprzeczytane"
 msgid "Toggle all read/non-read"
 msgstr "Przełącz wszystkie przeczytane/nieprzeczytane"
 
-#: naufrago.py:3283 naufrago.py:3284
+#: naufrago.py:3283
+#: naufrago.py:3284
 msgid "Without title"
 msgstr "Bez tytułu"
 
-#: naufrago.py:3300 naufrago.py:3301
+#: naufrago.py:3300
+#: naufrago.py:3301
 msgid "Without link"
 msgstr "Bez adresu"
 
@@ -525,33 +560,31 @@ msgid "Obtaining image "
 msgstr "Pobieranie obrazka"
 
 #: naufrago.py:3446
-#, fuzzy
 msgid "Obtaining offline content "
-msgstr "Pobieranie kanału "
+msgstr "Pobieranie zawartości offline"
 
 #: naufrago.py:3588
-#, fuzzy
 msgid "Obtaining offline content from "
-msgstr "Pobieranie kanału "
+msgstr "Pobieranie zawartości offline z "
 
 #: naufrago.py:3697
 msgid "Doing cleanup"
-msgstr ""
+msgstr "Czyszczenie"
 
 #: naufrago.py:3757
 msgid "Obtaining feed "
 msgstr "Pobieranie kanału "
 
 #: naufrago.py:4052
-#, fuzzy
 msgid "New entry/s"
-msgstr "Nowa kategoria"
+msgstr "Nowa pozycja/e"
 
 #: naufrago.py:4053
 msgid " entry/s were added"
-msgstr ""
+msgstr "pozycji dodano"
 
-#: naufrago.py:4072 naufrago.py:4146
+#: naufrago.py:4072
+#: naufrago.py:4146
 msgid "Open.."
 msgstr "Otwórz.."
 

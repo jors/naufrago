@@ -26,19 +26,18 @@
     </ul>
    <li><h2>Problemas</h2></li>
     <ul>
-     <li><a href="#14">La cancelaci&oacute;n/parada de la actualizaci&oacute;n tarda</a></li>
-     <li><a href="#15">La ordenaci&oacute;n por fecha de uno o varios feeds es incorrecta</a></li>
-     <li><a href="#16">Las entradas de uno o varios feeds no muestran el contenido, s&oacute;lo los t&iacute;tulos (o ni eso)</a></li>
-     <li><a href="#17">&iexcl;La aplicaci&oacute;n se cerr&oacute; inesperadamente!</a></li>
-     <li><a href="#18">&iexcl;Quiero reportar/arreglar problemas!</a></li>
+     <li><a href="#14">La ordenaci&oacute;n por fecha de uno o varios feeds es incorrecta</a></li>
+     <li><a href="#15">Las entradas de uno o varios feeds no muestran el contenido, s&oacute;lo los t&iacute;tulos (o ni eso)</a></li>
+     <li><a href="#16">&iexcl;La aplicaci&oacute;n se cerr&oacute; inesperadamente!</a></li>
+     <li><a href="#17">&iexcl;Quiero reportar/arreglar problemas!</a></li>
     </ul>
    <li><h2>Varios</h2></li>
     <ul>
-     <li><a href="#19">Si las entradas RSS son res&uacute;menes, &iquest;son necesarias las im&aacute;genes offline?</a></li>
-     <li><a href="#20">&iquest;Bajo qu&eacute; licencia se distribuye?</a></li>
-     <li><a href="#21">Me gustar&iacute;a que la aplicaci&oacute;n hiciera/tuviera...</a></li>
-     <li><a href="#22">Agradecimientos del autor</a></li>
-     <li><a href="#23">&iquest;Te gusta N&aacute;ufrago!?</a></li>
+     <li><a href="#18">Si las entradas RSS son res&uacute;menes, &iquest;son necesarias las im&aacute;genes offline?</a></li>
+     <li><a href="#19">&iquest;Bajo qu&eacute; licencia se distribuye?</a></li>
+     <li><a href="#20">Me gustar&iacute;a que la aplicaci&oacute;n hiciera/tuviera...</a></li>
+     <li><a href="#21">Agradecimientos del autor</a></li>
+     <li><a href="#22">&iquest;Te gusta N&aacute;ufrago!?</a></li>
     </ul>
   </ol>
   <hr>
@@ -78,7 +77,7 @@
   <h3 id="4"><u>&iquest;Por qu&eacute; reinventar la rueda?</u></h3>
   <p>Si es un cliente <i>clavado</i> (con excepciones) a Liferea (al menos en lo que al aspecto se refiere), &iquest;porqu&eacute; reinventar la rueda? Por muchos motivos. Principalmente porque el autor no supo encontrar un cliente RSS que funcionara offline con im&aacute;genes incluidas, los desarrolladores de Liferea no admiten <i>feature requests</i> (algo totalmente respetable) y mirar c&oacute;digo fuente ajeno requiere doble esfuerzo que crearlo uno mismo (ojo, &iexcl;opini&oacute;n personal!). Reinventando la rueda tambi&eacute;n se aprende, y adem&aacute;s pueden surgir mejoras o nuevas formas de hacer las cosas que de otro modo no hubieran aparecido.</p>
   <h3 id="5"><u><i>Homesite</i> o canales de distribuci&oacute;n</u></h3>
-  <p>El proyecto puede encontrarse tanto en <a href="http://enchufado.com/">el blog del autor</a> como <a href="http://sourceforge.net/projects/naufrago">la p&aacute;gina del proyecto en sourceforge</a>.</p>
+  <p>El proyecto puede encontrarse tanto en <a href="http://enchufado.com/">el blog del autor</a> como <a href="http://naufrago.sourceforge.net/">la p&aacute;gina del proyecto en sourceforge</a>.</p>
   <hr>
 
   <h1>Funcionamiento</h1>
@@ -101,28 +100,26 @@
   <hr>
 
   <h1>Problemas</h1>
-  <h3 id="14"><u>La cancelaci&oacute;n/parada de la actualizaci&oacute;n tarda</u></h3>
-  <p>En realidad, esto es inherente a c&oacute;mo funciona la cancelaci&oacute;n/parada de la actualizaci&oacute;n de feeds. Por sencillez, se ha definido un feed entero como operaci&oacute;n at&oacute;mica, fuera de la cual se puede llevar a cabo la parada. As&iacute; pues, durante una actualizaci&oacute;n, cuando se accione la cancelaci&oacute;n/parada, esta ser&aacute; efectiva cuando termine con el &uacute;ltimo feed que se est&eacute; actualizando en ese instante.</p>
-  <h3 id="15"><u>La ordenaci&oacute;n por fecha de uno o varios feeds es incorrecta</u></h3>
-  <p>&iquest;C&oacute;mo puede ser, si normalmente salen en orden? <i>Por defecto</i> y ya que feedparser no es infalible adivinando todos los formatos de fecha que corren por todos los feeds de Internet, <i>en esta versi&oacute;n (la 0.3) se ha optado por ordenar las entradas de los feeds por orden de llegada</i>. La ordenaci&oacute;n por la columna de fecha puede presentar, pues, el mencionado problema.</p>
-  <h3 id="16"><u>Las entradas de uno o varios feeds no muestran el contenido, s&oacute;lo los t&iacute;tulos (o ni eso)</u></h3>
+  <h3 id="14"><u>La ordenaci&oacute;n por fecha de uno o varios feeds es incorrecta</u></h3>
+  <p>&iquest;C&oacute;mo puede ser, si normalmente salen en orden? <i>Por defecto</i> y ya que feedparser no es infalible adivinando todos los formatos de fecha que corren por todos los feeds de Internet, <i>en esta versi&oacute;n se ha optado por ordenar las entradas de los feeds por orden de llegada</i>. La ordenaci&oacute;n por la columna de fecha puede presentar, pues, el mencionado problema.</p>
+  <h3 id="15"><u>Las entradas de uno o varios feeds no muestran el contenido, s&oacute;lo los t&iacute;tulos (o ni eso)</u></h3>
   <p>Del mismo modo que hay feeds que no publican fecha para sus entradas, algunos tampoco proporcionan contenido, sino &uacute;nicamente el t&iacute;tulo (a veces, ni siquiera eso). No te va a quedar otra que visitar su web.</p>
-  <h3 id="17"><u>&iexcl;La aplicaci&oacute;n se cerr&oacute; inesperadamente!</u></h3>
+  <h3 id="16"><u>&iexcl;La aplicaci&oacute;n se cerr&oacute; inesperadamente!</u></h3>
   <p>Por desgracia, esto sucede alguna vez y es un error no identificado (abortos, violaciones de segmento, errores de conexi&oacute;n contra las X...). A efectos de ayudar en la labor de identificaci&oacute;n de posibles errores, se ha habilitado un archivo de registro para estos casos (ubicado en <i>/usr/share/naufrago/naufrago.log</i> en el caso del paquete Debian, y en el directorio de descompresi&oacute;n en el caso del tarball). ES BIENVENIDA TODA AYUDA que se quiera aportar en este aspecto.</p>
-  <h3 id="18"><u>&iexcl;Quiero reportar/arreglar problemas!</u></h3>
+  <h3 id="17"><u>&iexcl;Quiero reportar/arreglar problemas!</u></h3>
   <p>Si bien la aplicaci&oacute;n ya es m&aacute;s estable, todav&iacute;a presenta problemas. Este punto necesita mayor investigaci&oacute;n y es d&oacute;nde realmente <i>se agradecer&iacute;a ayuda</i> (s&iacute;, tengo <a href="http://es.wikipedia.org/wiki/Sistema_de_control_de_versi&oacute;n">sistema de control de versiones</a> y eres bienvenido; m&aacute;ndame un correo y hablamos). Pod&eacute;is enviar los <a href="http://sourceforge.net/tracker/?group_id=333054&atid=1396393">bugreports al tracker de sourceforge</a> o bien envi&aacute;ndomelos personalmente a mi correo (<b>worbynet@gmail.com</b>).</p>
   <hr>
 
   <h1>Varios</h1>
-  <h3 id="19"><u>Si las entradas RSS son res&uacute;menes, &iquest;son necesarias las im&aacute;genes offline?</u></h3>
+  <h3 id="18"><u>Si las entradas RSS son res&uacute;menes, &iquest;son necesarias las im&aacute;genes offline?</u></h3>
   <p>En la pr&aacute;ctica, las entradas RSS no siempre son res&uacute;menes (sino la entrada completa), y no est&aacute; claro hacia d&oacute;nde va a evolucionar este tema en concreto en la Red. Y aunque fuera cierto que las entradas RSS fueran siempre res&uacute;menes, muchos de ellos tambi&eacute;n incluyen im&aacute;genes informativas/complementarias del contenido.</p>
-  <h3 id="20"><u>&iquest;Bajo qu&eacute; licencia se distribuye?</u></h3>
+  <h3 id="19"><u>&iquest;Bajo qu&eacute; licencia se distribuye?</u></h3>
   <p>Bajo la GPLv3.</p>
-  <h3 id="21"><u>Me gustar&iacute;a que la aplicaci&oacute;n hiciera/tuviera...</u></h3>
+  <h3 id="20"><u>Me gustar&iacute;a que la aplicaci&oacute;n hiciera/tuviera...</u></h3>
   <p>Al igual que los desarrolladores de Liferea, en principio no acepto <i>feature requests</i>, aunque como m&aacute;s se perdi&oacute; en Cuba, no pierdes nada por intentarlo. Si me parece interesante y viable, qui&eacute;n sabe :) Sino, siempre puedes echarme un cable con ello, hacerlo t&uacute; mismo, ped&iacute;rselo a alguien, etc...</p>
-  <h3 id="22"><u>Agradecimientos del autor</u></h3>
+  <h3 id="21"><u>Agradecimientos del autor</u></h3>
   <p>El autor agradece a todos aquellos que lo han aguantado durante el desarrollo (especialmente a la parienta :) y a todos los que le han echado un cable (&iexcl;saludos a jcasas y a mito!). Y de igual modo, agradece cualquier colaboraci&oacute;n que se quiera aportar al proyecto, especialmente cazando/resolviendo bugs.</p>
-  <h3 id="23"><u>&iquest;Te gusta N&aacute;ufrago!?</u></h3>
+  <h3 id="22"><u>&iquest;Te gusta N&aacute;ufrago!?</u></h3>
   <p>El mejor de los regalos para un escritor de software no es que su aplicaci&oacute;n sea usada, sino que sus usuarios le comuniquen su uso y/o agradecimiento. Un "gracias mochalbete" ser&aacute; suficiente para la mayor&iacute;a de los casos :)</p><p>Aunque tambi&eacute;n puedes colaborar en la mejora del proyecto, en la correcci&oacute;n de <i>bugs</i>, en la implementaci&oacute;n de nuevas caracter&iacute;sticas, en la traducci&oacute;n a nuevos idiomas, en el empaquetado para distintas distros... &iexcl;la lista es interminable! De igual modo, y aunque no resulte tan agradable, tambi&eacute;n puedes realizar cr&iacute;ticas al mismo. En cualquier caso, puedes escribirme a <b>worbynet@gmail.com</b> y estar&eacute; encantado de saber de ti.</p>
  </body>
 </html>
