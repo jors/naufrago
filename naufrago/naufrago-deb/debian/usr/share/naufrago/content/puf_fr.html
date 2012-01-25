@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
  <head>
   <title>Questions Fr&eacute;quemment Pos&eacute;es</title>
@@ -16,27 +15,29 @@
    </ul>
   <li><h2>Fonctionnement</h2></li>
    <ul>
-    <li><a href="#6">Comment fonctionne le <i>mode Hors-Ligne</i> ?</a></li>
-    <li><a href="#7">Comment fonctionne le mode <i>Affichage am&eacute;lior&eacute; </i>?</a></li>
-    <li><a href="#8">Je veux enregistrer des articles importants !</a></li>
-    <li><a href="#9">Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</a></li>
-    <li><a href="#10">Je ne peux pas supprimer les articles d'un flux donn&eacute;</a></li>
+    <li><a href="#6">Comment fonctionne le <i>mode hors-ligne</i> ?</a></li>
+    <li><a href="#7">Comment fonctionne le <i>mode hors-ligne profond</i> ?</a></li>
+    <li><a href="#8">Comment fonctionne le mode <i>Affichage am&eacute;lior&eacute; </i>?</a></li>
+    <li><a href="#9">Comment fonctionne le <i>mode nettoyage</i> ?</a></li>
+    <li><a href="#10">Des modes, des modes, encore des modes... combien de modes sont pr&eacute;sents, et surtout lequel choisir ?</a></li>
+    <li><a href="#11">Je veux enregistrer des articles importants !</a></li>
+    <li><a href="#12">Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</a></li>
+    <li><a href="#13">Je ne peux pas supprimer les articles d'un flux donn&eacute;</a></li>
    </ul>
   <li><h2>Probl&egrave;mes</h2></li>
    <ul>
-    <li><a href="#11">L'interruption de l'actualisation du flux prend trop de temps</a></li>
-    <li><a href="#12">Le classement par dates de certains flux est incorrect</a></li>
-    <li><a href="#13">Les entr&eacute;es de certains flux n'affichent aucun contenu (sauf les titres)</a></li>
-    <li><a href="#14">L'application s'est ferm&eacute;e brusquement !</a></li>
-    <li><a href="#15">Je veux faire un rapport d'erreurs ou r&eacute;parer ces erreurs !</a></li>
+    <li><a href="#14">Le classement par dates de certains flux est incorrect</a></li>
+    <li><a href="#15">Les entr&eacute;es de certains flux n'affichent aucun contenu (sauf les titres)</a></li>
+    <li><a href="#16">L'application s'est ferm&eacute;e brusquement !</a></li>
+    <li><a href="#17">Je veux faire un rapport d'erreurs ou r&eacute;parer ces erreurs !</a></li>
    </ul>
   <li><h2>Autre</h2></li>
    <ul>
-    <li><a href="#16">Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</a></li>
-    <li><a href="#17">Sous quelle licence cette application est-elle distribu&eacute;e ?</a></li>
-    <li><a href="#18">J'aimerais que l'application soit pourvue de ...</a></li>
-    <li><a href="#19">Remerciements de l'auteur</a></li>
-    <li><a href="#20">Aimez-vous Naufrago ?</a></li>
+    <li><a href="#18">Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</a></li>
+    <li><a href="#19">Sous quelle licence cette application est-elle distribu&eacute;e ?</a></li>
+    <li><a href="#20">J'aimerais que l'application soit pourvue de ...</a></li>
+    <li><a href="#21">Remerciements de l'auteur</a></li>
+    <li><a href="#22">Aimez-vous Naufrago ?</a></li>
    </ul>
   </ol>
   <hr>
@@ -78,46 +79,49 @@
   <h3 id="4"><u>Pourquoi r&eacute;inventer la roue ?</u></h3>
   <p>Si Naufrago est si proche de Liferea (au moins dans son interface), alors pourquoi r&eacute;inventer la roue ? Pour plusieurs raisons. Principalement parce que l'auteur ne trouvait pas de lecteur RSS pouvant fonctionner sans &ecirc;tre connect&eacute; en ligne (en incluant les images). La deuxi&egrave;me raison est que les d&eacute;veloppeurs de Liferea n'acceptent aucune soumission d'id&eacute;es de la part des utilisateurs (ce qui est respectable). R&eacute;inventer la roue signifie aussi apprendre, se perfectionner, et trouver de nouvelles mani&egrave;res de faire les choses.</p>
   <h3 id="5"><u>Page d'Acceuil ou r&eacute;seaux de distribution</u></h3>
-  <p>Le projet est accessible sur le&nbsp;<a href="http://enchufado.com/">blog de l'auteur</a>&nbsp;et sur la&nbsp;<a href="http://sourceforge.net/projects/naufrago">page sourceforge du projet</a>.</p>
+  <p>Le projet est accessible sur le&nbsp;<a href="http://enchufado.com/">blog de l'auteur</a>&nbsp;et sur la&nbsp;<a href="http://naufrago.sourceforge.net/">page sourceforge du projet</a>.</p>
   <hr>
 
   <h1>Fonctionnement</h1>
   <h3 id="6"><u>Comment fonctionne le mode Hors-Ligne ?</u></h3>
-  <p>Ce mode de fonctionnement assure l'importation et la conservation des articles/flux avec leurs images associ&eacute;es, sans avoir besoin d'une connexion &agrave; Internet. Cela implique que vous pouvez tr&egrave;s bien laisser ce mode activ&eacute; par d&eacute;faut, peu importe que vous ayez ou non une connection &agrave; Internet, et l'application essaiera quand m&ecirc;me de r&eacute;cup&eacute;rer les articles/flux/images li&eacute;es. Le seul d&eacute;savantage de ce mode est qu'en le laissant actif par d&eacute;faut, Naufrago consommera davantage de bande passante, et mettra plus de temps &agrave; actualiser son contenu (&eacute;tant donn&eacute; que les images seront aussi r&eacute;cup&eacute;r&eacute;es).&nbsp;</p>
-  <p><b>NOTE: </b>Pour que le mode Hors-Ligne fonctionne pleinement, apr&egrave;s l'avoir activ&eacute; dans la fen&ecirc;tre des Pr&eacute;f&eacute;rences, vous devrez actualiser tous les flux pour lesquels vous d&eacute;sirez voir les images hors-ligne.</p>
-  <h3 id="7"><u>Comment fonctionne le mode <i>Affichage am&eacute;lior&eacute;</i> ?</u></h3>
-  <p>Ce mode permet de d&eacute;plier/plier les cat&eacute;gories contenant des flux poss&eacute;dant des entr&eacute;es non-lues/lues. Cela facilite grandement la visualisation de ce qui a d&eacute;j&agrave; &eacute;t&eacute; lu, ou au contraire de ce qu'il reste &agrave; lire. Cela &eacute;vite aussi des clics superflus &agrave; la souris.</p>
-  <h3 id="8"><u>Je veux enregistrer des articles importants !</u></h3>
+  <p>Ce mode vous permet d'acc&eacute;der aux articles/cat&eacute;gories/posts, images incluses, sans avoir besoin d'&ecirc;tre connect&eacute; &agrave; Internet. Cela aura pour effet de causer quelques soucis vis-&agrave;-vis de la consommation de bande-passante, et et mettra davantage de temps pour r&eacute;cup&eacute;rer les mises-&agrave;-jour, &eacute;tant donn&eacute; que les images sont &eacute;galement r&eacute;cup&eacute;r&eacute;es. <b>NOTE: </b>Pour que le <i>mode hors-ligne</i> fonctionne correctement, vous devez actualiser tous les flux contenant les images &agrave; visionner en hors-ligne (apr&egrave;s avoir activer ce mode dans la fen&ecirc;tre des pr&eacute;f&eacute;rences).</p>
+  <h3 id="7"><u>Comment fonctionne le <i>mode hors-ligne profond</i> ?</u></h3>
+  <p>Ce mode r&eacute;cup&egrave;re &eacute;galement la source compl&egrave;te &agrave; partir d'un flux. Il est utile dans le cas o&ugrave; l'entr&eacute;e du flux n'est pas compl&egrave;te mais on d&eacute;sire la rendre compl&egrave;te afin de pouvoir la lire en hors-ligne. Gardez &agrave; l'esprit que ce mode requiert bien plus de bande-passante que le mode pr&eacute;c&eacute;dent, et mettra davantage de temps &agrave; s'ex&eacute;cuter. <b>NOTE: </b>Pour que le <i>mode hors-ligne</i> fonctionne correctement, vous devez actualiser tous les flux contenant les images &agrave; visionner en hors-ligne (apr&egrave;s avoir activer ce mode dans la fen&ecirc;tre des pr&eacute;f&eacute;rences).</p>
+  <h3 id="8"><u>Comment fonctionne le mode <i>Affichage am&eacute;lior&eacute;</i> ?</u></h3>
+  <p>Ce mode de repr&eacute;sentation des flux fonctionne en enroulant/d&eacute;roulant les cat&eacute;gories contenant les flux lus/non-lus. Cela permet une plus grande clart&eacute; et une meilleure visibilit&eacute; afin de voir les flux qu'il reste &agrave; lire.</p>
+  <h3 id="9"><u>Comment fonctionne le <i>mode nettoyage</i> ?</u></h3>
+  <p>Ce mode de repr&eacute;sentation des flux simplifie le panneau des flux en ne montrant que les flux contenant des entr&eacute;es non-lues.</p>
+  <h3 id="10"><u>Des modes, des modes, encore des modes... combien de modes sont pr&eacute;sents, et surtout lequel choisir ?</u></h3>
+  <p>Les modes <i>hors-ligne</i> et <i>hors-ligne profond</i> sont compatibles avec les autres modes et ind&eacute;pendants entre eux. Cependant, les modes de repr&eacute;sentation des flux (<i>D&eacute;marrer avec l'arborescence d&eacute;pli&eacute;e</i>, <i>Affichage am&eacute;lior&eacute;</i> et <i>mode nettoyage</i>) sont incompatibles entre eux, ce qui signifie que vous devez choisir un seul d'entre eux.</p>
+  <h3 id="11"><u>Je veux enregistrer des articles importants !</u></h3>
   <p>Pour cela vous devez cocher chaque article d&eacute;sir&eacute; (avant la date et titre de chaque article). Cela aura pour effet de ranger l'article ainsi coch&eacute; dans la cat&eacute;gorie <i>Important.</i></p>
-  <h3 id="9"><u>Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</u></h3>
+  <h3 id="12"><u>Je ne peux pas cr&eacute;er de sous-cat&eacute;gories</u></h3>
   <p>Comme mentionn&eacute; dans <a href="#2">la section sur les fonctionnalit&eacute;s</a>, the categorization allows only one level of categories.</p>
-  <h3 id="10"><u>Je ne peux pas supprimer les articles d'un flux donn&eacute;</u></h3>
+  <h3 id="13"><u>Je ne peux pas supprimer les articles d'un flux donn&eacute;</u></h3>
   <p>C'est exact, ils ne peuvent &ecirc;tre supprim&eacute;s. Il a &eacute;t&eacute; d&eacute;cid&eacute; que l'application s'occupe automatiquement de la suppression d'articles via un nombre d'articles pr&eacute;alablement configur&eacute; dans les Pr&eacute;f&eacute;rences de Naufrago. Alors ne vous en fa&agrave;tes pas, l'application se chargera du nettoyage pour vous..</p>
   <hr>
  
   <h1>Probl&egrave;mes</h1>
-  <h3 id="11"><u>L'interruption de l'actualisation d'un flux prend trop de temps</u></h3>
-  <p>&Agrave; vrai dire, cela est directement en rapport avec la fa&ccedil;on dont l'actualisation fonctionne. Pour conserver une &eacute;thique de simplicit&eacute; d'utilisation, nous avons d&eacute;fini cette proc&eacute;dure d'actualisation comme une op&eacute;ration atomique, en dehors de laquelle vous pouvez annuler/interrompre. Par cons&eacute;quent, durant l'actualisation, quand le bouton annuler/interrompre est press&eacute;, l'op&eacute;ration li&eacute;e sera efficace au moment o&ugrave; le syst&egrave;me actualisera le dernier flux (au moment o&ugrave; vous appuierez sur Interrompre).</p>
-  <h3 id="12"><u>Le classement par dates de certains flux est incorrect</u></h3>
-  <p>Comment afficher les flux par ordre croissant selon leurs dates ? <i>Par d&eacute;faut</i> et parce que l'analyseur de flux n'est pas infaillible en ce qui concerne les diff&eacute;rents formats de dates possibles sur Internet, <i>in nous avons d&eacute;cid&eacute; dans cette version (0.3) de ranger les flux selon leur date d'entr&eacute;e dans Naufrago</i>.</p>
-  <h3 id="13"><u>Les entr&eacute;es de certains flux n'affichent aucun contenu (sauf les titres)</u></h3>
+  <h3 id="14"><u>Le classement par dates de certains flux est incorrect</u></h3>
+  <p>Comment afficher les flux par ordre croissant selon leurs dates ? <i>Par d&eacute;faut</i> et parce que l'analyseur de flux n'est pas infaillible en ce qui concerne les diff&eacute;rents formats de dates possibles sur Internet, <i>in nous avons d&eacute;cid&eacute; dans cette version de ranger les flux selon leur date d'entr&eacute;e dans Naufrago</i>.</p>
+  <h3 id="15"><u>Les entr&eacute;es de certains flux n'affichent aucun contenu (sauf les titres)</u></h3>
   <p>Certains flux ne publient pas les dates de leurs entr&eacute;es, d'autres ne renseignent m&ecirc;me pas leur contenu (uniquement les titres). La seule mani&egrave;re d'y rem&eacute;dier est de visiter directement le site fournisseur de ces flux.</p>
-  <h3 id="14"><u>L'application s'est ferm&eacute;e brusquement !</u></h3>
+  <h3 id="16"><u>L'application s'est ferm&eacute;e brusquement !</u></h3>
   <p>Malheureusement, cela arrive parfois, sans raisons clairement identifi&eacute;es. Afin de vous aider &agrave; comprendre le type d'erreur li&eacute;e &agrave; l'arr&ecirc;t brutal de l'application, un fichier journal (log) a &eacute;t&eacute; activ&eacute; par d&eacute;faut. Ce fichier se trouve dans <i>/usr/share/naufrago/naufrago.log</i> pour le paquet Debian, et dans le dossier d&eacute;compress&eacute; pour l'archive source. TOUTE AIDE EST LA BIENVENUE si vous d&eacute;sirez nous aider en ce qui concerne ces erreurs.</p>
-  <h3 id="15"><u>Je veux faire un rapport d'erreurs ou r&eacute;parer ces erreurs !</u></h3>
+  <h3 id="17"><u>Je veux faire un rapport d'erreurs ou r&eacute;parer ces erreurs !</u></h3>
   <p>Bien que l'application soit &agrave; pr&eacute;sent plus stable qu'auparavant, de nombreux probl&egrave;mes existent toujours. Ce point n&eacute;cessite des recherches plus pouss&eacute;es, et c'est bien l&agrave; que <i>j'appr&eacute;cierai votre aide</i>. Oui, je poss&egrave;de un <a href="http://fr.wikipedia.org/wiki/Revision_Control_System">Syst&egrave;me de gestion des versions</a> et vous &ecirc;tes les bienvenue; envoyez-moi un courrier &eacute;lectronique (en anglais), nous pourrons en discuter. Vous pouvez envoyer des rapports de bogues sur <a href="http://sourceforge.net/tracker/?group_id=333054&amp;atid=1396393">la partie d&eacute;di&eacute;e dans notre espace sourceforge</a> ou bien directement &agrave; mon compte de messagerie (<b>worbynet@gmail.com</b>).</p>
   <hr>
  
   <h1>Autre</h1>
-  <h3 id="16"><u>Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</u></h3>
+  <h3 id="18"><u>Si les flux RSS sont des r&eacute;sum&eacute;s, les images en mode Hors-Ligne sont-elles n&eacute;cessaires ?</u></h3>
   <p>Dans la pratique, les entr&eacute;es RSS ne sont pas toujours des extraits, ou des r&eacute;sum&eacute;s. M&ecirc;me s'il &eacute;tait vrai que les flux RSS &eacute;taient fournis comme des r&eacute;sum&eacute;s, beaucoup d'entre eux contiennent des images &agrave; but informatif ou du contenu additionnel.</p>
-  <h3 id="17"><u>Sous quelle licence cette application est-elle distribu&eacute;e ?</u></h3>
+  <h3 id="19"><u>Sous quelle licence cette application est-elle distribu&eacute;e ?</u></h3>
   <p>Sous licence GPLv3.</p>
-  <h3 id="18"><u>J'aimerais que l'application soit pourvue de ...</u></h3>
+  <h3 id="20"><u>J'aimerais que l'application soit pourvue de ...</u></h3>
   <p>Tout comme Liferea, en principe je n'accepte pas de demande d'am&eacute;lioration ou d'id&eacute;es, mais vous pouvez toujours essayer, vous n'avez rien &agrave; perdre apr&egrave;s tout. Vos suggestions pourraient &ecirc;tre int&eacute;ressantes, sait-on jamais. Mais vous pouvez toujours m'aider directement au d&eacute;veloppement, ou bien am&eacute;liorer l'application, que sais-je encore...</p>
-  <h3 id="19"><u>Remerciements de l'auteur</u></h3>
+  <h3 id="21"><u>Remerciements de l'auteur</u></h3>
   <p>L'auteur remercie tous ceux qui l'ont soutenu durant le d&eacute;veloppement de l'application ainsi que tous ceux qui lui ont donn&eacute; un coup de main. De la m&ecirc;me mani&egrave;re, il appr&eacute;cie toute contribution au projet, notamment en ce qui concerne la recherche des bogues et/ou leur r&eacute;solution.</p>
-  <h3 id="20"><u>Aimez-vous Naufrago ?</u></h3>
+  <h3 id="22"><u>Aimez-vous Naufrago ?</u></h3>
   <p>Le meilleur cadeau que vous puissiez faire &agrave; l'auteur d'une application n'est pas tant de l'utiliser mais bien de lui faire un rapport sur votre utilisation personnelle de ladite application ou votre reconnaissance. Un simple "Merci" suffira dans la plupart des cas :)</p>
   <p>Bien s&ucirc;r, vous pouvez aussi am&eacute;liorer le projet, en cr&eacute;ant des correctifs,&nbsp;en impl&eacute;mentant de nouvelles fonctionnalit&eacute;s, en traduisant dans d'autres langues, en cr&eacute;ant des paquets pour diff&eacute;rents distributions... La liste n'est pas exhaustive! Bien &eacute;videmment, vous pouvez critiquer l'application. Quoi qu'il en soit, vous pouvez me contacter &agrave; &nbsp;<b>worbynet@gmail.com</b>&nbsp;et je serai heureux de communiquer avec vous.</p>
  </body>

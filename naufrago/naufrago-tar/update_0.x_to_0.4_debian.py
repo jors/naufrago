@@ -30,6 +30,18 @@ def v02to03(cursor):
  except:
   pass
 
+def v03to04(cursor):
+ try:
+  cursor.execute('ALTER TABLE config ADD clear_mode integer NOT NULL DEFAULT 0')
+  cursor.execute('ALTER TABLE config ADD deep_offline_mode integer NOT NULL DEFAULT 0')
+  cursor.execute('ALTER TABLE config ADD http_proxy varchar(1024) NOT NULL DEFAULT \'\'')
+  cursor.execute('ALTER TABLE config ADD use_proxy integer NOT NULL DEFAULT 0')
+  cursor.execute('CREATE TABLE contenido_offline(id integer PRIMARY KEY, nombre varchar(256) NOT NULL, id_articulo integer NOT NULL);')
+  conn.commit()
+  print 'Naufrago! 0.3 database found, changes correctly applied :)'
+ except:
+  pass
+
 for user in os.listdir('/home'):
  homedir = '/home/' + user
  if os.path.isdir(homedir):
@@ -39,11 +51,13 @@ for user in os.listdir('/home'):
    cursor = conn.cursor()
    v01to02(cursor)
    v02to03(cursor)
+   v03to04(cursor)
    conn.commit()
    cursor.close()
-  elif os.path.exists(homedir + '/.config/naufrago/naufrago.db'): # ... or 0.2 version?
+  elif os.path.exists(homedir + '/.config/naufrago/naufrago.db'): # ... or 0.2/later version?
    conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
    cursor = conn.cursor()
    v02to03(cursor)
+   v03to04(cursor)
    conn.commit()
    cursor.close()

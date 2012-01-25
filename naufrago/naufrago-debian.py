@@ -94,7 +94,7 @@ if distro_package: # We're running on 'Distro-mode' (intended for distribution p
   puf_path = app_path + 'content/puf_ca.html'
  elif "pl" in locale:
   index_path = app_path + 'content/index_pl.html'
-  puf_path = app_path + 'content/puf.html'
+  puf_path = app_path + 'content/puf_pl.html'
  elif "it" in locale:
   index_path = app_path + 'content/index_it.html'
   puf_path = app_path + 'content/puf.html'
@@ -120,7 +120,7 @@ else: # We're running on 'tarball-mode' (unpacked from tarball)
   puf_path = current_path + '/content/puf_ca.html'
  elif "pl" in locale:
   index_path = current_path + '/content/index_pl.html'
-  puf_path = current_path + '/content/puf.html'
+  puf_path = current_path + '/content/puf_pl.html'
  elif "it" in locale:
   index_path = current_path + '/content/index_it.html'
   puf_path = current_path + '/content/puf.html'
@@ -1307,7 +1307,7 @@ class Naufrago:
     dialog.set_has_separator(False)
     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
     label = gtk.Label("")
-    label.set_markup("Naufrago! version <b>"+read+"</b> is available! Get it at:")
+    label.set_markup(_("Naufrago! version") + " <b>" + read + "</b> " + _("is available! Get it at:"))
     download_url = 'http://sourceforge.net/projects/naufrago/files/'
     url_button = gtk.LinkButton(download_url, download_url)
     dialog.vbox.pack_start(label)

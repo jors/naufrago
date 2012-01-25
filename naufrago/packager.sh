@@ -10,7 +10,7 @@ case $1 in
  deb)
   # DEB
   cp -a $svn_path/content/*.html $svn_path/naufrago-deb/debian/usr/share/naufrago/content/
-  cp -a $svn_path/media/*.png $svn_path/media/*.gif $svn_path/media/*.svg $svn_path/naufrago-deb/debian/usr/share/naufrago/media/
+  cp -a $svn_path/media/* $svn_path/naufrago-deb/debian/usr/share/naufrago/media/
   cp -a $svn_path/naufrago.py $svn_path/naufrago-deb/debian/usr/share/naufrago/
   xgettext --language=Python --keyword=_ --output=$svn_path/naufrago.pot $svn_path/naufrago.py
   for i in ca es it fr pl; do
@@ -24,7 +24,7 @@ case $1 in
   for i in README README.es README.ca; do
    gzip -f -9 $svn_path/naufrago-deb/debian/usr/share/doc/naufrago/${i}
   done
-  #rm -rf $desktop_deb_path
+  rm -rf $desktop_deb_path
   svn export $svn_path/naufrago-deb $desktop_deb_path
   cd $desktop_deb_path
   chown -R root.root *
