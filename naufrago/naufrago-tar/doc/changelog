@@ -1,3 +1,32 @@
+naufrago (0.4-1) testing unstable; urgency=low
+
+  * Fourth release.
+  * IMPROVED: User-Agent identifier set to app
+    name + version.
+  * FIX: Lazy bug that imported feeds the bad way (not
+    importing uncategorized ones).
+  * FIX: The pynotify message was not gettexted.
+  * FIX: Images that couldn't be retrieved are now retried
+    on next round.
+  * FIX: Items of some feeds were shown as an exceprt, now
+    show complete (thanks phrash).
+  * FIX: Added an alternative way to retrieve feed favicons.
+  * IMPROVED: Pychecker & Pylint clean process (unused vars,
+    boolean checks).
+  * IMPROVED: Live feed items hidding (when hide_readentries
+    is enabled).
+  * IMPROVED: X button minimizes to tray instead of quitting
+    (when tray icon is active).
+  * NEW: 'Clear mode' (Incompatible with 'Start with unfolded'
+    & 'Driven mode').
+  * NEW: Toolbar button to mark EVERYTHING as read
+    ('Read all').
+  * NEW: 'Deep Offline mode'? Follows feed links & stores
+    them on local.
+  * NEW: Proxy funcionality integrated (thanks Niels).
+
+ -- Jordi Oliveras <worbynet@gmail.com>  Fri, 25 Jan 2012 21:57:01 +0200
+
 naufrago (0.3-1) testing unstable; urgency=low
 
   * Third Release.

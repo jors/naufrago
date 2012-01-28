@@ -17,12 +17,12 @@ Contingut
 1. Introducció
 ================
 
-Náufrago! és un lector simple de RSS que permet veure noticias amb
+Náufrago! és un lector simple de RSS que permet veure noticies amb
 les seves imatges tot i no mantenir-se a flot, o dit d'altre manera,
 sense estar online. Això és perquè hi ha gent, com l'autor, que no 
-sempre té una conexió a mà i, tot i això, vol poder llegir articles/
-entrades/posts amb les imatges que puguin acompanyar-los. Aquest és
-el leit motiv de l'aplicació.
+sempre té una conexió a mà i, tot i això, vol poder llegir noticies
+amb les imatges que puguin acompanyar-los. Aquest és el leit motiv de
+l'aplicació.
 
 ====================
 2. Característiques
@@ -42,6 +42,7 @@ Les destacades serien:
  - Carpetes d'importants i no llegits.
  - Cercador de termes.
  - Multilidioma (de moment Anglès, Francès, Polac, Italià, Català i Castellà).
+   Vols traduïr? És senzill! Si us plau, preguntam cóm :)
  - Autocomprovador d'actualitzacions.
 
 Lista de desitjos:
@@ -62,9 +63,12 @@ A nivell de software:
  - python-feedparser (bindings de feedparser per a Python).
  - python-webkit (bindings de Webkit per a Python).
 
-A nivell de hardware, qualsevol cosa que pugui moure-ho. L'autor 
-ha realitzat el desenvolupament i l'utilitza a diari des d'un
-Netbook amb un Intel Atom a 1,6Ghz amd 1GB de RAM.
+A nivell de hardware, qualsevol cosa que pugui moure-ho. L'autor ho ha
+desenvolupat i l'ha utilitzat a diari des d'un Netbook amb un Intel Atom @
+1,6Ghz / 1GB de RAM. Posteriorment ha passat a un Laptop amb un Intel
+Core2 T5600 @ 1.83GHz / 2,5GB RAM. Si estás pensant en utilitzar la feature
+modo_offline_profund (disponible des de la release 0.4), quant millor siguin
+el teu processador i l'ample de banda de la teva conexió a Internet, tant millor.
 
 ================================
 4. Per què reinventar la roda?
@@ -76,21 +80,20 @@ perquè l'autor no va saber trobar un client de RSS que funcionés offline
 amb imatges incloses, els desenvolupadors de Liferea no admeten feature
 requests (algo totalment respectable) i mirar codi font aliè requereix 
 doble esforç que crear-ne un propi (atenció, opinió personal!). Reinventant
-la roda també s'apren, i a més podem sorgir millores o noves formes de fer
-les coses que d'altre manera no haguèssin sorgit.
+la roda també s'apren, i a més podem sorgir idees noves en aquest camp.
 
 ====================
 5. Instalació i ús
 ====================
 
-Si utilitzes el paquet de Debian, probablement ja el tinguis instalat
+Si utilitzes el PAQUET DEBIAN, probablement ja el tinguis instalat
 i amb les dependències resoltes. Per a iniciar l'aplicació, existeix una
 icona al menú Internet de GNOME. En tot cas, per a utilitzar l'aplicació
-necessites Debian Squeeze/Testing o superior (al menys fins que Squeeze passi
-a ser la següent Stable ;)
+necessites Debian Squeeze o superior.
 
-Si utilitzes el tarball, havent-ho desempaquetat e instal-lat les dependències
-esmentades en l'anterior punt, nomès queda executar -preferiblement- el
+Si utilitzes el TARBALL, havent-ho desempaquetat, instal-lat les dependències
+esmentades en l'anterior punt i seguit les instruccions de l'arxiu
+LLEGEIX-ME.IMPORTANT!!!, nomès queda executar -preferiblement- el
 script "naufrago_launcher.sh". Tots els arxius i directoris que necessiti
 l'aplicació seran creats al directori on s'executi. Opcionalment, si vols
 utilitzar una icona/llançador per a iniciar l'aplicació, pots utilitzar el
@@ -102,10 +105,15 @@ amb GNOME, aquesta ubicació és /usr/share/applications/).
 6. Problemes / Suport
 =======================
 
-L'aplicació intenta de bon grat portar a terme el seu comès, però molt
-probablement no està exenta d'errors. En cas de que succeeixin, pots
-contactarme detallant el problema del mode més precís possile i intentaré
-veure què succeeix per a corregir-ho.
+L'aplicació intenta de bon grat portar a terme el seu comès, però no està
+exenta d'errors. En cas de que succeeixin, pots contactarme detallant el
+problema del mode més precís possile i intentaré veure què succeeix per a
+corregir-ho. Tot i que el que de debó m'agradaria és que poguessis donar-me
+un cop de mà caçant bugs i programant :)
+
+Si us plau, inserta els bugs al tracker de Sourceforge:
+
+http://sourceforge.net/tracker/?func=add&group_id=333054&atid=1396393
 
 =============
 7. Llicència
@@ -120,7 +128,7 @@ la teva llibertat!
 8. Autors
 ===========
 
-De moment, nomès n'hi ha un: Jordi Oliveras ( worbynet at gmail dot com ).
+Encara  nomès n'hi ha un: Jordi Oliveras ( worbynet at gmail dot com ).
 
 ===============
 9. Agraïments
@@ -129,6 +137,10 @@ De moment, nomès n'hi ha un: Jordi Oliveras ( worbynet at gmail dot com ).
 Dec agraïr als que m'han aguantat durant el desenvolupament,
 especialment a la meva parella, i a més:
 
+- Contribuïdors de codi (Niels).
+- Grans idees (Horia).
+- Reportadors de bugs  (prash & others).
+- Traductors (Ludovic, Michal, kir).
 - Canals Python de irc.freenode.net & irc.hispano.org.
 - El meravellòs svg utilitzat com a logo de GMcGlinn
   (http://www.openclipart.org/user-detail/GMcGlinn).

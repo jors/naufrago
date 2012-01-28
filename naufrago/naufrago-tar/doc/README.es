@@ -1,4 +1,3 @@
-22/12/2010
 
 =========
 Contenido
@@ -22,8 +21,8 @@ Náufrago! es un lector simple de RSS que permite ver noticias
 con sus imágenes aún sin mantenerse a flote, o dicho de otro modo,
 sin estar online. Esto es porque hay gente, como el autor, que no
 siempre tiene una conexión a mano y, sin embargo, quiere poder leer
-artículos/entradas/posts con las imágenes que puedan acompañarlos.
-Este es el leit motiv de la aplicación.
+noticias con las imágenes que puedan acompañarlos. Este es el leit
+motiv de la aplicación.
 
 ===================
 2. Características
@@ -43,6 +42,7 @@ Las destacadas serían:
  - Carpeta de Importantes y No leídos.
  - Buscador de términos.
  - Multiidioma (de momento Inglés, Francés, Polaco, Italiano, Catalán y Castellano).
+   ¿Quieres traducir? ¡Es fácil! Por favor, pregúntame cómo :)
  - Autocomprobador de actualizaciones.
 
 Lista de deseos:
@@ -63,22 +63,24 @@ A nivel de software:
  - python-webkit (bindings de Webkit para Python).
 
 A nivel de hardware, cualquier cosa que pueda moverlo. El autor
-lo ha desarrollado y lo usa a diario desde un Netbook con un Intel
-Atom a 1,6Ghz con 1GB de RAM.
+lo ha desarrollado y lo ha usado a diario desde un Netbook con un Intel
+Atom @ 1,6Ghz / 1GB de RAM. Posteriormente pasó a un Laptop con un Intel
+Core2 T5600 @ 1.83GHz / 2,5GB RAM. Si estas pensando en usar la feature 
+modo_offline_profundo (disponible desde la release 0.4), cuanto mejor sean
+tu procesador y el ancho de banda de tu conexión a Internet, tanto mejor.
 
 =================================
 4. ¿Por qué reinventar la rueda?
 =================================
 
 Si es un cliente clavado (con excepciones) a Liferea (en lo que al diseño
-se refiere), ¿por qué reinventar la rueda? Por muchos motivos. Principalmente
-porque el autor no supo encontrar un cliente RSS que funcionara offline con
-imágenes incluidas, los desarrolladores de Liferea no admiten feature
-requests (algo totalmente respetable) y mirar código fuente ajeno
-requiere doble esfuerzo que crearlo uno mismo (ojo, ¡opinión
+se refiere), ¿por qué reinventar la rueda? Bueno, por muchos motivos.
+Principalmente porque el autor no supo encontrar un cliente RSS que
+funcionara offline con imágenes incluidas, los desarrolladores de Liferea
+no admiten feature requests (algo totalmente respetable) y mirar código fuente
+ajeno requiere doble esfuerzo que crearlo uno mismo (ojo, ¡opinión
 personal!). Reinventando la rueda también se aprende, y además pueden
-surgir mejoras o nuevas formas de hacer las cosas que de otro modo no
-hubieran aparecido.
+surgir ideas nuevas en este campo.
 
 =====================
 5. Instalación y uso
@@ -87,11 +89,11 @@ hubieran aparecido.
 Si usas el PAQUETE DEBIAN, probablemente ya lo tengas instalado y con
 las dependencias resueltas. Para iniciar la aplicación, existe un icono
 en el menú de Internet de Gnome. En todo caso, para usar la aplicación
-necesitas Debian Squeeze/Testing o superior (al menos hasta que Squeeze
-pase a ser la siguiente Stable ;)
+necesitas Debian Squeeze o superior.
 
-Si usas el TARBALL, habiendolo desempaquetado e instalado las dependencias
-mencionadas en el punto anterior, sólo queda ejecutar -preferiblemente-
+Si usas el TARBALL, habiendolo desempaquetado, instalado las dependencias
+mencionadas en el punto anterior y habiensdo seguido las instrucciones del
+archivo LEEME.IMPORTANTE, sólo queda ejecutar -preferiblemente-
 el script "naufrago_launcher.sh". Todos los archivos y directorios que
 necesite la aplicación seran creados en el directorio dónse se ejecute.
 Opcionalmente, si quieres usar un icono/lanzador para iniciar la aplicación,
@@ -103,10 +105,15 @@ correspondiente (para Debian con GNOME, la ubicación es /usr/share/applications
 6. Problemas / Soporte
 =======================
 
-La aplicación intenta de buen grado llevar a cabo su cometido, pero muy
-seguramente no está exenta de errores. En caso de que ocurran, puedes
-contactarme detallando el problema del modo más preciso posible, e intentaré
-ver qué sucede para correjirlo.
+La aplicación intenta de buen grado llevar a cabo su cometido, pero no
+está exenta de errores. En caso de que ocurran, puedes contactarme detallando
+el problema del modo más preciso posible, e intentaré ver qué sucede para correjirlo.
+Pero lo que de verdad me gustaría es que pudieras ayudarme dando caza a bugs y 
+programando :)
+
+Por favor, inserta los bugs en el tracker de Sourceforge:
+
+http://sourceforge.net/tracker/?func=add&group_id=333054&atid=1396393
 
 ============
 7. Licencia
@@ -121,7 +128,7 @@ juego tu libertad!
 8. Autores
 ===========
 
-Por el momento, sólo hay uno: Jordi Oliveras ( worbynet at gmail dot com ).
+Todavía sólo hay uno: Jordi Oliveras ( worbynet at gmail dot com ).
 
 ===================
 9. Agradecimientos
@@ -130,6 +137,10 @@ Por el momento, sólo hay uno: Jordi Oliveras ( worbynet at gmail dot com ).
 Debo agradecer a los que me aguantaron durante el desarrollo,
 especialmente a mi pareja, y además:
 
+- Contribuidores de código (Niels).
+- Grandes ideas (Horia).
+- Reportadores de bugs  (prash & others).
+- Traductores (Ludovic, Michal, kir).
 - Canales Python de irc.freenode.net & irc.hispano.org.
 - El maravilloso svg usado como logo de GMcGlinn
   (http://www.openclipart.org/user-detail/GMcGlinn).

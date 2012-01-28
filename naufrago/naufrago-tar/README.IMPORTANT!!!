@@ -10,11 +10,11 @@ A) Having uncompressed the tarball, please, recursively
    
    chown -R youruser.youruser naufrago/
 
-B) If you currently have Naufrago! 0.1 or 0.2 installed,
-   do this in order to upgrade to 0.3 version:
+B) If you currently have Naufrago! installed, please do
+   this in order to upgrade to 0.4 version:
 
    1. COPY the following directories and files from Naufrago!
-   version 0.1 or 0.2 to this directory:
+   version 0.1, 0.2 or 0.3 to this directory:
 
    - favicons
    - imagenes
@@ -26,15 +26,15 @@ B) If you currently have Naufrago! 0.1 or 0.2 installed,
    cp -a old_naufrago/imagenes naufrago/
    cp old_naufrago/naufrago.db naufrago/
 
-   2. RUN the script named 'update_0.x_to_0.3.py' provided
+   2. RUN the script named 'update_0.x_to_0.4.py' provided
    within this tarball. You can do it through one of the
    following ways:
 
    Option 1:
-   chmod +x update_0.x_to_0.3.py && ./update_0.x_to_0.3.py
+   chmod +x update_0.x_to_0.4.py && ./update_0.x_to_0.4.py
 
    Option 2:
-   python update_0.x_to_0.3.py
+   python update_0.x_to_0.4.py
 
    3. ENJOY. If there were no errors, you're done! Launch this new
    version of Naufrago! and enjoy!
@@ -43,19 +43,19 @@ B) If you currently have Naufrago! 0.1 or 0.2 installed,
  PROBLEMS
 ----------
 
-Q. I ran the 0.3 app version before doing the upgrade
+Q. I ran the 0.4 app version before doing the upgrade
 steps and now the app does not work well! Help!
-A. If you run the 0.3 app version before doing previous upgrade
+A. If you run the 0.4 app version before doing previous upgrade
 steps, please, delete the 'favicons' and 'imagenes' directories and
 the 'naufrago.db' file and proceed with the above mentioned steps.
 
 Q. At step 3, when I run the script, it says it cannot find the
 database file.
-A. Make sure you copied the 0.1 or 0.2 database on the same path
+A. Make sure you copied the 0.1, 0.2 or 0.3 database on the same path
 where the script is. Also make sure you have write permission on it.
 
-Q. I did not used 0.1 or 0.2 version previously, what should I do?
-A. Just ignore this whole file and run the 0.3 app happily :)
+Q. I did not used any version of Naufrago! previously, what should I do?
+A. Just ignore this whole file and run the 0.4 app happily :)
 
 Q. Any other issue?
 A. Please, let me know through the project's sourceforge tracker

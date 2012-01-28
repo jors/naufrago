@@ -20,9 +20,9 @@ Contents
 Náufrago! is a simple RSS reader that allows reading news with
 its images even when it's not afloat, or what's the same, without
 being online. This is because there are people, like the author,
-that not always has an Internet connection near, but wants to be
-able to read articles/entries/posts with its images. This is the
-leit motiv of the application.
+that does not always has an available Internet connection but still
+wants to be able to read news with its images. This is the leit motiv
+of the application.
 
 ============
 2. Features
@@ -30,7 +30,7 @@ leit motiv of the application.
 
 The majors ones would be:
 
- - Feed categorization in a single level tree.
+ - Feed categorization in a single-level tree.
  - Feed organization drag & dropping through categories.
  - Online/offline feed reading (including images).
  - Full screen mode for better feed reading.
@@ -42,6 +42,7 @@ The majors ones would be:
  - Important and Unread folders.
  - Term searching capabilities.
  - Multilanguage (currently English, French, Polish, Italian, Catalan and Spanish).
+   Want to translate? It's easy! Please, come & ask me how :)
  - Automatic update checker.
 
 Whishlist:
@@ -55,15 +56,18 @@ Whishlist:
 Software ones:
 
  - GNU/Linux (Squeeze/Testing or greater for the Debian package).
- - Python 2.5 or better.
+ - Python 2.5 or better (only 2.x series at this time).
  - python-gtk2 (Python gtk2 bindings).
  - python-pysqlite2 (Python sqlite3 bindings).
  - python-feedparser (Python feedparser bindings).
  - python-webkit (Python Webkit bindings).
 
-In the hardware level, anything that can move the app. The author
-development environment & daily usage is a Netbook with an Intel 
-Atom 1,6Ghz with 1GB of RAM.
+In the hardware level, anything that can move the app. The author used as
+his development environment & daily usage a Netbook with an Intel 
+Atom @ 1,6Ghz / 1GB of RAM. Later, moved to a laptop with an Intel Core2
+T5600 @ 1.83GHz / 2,5GB RAM. If you are planning to use the deep_offline_mode
+feature (available from 0.4 release), the faster the CPU & your Internet
+connection, the better.
 
 ===============================
 4. Reinventing the wheel, why?
@@ -71,29 +75,28 @@ Atom 1,6Ghz with 1GB of RAM.
 
 If the look & functions of this app are nearly a mirror (with some 
 exceptions) of Liferea (at least in aspect), why reinventing the
-wheel? For many reasons. Mainly because the author could not find a
-RSS client that worked offline including images, Liferea developers
-don't admit feature requests (a respectable thing) and taking a look
-at alien/third party source code requires twice the effort of creating
-one of my own (warning, this is a personal opinion!). Reinventing the wheel
-also helps learning, and it also can add new ways of doing things/features
-that in other way could not have appeared.
+wheel? Well, for many reasons. Mainly because the author could not find a
+RSS client that worked offline including images. Also because Liferea
+developers don't admit feature requests (a respectable thing) and taking a
+look at alien/third party source code requires twice the effort of creating
+one of my own (warning, IMHO!). Reinventing the wheel also helps learning, 
+and it can also add new ideas to this topic.
 
 ==========================
 5. Installation and usage
 ==========================
 
-If you use the Debian package, you probably have this app installed and
-with its dependencies solved. To start the app, go to the Internet GNOME
-menu and clic its icon. In any case, you need Debian Squeeze/Testing or
-greater to run the app (at least until Squeeze/Testing becomes the current
-Stable ;)
+If you use the DEBIAN PACKAGE , you probably have this app installed with
+its dependencies solved. To start the app, go to the GNOME's Internet menu
+and clic Naufrago! icon. In any case, you need Debian Squeeze or greater to
+run the app.
 
-If you use the tarball, unpackage it and install the mentioned dependencies.
-Then you can run it -preferably- through the script "naufrago_launcher.sh".
+If you use the TARBALL, unpack it, install the mentioned dependencies and
+follow the instructions of the README.IMPORTANT!!! file. Then you can run it
+-preferably- through the script "naufrago_launcher.sh" or the way you like.
 All the archives & directories needed by the app will be created on the
 directory that is executed. Optionally, if you want to use an icon/launcher
-to start the app, you can use the one we ship you (naufrago.desktop) by
+to start the app, you can use the one provided (naufrago.desktop) by
 changing first the path to the "naufrago_launcher.sh" init script and putting
 it on the corresponding directory (in a Debian with GNOME, the proper path would
 be /usr/share/applications/).
@@ -102,10 +105,14 @@ be /usr/share/applications/).
 6. Problems / Suport
 =====================
 
-The application attempts to willingly carry out its mission, but very
-certainly it is not free of errors. If they occur, you can contact me 
-detailing the problem as precisely as possible, and I will try to see
-what happens in order to correct it.
+The application attempts to willingly carry out its mission, but it is not
+free of errors. If they occur, you can contact me detailing the problem as
+precisely as possible, and I will try to see what happens in order to correct it.
+But what I would really appreciate is you can help me with bug hunting & coding :)
+
+Please, file issues at the Sourceforge tracker:
+
+http://sourceforge.net/tracker/?func=add&group_id=333054&atid=1396393
 
 ============
 7. License
@@ -119,7 +126,7 @@ author or the FSF. Your freedom is in play!
 8. Authors
 ============
 
-For the moment, there's onyy one: Jordi Oliveras ( worbynet at gmail dot com ).
+Still, there's only one: Jordi Oliveras ( worbynet at gmail dot com ).
 
 ==============
 9. Thanks to
@@ -128,6 +135,10 @@ For the moment, there's onyy one: Jordi Oliveras ( worbynet at gmail dot com ).
 I must thank to the ones that endured me during development, specially
 my girl, and also:
 
+- Code contributors (Niels).
+- Great ideas (Horia).
+- Bug reporters (prash & others).
+- Translators (Ludovic, Michal, kir).
 - Python channels irc.freenode.net & irc.hispano.org.
 - The wonderfull svg used as logo by GMcGlinn
   (http://www.openclipart.org/user-detail/GMcGlinn).

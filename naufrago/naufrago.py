@@ -1293,7 +1293,7 @@ class Naufrago:
    if APP_VERSION == read:
     if type(action) is gtk.Action:
      dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
-     dialog.set_size_request(350,75)
+     dialog.set_size_request(375,75)
      dialog.set_has_separator(False)
      dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
      label = gtk.Label(_("No updates available."))
@@ -1303,7 +1303,7 @@ class Naufrago:
      dialog.destroy()
    else:
     dialog = gtk.Dialog(_("Upgrade checker"), self.window, (gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT), None)
-    dialog.set_size_request(350,100)
+    dialog.set_size_request(375,100)
     dialog.set_has_separator(False)
     dialog.add_button(_("Close"), gtk.RESPONSE_ACCEPT)
     label = gtk.Label("")
