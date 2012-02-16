@@ -42,22 +42,18 @@ def v03to04(cursor):
  except:
   pass
 
-for user in os.listdir('/home'):
- homedir = '/home/' + user
- if os.path.isdir(homedir):
-  if os.path.exists(homedir + '/.naufrago/'): # Are we dealing with 0.1...
-   os.rename(homedir + '/.naufrago/', homedir + '/.config/naufrago/')
-   conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
-   cursor = conn.cursor()
-   v01to02(cursor)
-   v02to03(cursor)
-   v03to04(cursor)
-   conn.commit()
-   cursor.close()
-  elif os.path.exists(homedir + '/.config/naufrago/naufrago.db'): # ... or 0.2/later version?
-   conn = sqlite3.connect(homedir + '/.config/naufrago/naufrago.db')
-   cursor = conn.cursor()
-   v02to03(cursor)
-   v03to04(cursor)
-   conn.commit()
-   cursor.close()
+app_path = os.getcwd()
+db_path = app_path + '/naufrago.db'
+
+if os.path.exists(db_path):
+ try:
+  conn = sqlite3.connect(db_path)
+  cursor = conn.cursor()
+  v01to02(cursor)
+  v02to03(cursor)
+  v03to04(cursor)
+  conn.commit()
+  cursor.close()
+  print 'All done!'
+ except:
+  print 'Could not find database... Did you forget to move it to the current directory?'
