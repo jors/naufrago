@@ -1,0 +1,3 @@
+body { background-image: url("sea.jpg"); background-attachment: fixed; background-position: 100% 100%; background-repeat: no-repeat; }
+.round-corner{ -moz-border-radius:20px; -webkit-border-radius:20px; -khtml-border-radius:20px; border-radius:20px; }
+.transparent { filter:alpha(opacity=85); -moz-opacity:0.85; -khtml-opacity: 0.85; opacity: 0.85; }
