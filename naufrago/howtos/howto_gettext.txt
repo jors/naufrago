@@ -15,7 +15,7 @@ print _('Hello World!')
 xgettext --language=Python --keyword=_ --output=translate2.pot translate2.py
 
 # 4. Generate the locales of the language we are going to add support
-dpkg-reconfigure locale (and add wanted locales)
+dpkg-reconfigure locales (and add wanted locales)
 
 # 5. To start a new translation, you have to create a file for it
 LANG=ca_ES.UTF-8 msginit
